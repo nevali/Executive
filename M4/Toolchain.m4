@@ -27,9 +27,9 @@ if test -z "$CC" ; then
 	esac
 fi
 
-AS_VAR_SET([DEBUG_CPPFLAGS],["-DDEBUG=1 -DEXEC_BUILD_DEBUG=1 -DEXEC_BUILD_CONFIG=\"Debug\""])
-AS_VAR_SET([FREE_CPPFLAGS],["-DNDEBUG -DEXEC_BUILD_FREE=1 -DEXEC_BUILD_CONFIG=\"Free\""])
-AS_VAR_SET([RELEASE_CPPFLAGS],["-DNDEBUG -DEXEC_BUILD_RELEASE=1 -DEXEC_BUILD_CONFIG=\"Release\""])
+AS_VAR_SET([DEBUG_CPPFLAGS],["-DDEBUG=1 -DEXEC_BUILD_DEBUG=1 -DEXEC_BUILD_CONFIG='\"Debug\"'"])
+AS_VAR_SET([FREE_CPPFLAGS],["-DNDEBUG -DEXEC_BUILD_FREE=1 -DEXEC_BUILD_CONFIG='\"Free\"'"])
+AS_VAR_SET([RELEASE_CPPFLAGS],["-DNDEBUG -DEXEC_BUILD_RELEASE=1 -DEXEC_BUILD_CONFIG='\"Release\"'"])
 
 AC_ARG_ENABLE([errors-as-warnings],[AS_HELP_STRING([--disable-errors-as-warnings],[don't treat compiler warnings as errors])],,[enable_errors_as_warnings=yes])
 if test x"$GCC" = x"yes" ; then

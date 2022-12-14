@@ -13,9 +13,13 @@ PAL_POSIX_init(void)
 	{
 		return;
 	}
-	PALLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - POSIX Platform Adaptation Layer [build " PRODUCT_BUILD_ID_STR "]");
 	init_once = 1;
 	PAL_POSIX_Platform_init();
 	PAL_POSIX_MemoryManager_init();
 	PAL_POSIX_PlatformDiagnostics_init();
+#ifdef EXEC_BUILD_CONFIG
+	PALLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - POSIX Platform Adaptation Layer [" EXEC_BUILD_CONFIG " build " PRODUCT_BUILD_ID_STR "]");
+#else
+	PALLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - POSIX Platform Adaptation Layer [build " PRODUCT_BUILD_ID_STR "]");
+#endif
 }

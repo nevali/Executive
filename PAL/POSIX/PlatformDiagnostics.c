@@ -32,6 +32,13 @@ void
 PAL_POSIX_PlatformDiagnostics_init(void)
 {
 	memset(&PAL_POSIX_diagnostics, 0, sizeof(PAL_POSIX_PlatformDiagnostics));
+#if EXEC_BUILD_DEBUG
+	PAL_POSIX_diagnostics.level = LOG_TRACE;
+#elif EXEC_BUILD_FREE
+	PAL_POSIX_diagnostics.level = LOG_INFO;
+#else
+	PAL_POSIX_diagnostics.level = LOG_NOTICE;
+#endif
 	PAL_POSIX_diagnostics.PlatformDiagnostics.lpVtbl = &PAL_POSIX_PlatformDiagnostics_vtable;
 	PAL_POSIX_diagnostics.PlatformDiagnostics.instptr = &PAL_POSIX_diagnostics;
 	PAL_POSIX_diagnostics.Object.lpVtbl = (void *) &PAL_POSIX_PlatformDiagnostics_vtable;
@@ -96,7 +103,10 @@ PAL_POSIX_PlatformDiagnostics_log(struct IPlatformDiagnostics *self, LogLevel le
 {
 	UNUSED__(self);
 
-	fprintf(stderr, "<%d> %s\n", level, str);
+	if(level >= PAL_POSIX_diagnostics.level)
+	{
+		fprintf(stderr, "<%d> %s\n", level, str);
+	}
 }
 
 size_t

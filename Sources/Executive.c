@@ -53,19 +53,17 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	/* Inform the Platform of the new allocator's availability */
 	IPlatform_setDefaultAllocator(executive.data.platform, executive.data.allocator);
 	/* Obtain the PAL's boot environment, if it has one */
-	if(params->PAL_metaClass(&CLSID_PAL_BootEnvironment, &IID_IBootEnvironment, (void *) &(executive.data.bootEnvironment)) != E_SUCCESS)
+	if(E_SUCCESS != Executive_metaClass(&CLSID_PAL_BootEnvironment, &IID_IBootEnvironment, (void *) &(executive.data.bootEnvironment)))
 	{
+		/* XXX this should happen via Executive_metaClass() */
 		executive.data.bootEnvironment = Executive_BootEnvironment_create();
 	}
-	if(!executive.data.bootEnvironment)
-	{
-		ExPanic("failed to create or obtain a Boot Environment");
-	}
+	ExAssert(NULL != executive.data.bootEnvironment);
 	/* Optionally obtain a diagnostics instance; this can fail without
 	 * incident (in this event the ExNotice() calls that follow become
 	 * no-ops)
 	 */
-	params->PAL_metaClass(&CLSID_PAL_PlatformDiagnostics, &IID_IPlatformDiagnostics, (void *) &(executive.data.diagnostics));
+	ExAssert(E_SUCCESS == Executive_metaClass(&CLSID_PAL_PlatformDiagnostics, &IID_IPlatformDiagnostics, (void *) &(executive.data.diagnostics)));
 
 	ExNotice(PRODUCT_FULLNAME " " PACKAGE_NAME " [" HOST_FAMILY "] - " PRODUCT_RELEASE);
 	ExNotice("  version " PACKAGE_VERSION ", build " PRODUCT_BUILD_ID_STR ", built at " PRODUCT_BUILD_DATE " " PRODUCT_BUILD_TIME " by " PRODUCT_BUILD_USER "@" PRODUCT_BUILD_HOST);
