@@ -92,11 +92,13 @@ union PAL_POSIX_BootEnvironment
 
 struct PAL_POSIX_PlatformDiagnostics
 {
-	/* allow this to be statically initialised */
 	IPlatformDiagnostics PlatformDiagnostics;
 	IObject Object;
 	IWriteChannel WriteChannel;
-	LogLevel level;
+	struct
+	{
+		LogLevel level;
+	} data;
 };
 
 # ifdef __cplusplus

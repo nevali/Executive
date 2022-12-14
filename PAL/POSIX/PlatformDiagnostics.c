@@ -26,18 +26,29 @@ static struct IWriteChannel_vtable_ PAL_POSIX_PlatformDiagnostics_IWriteChannel_
 	PAL_POSIX_PlatformDiagnostics_write
 };
 
-PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics;
+PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics = {
+	{ NULL, NULL }, /* PlatformDiagnostics*/
+	{ NULL, NULL }, /* Object */
+	{ NULL, NULL }, /* WriteChannel */
+	{
+#if EXEC_BUILD_DEBUG
+		LOG_TRACE
+#else
+		LOG_CONDITION
+#endif
+	}
+};
 
 void
 PAL_POSIX_PlatformDiagnostics_init(void)
 {
 	memset(&PAL_POSIX_diagnostics, 0, sizeof(PAL_POSIX_PlatformDiagnostics));
 #if EXEC_BUILD_DEBUG
-	PAL_POSIX_diagnostics.level = LOG_TRACE;
+	PAL_POSIX_diagnostics.data.level = LOG_TRACE;
 #elif EXEC_BUILD_FREE
-	PAL_POSIX_diagnostics.level = LOG_INFO;
+	PAL_POSIX_diagnostics.data.level = LOG_INFO;
 #else
-	PAL_POSIX_diagnostics.level = LOG_NOTICE;
+	PAL_POSIX_diagnostics.data.level = LOG_NOTICE;
 #endif
 	PAL_POSIX_diagnostics.PlatformDiagnostics.lpVtbl = &PAL_POSIX_PlatformDiagnostics_vtable;
 	PAL_POSIX_diagnostics.PlatformDiagnostics.instptr = &PAL_POSIX_diagnostics;
@@ -103,7 +114,7 @@ PAL_POSIX_PlatformDiagnostics_log(struct IPlatformDiagnostics *self, LogLevel le
 {
 	UNUSED__(self);
 
-	if(level >= PAL_POSIX_diagnostics.level)
+	if(level >= PAL_POSIX_diagnostics.data.level)
 	{
 		fprintf(stderr, "<%d> %s\n", level, str);
 	}
