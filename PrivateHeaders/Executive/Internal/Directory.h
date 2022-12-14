@@ -64,8 +64,15 @@ struct Executive_Directory_Entry
 		char *name;
 		UUID clsid;
 		DirectoryEntryFlags flags;
+		DirectoryEntryFlags userFlags;
+		/* the basic target object */
 		IObject *object;
-		IDirectoryEntryTarget *target;
+		/* the target delegate interface */
+		IDirectoryEntryTarget *delegate;
+		/* if flags & DEF_LINK*/
+		ILink *link;
+		/* if flags & DEF_CONTAINER */
+		IContainer *container;
 	} data;
 };
 

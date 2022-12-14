@@ -49,6 +49,8 @@
 # include <Executive/IDirectoryEntryTarget.h>
 # include <Executive/ILink.h>
 
+# include <Executive/IWriteChannel.h>
+
 # include <Executive/ITasker.h>
 # include <Executive/ITask.h>
 # include <Executive/IThread.h>

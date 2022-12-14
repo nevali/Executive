@@ -22,10 +22,23 @@ void
 Executive_BootstrapTask_mainThread(IThread *self)
 {
 	struct TaskCreationParameters taskInfo;
+	IWriteChannel *diag;
 
 	UNUSED__(self);
 
 	EXLOGF((LOG_TRACE, "Executive::BootstrapTask::mainThread() started"));
+	if(E_SUCCESS == ExOpen("/System/Diagnostics", &IID_IWriteChannel, &diag))
+	{
+		const char *message = "========================================================================\n"
+			" Executive -- Bootstrap Task -- Diagnostic Interface\n"
+			"========================================================================\n";
+		EXLOGF((LOG_DEBUG7, "successfully opened diagnostic channel"));
+		IWriteChannel_write(diag, (const uint8_t *) message, ExStrLen(message));
+	}
+	else
+	{
+		EXLOGF((LOG_DEBUG7, "unable to open diagnostic channel"));
+	}
 	/* Ask the PAL for its device manager */
 	/* Add the device manager as /System/Nodes/localhost/Devices */
 	/* Add /System/Devices as link to /System/Nodes/localhost/Devices */
@@ -42,7 +55,9 @@ Executive_BootstrapTask_mainThread(IThread *self)
 	ITasker_createTask(executive.data.tasker, &taskInfo, &IID_ITask, NULL);
 
 	Executive_Directory_dump((IContainer *) (void *) executive.data.rootNS);
-	ExPanic("done");
+
+	IWriteChannel_release(diag);
+
 	/* Yield to the scheduler forever */
 	for(;;)
 	{

@@ -23,12 +23,13 @@
 
 # include <Executive/Errors.h>
 # include <PAL/PAL.h>
+# include <Executive/IWriteChannel.h>
 
 typedef union PAL_POSIX_Platform PAL_POSIX_Platform;
 typedef union PAL_POSIX_MemoryManager PAL_POSIX_MemoryManager;
 typedef union PAL_POSIX_Region PAL_POSIX_Region;
 typedef union PAL_POSIX_BootEnvironment PAL_POSIX_BootEnvironment;
-typedef union PAL_POSIX_PlatformDiagnostics PAL_POSIX_PlatformDiagnostics;
+typedef struct PAL_POSIX_PlatformDiagnostics PAL_POSIX_PlatformDiagnostics;
 
 /* These are well-known metaclasses retrievable via PAL$metaClass() */
 extern PAL_POSIX_Platform PAL_POSIX_platform;
@@ -89,14 +90,11 @@ union PAL_POSIX_BootEnvironment
 	} data;
 };
 
-union PAL_POSIX_PlatformDiagnostics
+struct PAL_POSIX_PlatformDiagnostics
 {
 	IPlatformDiagnostics PlatformDiagnostics;
 	IObject Object;
-	struct
-	{
-		void *vtable;
-	} data;
+	IWriteChannel WriteChannel;
 };
 
 # ifdef __cplusplus

@@ -4,17 +4,26 @@
 
 #include "p_POSIX.h"
 
-#define INTF_TO_CLASS(i) (PAL_POSIX_PlatformDiagnostics *)((void *)(i))
+#define INTF_TO_CLASS(i) (PAL_POSIX_PlatformDiagnostics *)((i)->instptr)
 
-static int PAL_POSIX_PlatformDiagnostics_queryInterface(struct IPlatformDiagnostics *self, REFUUID iid, void **out);
-static int32_t PAL_POSIX_PlatformDiagnostics_retain(struct IPlatformDiagnostics *self);
-static int32_t PAL_POSIX_PlatformDiagnostics_release(struct IPlatformDiagnostics *self);
+static STATUS PAL_POSIX_PlatformDiagnostics_queryInterface(struct IPlatformDiagnostics *self, REFUUID iid, void **out);
+static REFCOUNT PAL_POSIX_PlatformDiagnostics_retain(struct IPlatformDiagnostics *self);
+static REFCOUNT PAL_POSIX_PlatformDiagnostics_release(struct IPlatformDiagnostics *self);
+
+static size_t PAL_POSIX_PlatformDiagnostics_write(struct IWriteChannel *self, const uint8_t *buf, size_t nbytes);
 
 static struct IPlatformDiagnostics_vtable_ PAL_POSIX_PlatformDiagnostics_vtable = {
 	PAL_POSIX_PlatformDiagnostics_queryInterface,
 	PAL_POSIX_PlatformDiagnostics_retain,
 	PAL_POSIX_PlatformDiagnostics_release,
 	PAL_POSIX_PlatformDiagnostics_log
+};
+
+static struct IWriteChannel_vtable_ PAL_POSIX_PlatformDiagnostics_IWriteChannel_vtable = {
+	(STATUS (*)(IWriteChannel *, REFUUID, void **)) &PAL_POSIX_PlatformDiagnostics_queryInterface,
+	(REFCOUNT (*)(IWriteChannel *)) &PAL_POSIX_PlatformDiagnostics_retain,
+	(REFCOUNT (*)(IWriteChannel *))PAL_POSIX_PlatformDiagnostics_release,
+	PAL_POSIX_PlatformDiagnostics_write
 };
 
 PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics;
@@ -24,6 +33,11 @@ PAL_POSIX_PlatformDiagnostics_init(void)
 {
 	memset(&PAL_POSIX_diagnostics, 0, sizeof(PAL_POSIX_PlatformDiagnostics));
 	PAL_POSIX_diagnostics.PlatformDiagnostics.lpVtbl = &PAL_POSIX_PlatformDiagnostics_vtable;
+	PAL_POSIX_diagnostics.PlatformDiagnostics.instptr = &PAL_POSIX_diagnostics;
+	PAL_POSIX_diagnostics.Object.lpVtbl = (void *) &PAL_POSIX_PlatformDiagnostics_vtable;
+	PAL_POSIX_diagnostics.Object.instptr = &PAL_POSIX_diagnostics;
+	PAL_POSIX_diagnostics.WriteChannel.lpVtbl = &PAL_POSIX_PlatformDiagnostics_IWriteChannel_vtable;
+	PAL_POSIX_diagnostics.WriteChannel.instptr = &PAL_POSIX_diagnostics;
 }
 
 static int
@@ -33,7 +47,7 @@ PAL_POSIX_PlatformDiagnostics_queryInterface(IPlatformDiagnostics *self, REFUUID
 	
 	if(!memcmp(riid, &IID_IObject, sizeof(UUID)))
 	{
-		if(*ptr)
+		if(ptr)
 		{
 			/* no retain() because this class is a singleton */
 			*ptr = &(me->Object);
@@ -42,10 +56,17 @@ PAL_POSIX_PlatformDiagnostics_queryInterface(IPlatformDiagnostics *self, REFUUID
 	}
 	if(!memcmp(riid, &IID_IPlatformDiagnostics, sizeof(UUID)))
 	{
-		if(*ptr)
+		if(ptr)
 		{
-			/* no retain() because this class is a singleton */
 			*ptr = &(me->PlatformDiagnostics);
+		}
+		return E_SUCCESS;
+	}
+	if(!memcmp(riid, &IID_IWriteChannel, sizeof(UUID)))
+	{
+		if(ptr)
+		{
+			*ptr = &(me->WriteChannel);
 		}
 		return E_SUCCESS;
 	}
@@ -77,3 +98,15 @@ PAL_POSIX_PlatformDiagnostics_log(struct IPlatformDiagnostics *self, LogLevel le
 
 	fprintf(stderr, "<%d> %s\n", level, str);
 }
+
+size_t
+PAL_POSIX_PlatformDiagnostics_write(IWriteChannel *self, const uint8_t *buf, size_t nbytes)
+{
+	UNUSED__(self);
+
+	fprintf(stderr, "\033[0;33m");
+	fwrite((void *) buf, nbytes, 1, stderr);
+	fprintf(stderr, "\033[0m");
+	return nbytes;
+}
+

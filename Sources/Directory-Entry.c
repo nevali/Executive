@@ -60,6 +60,7 @@ Executive_Directory_Entry_create(const char *name, REFUUID clsid, DirectoryEntry
     p->Object.instptr = p;
     p->data.refCount = 1;
     p->data.flags = flags;
+    p->data.userFlags = 0;
     p->data.name = ExStrDup(name);
     ExUuidCopy(&(p->data.clsid), clsid);
     return p;
@@ -84,13 +85,21 @@ static REFCOUNT
 Executive_Directory_Entry_release(IDirectoryEntry *me)
 {
     EXEC_COMMON_RELEASE(Executive_Directory_Entry, {
-        if(self->data.target)
+        if(self->data.delegate)
         {
-            IDirectoryEntryTarget_release(self->data.target);
+            IDirectoryEntryTarget_release(self->data.delegate);
         }
         if(self->data.object)
         {
             IObject_release(self->data.object);
+        }
+        if(self->data.link)
+        {
+            ILink_release(self->data.link);
+        }
+        if(self->data.container)
+        {
+            IObject_release(self->data.container);
         }
         ExFree(self->data.name);
     });
@@ -100,10 +109,6 @@ Executive_Directory_Entry_queryTargetInterface(IDirectoryEntry *me, REFUUID iid,
 {
     Executive_Directory_Entry *self = INTF_TO_CLASS(me);
 
-    if(self->data.target)
-    {
-        return IDirectoryEntryTarget_queryInterface(self->data.target, iid, out);
-    }
     if(self->data.object)
     {
         return IObject_queryInterface(self->data.object, iid, out);
@@ -132,7 +137,7 @@ Executive_Directory_Entry_flags(IDirectoryEntry *me)
 {
     Executive_Directory_Entry *self = INTF_TO_CLASS(me);
     
-    return self->data.flags;
+    return self->data.flags | self->data.userFlags;
 }
 
 static STATUS
@@ -140,11 +145,13 @@ Executive_Directory_Entry_setFlags(IDirectoryEntry *me, DirectoryEntryFlags flag
 {
     Executive_Directory_Entry *self = INTF_TO_CLASS(me);
 
-    if(self->data.flags & DEF_IMMUTABLE)
+    /* These are not valid user flags */
+    flags &= ~(DEF_LINK|DEF_VOID|DEF_CONTAINER);
+    if(self->data.flags & DEF_IMMUTABLE || self->data.userFlags & DEF_IMMUTABLE)
     {
         EXLOGF((LOG_CONDITION, "%%E-PERM: set flags: operation not permitted (directory entry is marked immutable); flags = %d, new flags = %d", self->data.flags, flags));
         return E_PERM;
     }
-    self->data.flags = flags;
+    self->data.userFlags = flags;
     return E_SUCCESS;
 }
