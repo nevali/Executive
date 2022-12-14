@@ -153,6 +153,8 @@ struct Executive
 # define ExCreate(filename, clsid, iid, out) INamespace_create(executive.data.rootNS, filename, NULL, clsid, iid, (void **) (out))
 # undef ExAdd
 # define ExAdd(filename, clsid, obj)   INamespace_add(executive.data.rootNS, filename, NULL, clsid, obj)
+# undef ExCreateLink
+# define ExCreateLink(filename, target, force) INamespace_createLink(executive.data.rootNS, filename, NULL, target, force)
 # undef ExSetFlags
 # define ExSetFlags(filename, flags)   INamespace_setFlags(executive.data.rootNS, filename, NULL, flags)
 

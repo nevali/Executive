@@ -53,9 +53,11 @@ static struct MFactory Executive_Allocator_MFactory = { &Executive_Allocator_MFa
 
 static struct MetaClassEntry metaClass_entries[] = {
 	{ "PAL::Platform", &CLSID_PAL_Platform, "Platform", NULL, NULL },
+	{ "PAL::PlatformDiagnostics", &CLSID_PAL_PlatformDiagnostics, "Platform Diagnostics", NULL, NULL },
 	{ "PAL::BootEnvironment", &CLSID_PAL_BootEnvironment, "Boot Environment", NULL, NULL },
-	{ "Executive::Allocator", &CLSID_Executive_Allocator, "Memory Allocator", NULL, &Executive_Allocator_MFactory },
 	{ "Executive::Container", &CLSID_Executive_Container, "Container", Executive_Directory_metaClass, NULL },
+	{ "Executive::Link", &CLSID_Executive_Link, "Link", NULL, NULL },
+	{ "Executive::Allocator", &CLSID_Executive_Allocator, "Memory Allocator", NULL, &Executive_Allocator_MFactory },
 	{ "Executive::Root", &CLSID_Executive_Root, "Object Directory", Executive_Directory_metaClass, NULL },
 	{ "Executive::System", &CLSID_Executive_System, "System Domain", Executive_Directory_metaClass, NULL },
 	{ "Executive::Local", &CLSID_Executive_Local, "Local Domain", Executive_Directory_metaClass, NULL },

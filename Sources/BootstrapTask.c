@@ -27,6 +27,7 @@ Executive_BootstrapTask_mainThread(IThread *self)
 	UNUSED__(self);
 
 	EXLOGF((LOG_TRACE, "Executive::BootstrapTask::mainThread() started"));
+	diag = NULL;
 	if(E_SUCCESS == ExOpen("/System/Diagnostics", &IID_IWriteChannel, &diag))
 	{
 		const char *message = "========================================================================\n"
@@ -56,7 +57,10 @@ Executive_BootstrapTask_mainThread(IThread *self)
 
 	Executive_Directory_dump((IContainer *) (void *) executive.data.rootNS);
 
-	IWriteChannel_release(diag);
+	if(diag)
+	{
+		IWriteChannel_release(diag);
+	}
 
 	/* Yield to the scheduler forever */
 	for(;;)

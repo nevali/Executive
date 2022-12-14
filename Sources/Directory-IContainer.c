@@ -64,6 +64,7 @@ dumpDir(IContainer *self, const char *name, int depth)
 	IIterator *iterator;
 	IDirectoryEntry *dirent;
 	IContainer *container;
+	ILink *link;
 
 	for(c = 0; c < sizeof(space)-1 && c < (size_t) depth; c++)
 	{
@@ -77,7 +78,7 @@ dumpDir(IContainer *self, const char *name, int depth)
 	iterator = IContainer_iterator(self);
 	if(!iterator)
 	{
-		EXLOGF((LOG_DEBUG, "dumpDir(): ERROR: container '%s' does not provide an iterator", name));
+		EXLOGF((LOG_DEBUG7, "dumpDir(): WARNING: container '%s' does not provide an iterator", name));
 		return;
 	}
 	while(NULL != (dirent = (IDirectoryEntry *) (void *) IIterator_current(iterator)))
@@ -91,32 +92,40 @@ dumpDir(IContainer *self, const char *name, int depth)
 			cname = cbuf;
 		}
 		flags = IDirectoryEntry_flags(dirent);
+		flagsbuf[0] = (flags & DEF_IMMUTABLE ? '!' : '-');
+		flagsbuf[1] = (flags & DEF_SYSTEM ? 's' : '-');
+		flagsbuf[2] = (flags & DEF_HIDDEN ? 'h' : '-');
 		if(flags & DEF_VOID)
 		{
-			flagsbuf[0] = '#';
+			flagsbuf[3] = '?';
 		}
 		else if(flags & DEF_LINK)
 		{
-			flagsbuf[0] = '@';
+			flagsbuf[3] = '@';
 		}
 		else if(flags & DEF_MOUNTPOINT)
 		{
-			flagsbuf[0] = '*';
+			flagsbuf[3] = '#';
 		}
 		else if(flags & DEF_CONTAINER)
 		{
-			flagsbuf[0] = '+';
+			flagsbuf[3] = '+';
 		}
 		else
 		{
-			flagsbuf[0] = '-';
+			flagsbuf[3] = '-';
 		}
-		flagsbuf[1] = (flags & DEF_SYSTEM ? 's' : '-');
-		flagsbuf[2] = (flags & DEF_HIDDEN ? 'h' : '-');
-		flagsbuf[3] = (flags & DEF_IMMUTABLE ? 'x' : '-');
 		flagsbuf[4] = 0;
-		EXLOGF((LOG_NOTICE, "%42s %s  %s%s", cname, flagsbuf, space, IDirectoryEntry_name(dirent)));
-		if(E_SUCCESS == IDirectoryEntry_queryTargetInterface(dirent, &IID_IContainer, (void **) &container))
+		if((flags & DEF_LINK) && E_SUCCESS == IDirectoryEntry_queryTargetInterface(dirent, &IID_ILink, (void **) &link))
+		{
+			EXLOGF((LOG_NOTICE, "%42s %s  %s%s -> %s", cname, flagsbuf, space, IDirectoryEntry_name(dirent), ILink_target(link)));
+			ILink_release(link);
+		}
+		else
+		{
+			EXLOGF((LOG_NOTICE, "%42s %s  %s%s", cname, flagsbuf, space, IDirectoryEntry_name(dirent)));
+		}
+		if((flags & DEF_CONTAINER) && E_SUCCESS == IDirectoryEntry_queryTargetInterface(dirent, &IID_IContainer, (void **) &container))
 		{
 			dumpDir(container, IDirectoryEntry_name(dirent), depth + 2);
 			IContainer_release(container);

@@ -94,17 +94,18 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	ExAssert(E_SUCCESS == ExCreate("/System", &CLSID_Executive_System, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/System", DEF_SYSTEM|DEF_IMMUTABLE));
 	ExAssert(E_SUCCESS == ExCreate("/Users", &CLSID_Executive_Container, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Users", DEF_SYSTEM|DEF_IMMUTABLE));
+	ExAssert(E_SUCCESS == ExSetFlags("/Users", DEF_IMMUTABLE));
 	ExAssert(E_SUCCESS == ExCreate("/Volumes", &CLSID_Executive_Container, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Volumes", DEF_SYSTEM|DEF_IMMUTABLE));
+	ExAssert(E_SUCCESS == ExSetFlags("/Volumes", DEF_IMMUTABLE));
 	ExAssert(E_SUCCESS == ExCreate("/Local", &CLSID_Executive_Local, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Local", DEF_SYSTEM|DEF_IMMUTABLE));
+	ExAssert(E_SUCCESS == ExSetFlags("/Local", DEF_IMMUTABLE));
 	ExAssert(E_SUCCESS == ExCreate("/Network", &CLSID_Executive_Network, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Network", DEF_SYSTEM|DEF_IMMUTABLE));
+	ExAssert(E_SUCCESS == ExSetFlags("/Network", DEF_IMMUTABLE));
 	ExAssert(E_SUCCESS == ExCreate("/Cluster", &CLSID_Executive_Cluster, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Cluster", DEF_SYSTEM|DEF_IMMUTABLE));
+	ExAssert(E_SUCCESS == ExSetFlags("/Cluster", DEF_IMMUTABLE));
 
 	/* Create an instance of the built-in co-operative tasker */
+	/* XXX this should be via a metaclass interface */
 	executive.data.tasker = Executive_CooperativeTasker_create();
 	ExAssert(NULL != executive.data.tasker);
 	ExAssert(E_SUCCESS == ExAdd("/System/Tasks", &CLSID_Executive_Tasker, (IObject *) (void *) executive.data.tasker));
@@ -112,22 +113,18 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	/* XXX this should be ExAdd() */
 	ExAssert(E_SUCCESS == ExCreate("/System/Classes", &CLSID_Executive_Container, NULL, NULL));
 	ExSetFlags("/System/Classes", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN);
-	/* add the Platform object */
-	ExAssert(E_SUCCESS == ExAdd("/System/Platform", &CLSID_PAL_Platform, (IObject *) (void *) executive.data.platform));
-	ExSetFlags("/System/Platform", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN);
-	/* add the Diagnostics object */
-	if(executive.data.diagnostics)
-	{
-		ExAssert(E_SUCCESS == ExAdd("/System/Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) executive.data.diagnostics));
-		ExAssert(E_SUCCESS == ExSetFlags("/System/Diagnostics", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN));
-	}
 	if(executive.data.bootEnvironment)
 	{
 		ExAssert(E_SUCCESS == ExAdd("/System/Boot/Environment", &CLSID_PAL_BootEnvironment, (IObject *) (void *) executive.data.bootEnvironment));
 		ExAssert(E_SUCCESS == ExSetFlags("/System/Boot/Environment", DEF_SYSTEM|DEF_IMMUTABLE));
 	}
+	ExAssert(E_SUCCESS == ExCreate("/System/Volumes/Boot", &CLSID_Executive_Container, NULL, NULL));
+	ExAssert(E_SUCCESS == ExSetFlags("/System/Volumes/Boot", DEF_SYSTEM|DEF_MOUNTPOINT|DEF_IMMUTABLE));
+	ExAssert(E_SUCCESS == ExCreate("/System/Volumes/System", &CLSID_Executive_Container, NULL, NULL));
+	ExAssert(E_SUCCESS == ExSetFlags("/System/Volumes/System", DEF_SYSTEM|DEF_MOUNTPOINT|DEF_IMMUTABLE));
+	ExAssert(E_SUCCESS == ExCreate("/System/Volumes/Data", &CLSID_Executive_Container, NULL, NULL));
+	ExAssert(E_SUCCESS == ExSetFlags("/System/Volumes/Data", DEF_SYSTEM|DEF_MOUNTPOINT|DEF_IMMUTABLE));
 	EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the object directory completed"));
-
 
 	/* Ask the tasker to create a task in the Executive's address space */
 	taskInfo.flags = TF_EXECUTIVE;

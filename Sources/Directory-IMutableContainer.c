@@ -18,7 +18,8 @@ const struct IMutableContainer_vtable_ Executive_Directory_IMutableContainer_vta
 	(REFCOUNT (*)(IMutableContainer *, const char *, IDirectoryEntry **))(void *) &Executive_Directory_resolve,
 	(IIterator *(*)(IMutableContainer *))(void *) &Executive_Directory_iterator,
 	Executive_Directory_IMutableContainer_create,
-	Executive_Directory_add
+	Executive_Directory_add,
+	Executive_Directory_createLink
 };
 
 static void Executive_Directory_addEntry(Executive_Directory *self, Executive_Directory_Entry *entry);
@@ -127,6 +128,40 @@ Executive_Directory_add(IMutableContainer *me, const char *name, REFUUID clsid, 
 	}
 	return E_SUCCESS;
 }
+
+STATUS Executive_Directory_createLink(IMutableContainer *me, const char *name, const char *target, bool force)
+{
+	Executive_Directory *self = INTF_TO_CLASS(me);
+	Executive_Directory_Entry *entry;
+	IDirectoryEntry *dentry;
+	Executive_Directory_Link *link;
+
+	EXLOGF((LOG_DEBUG7, "checking that entry does not already exist"));
+	if(E_SUCCESS == Executive_Directory_resolve(&(self->Container), name, &dentry))
+	{
+		IDirectoryEntry_release(dentry);
+		EXLOGF((LOG_CONDITION, "%%E-EXISTS: an object named '%s' already exists within this container", name));
+		return E_EXISTS;
+	}
+	if(NULL == (entry = Executive_Directory_Entry_create(name, &CLSID_Executive_Link, DEF_LINK)))
+	{
+		return E_NOMEM;
+	}
+	EXLOGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>add(): entry created"));
+	link = Executive_Directory_Link_create(target);
+	Executive_Directory_addEntry(self, entry);
+	Executive_Directory_Entry_populateObject(entry, (void *)(IObject *) link, NULL);
+		if(entry->data.delegate)
+	{
+		IDirectoryEntryTarget_linked(entry->data.delegate, &(entry->DirectoryEntry));
+	}
+
+	UNUSED__(target);
+	UNUSED__(force);
+
+	return E_SUCCESS;
+}
+
 
 static void
 Executive_Directory_Entry_populateObject(Executive_Directory_Entry *self, IObject *object, IDirectoryEntryTarget *delegate)

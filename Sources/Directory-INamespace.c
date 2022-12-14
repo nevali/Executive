@@ -23,6 +23,7 @@ const struct INamespace_vtable_ Executive_Directory_INamespace_vtable = {
 	Executive_Directory_open,
 	Executive_Directory_INamespace_create,
 	Executive_Directory_INamespace_add,
+	Executive_Directory_INamespace_createLink,
 	Executive_Directory_INamespace_setFlags
 };
 
@@ -324,6 +325,40 @@ Executive_Directory_INamespace_add(INamespace *me, const char *path, IContainer 
 	EXLOGF((LOG_DEBUG, "new object created successfully"));
 	return status;
 }
+
+STATUS
+Executive_Directory_INamespace_createLink(INamespace *me, const char *path, IContainer *scope, const char *target, bool force)
+{
+	STATUS status;
+	IContainer *container;
+	IMutableContainer *mutable;
+	const char *basename;
+
+	ExAssert(target != NULL);
+	if(E_SUCCESS != (status = Executive_Directory_resolveContainer(me, path, scope, &container, &basename)))
+	{
+		return status;
+	}
+	EXLOGF((LOG_DEBUG, "located parent entry for '%s'", path));
+	EXLOGF((LOG_DEBUG, "basename is '%s'", basename));
+	if(E_SUCCESS != (status = IContainer_queryInterface(container, &IID_IMutableContainer, (void **) &mutable)))
+	{
+		EXLOGF((LOG_DEBUG, "IDirectoryEntry::queryTargetInterface() failed %d", status));
+		IContainer_release(container);
+		return status;
+	}
+	IContainer_release(container);
+	if(E_SUCCESS != (status = IMutableContainer_createLink(mutable, basename, target, force)))
+	{
+		EXLOGF((LOG_DEBUG, "IMutableContainer::createLink() failed %d", status));
+		IMutableContainer_release(mutable);
+		return status;
+	}
+	IMutableContainer_release(mutable);
+	EXLOGF((LOG_DEBUG, "new link created successfully"));
+	return status;
+}
+
 
 STATUS
 Executive_Directory_INamespace_setFlags(INamespace *me, const char *path, IContainer *scope, DirectoryEntryFlags flags)

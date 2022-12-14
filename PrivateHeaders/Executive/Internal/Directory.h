@@ -105,12 +105,15 @@ IIterator *Executive_Directory_iterator(IContainer *me);
 /* IMutableContainer */
 STATUS Executive_Directory_IMutableContainer_create(IMutableContainer *me, const char *name, REFUUID clsid, REFUUID iid, void **out);
 STATUS Executive_Directory_add(IMutableContainer *me, const char *name, REFUUID clsid, IObject *target);
+STATUS Executive_Directory_createLink(IMutableContainer *me, const char *name, const char *target, bool force);
+
 /* INamespace */
 STATUS Executive_Directory_resolveEntry(INamespace *me, const char *path, IContainer *scope, IDirectoryEntry **dentry);
 STATUS Executive_Directory_resolveContainer(INamespace *me, const char *path, IContainer *scope, IContainer **container, const char **basename);
 STATUS Executive_Directory_open(INamespace *me, const char *path, IContainer *scope, REFUUID iid, void **out);
 STATUS Executive_Directory_INamespace_create(INamespace *me, const char *path, IContainer *scope, REFUUID clsid, REFUUID iid, void **out);
 STATUS Executive_Directory_INamespace_add(INamespace *me, const char *path, IContainer *scope, REFUUID clsid, IObject *target);
+STATUS Executive_Directory_INamespace_createLink(INamespace *me, const char *path, IContainer *scope, const char *target, bool force);
 STATUS Executive_Directory_INamespace_setFlags(INamespace *me, const char *path, IContainer *scope, DirectoryEntryFlags flags);
 
 /* IDirectoryEntryTarget */
@@ -124,5 +127,8 @@ void Executive_Directory_dump(IContainer *me);
 
 /** Executive::Directory::Iterator */
 Executive_Directory_Iterator *Executive_Directory_Iterator_create(Executive_Directory_Entry *dirent);
+
+/** Executive::Directory::Link */
+Executive_Directory_Link *Executive_Directory_Link_create(const char *target);
 
 #endif /*!EXECUTIVE_INTERNAL_DIRECTORY_H_*/

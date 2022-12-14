@@ -13,6 +13,7 @@ struct Executive_Directory_Link
 	struct
 	{
 		REFCOUNT refCount;
+        char *target;
 	} data;
 };
 
@@ -26,22 +27,25 @@ static STATUS Executive_Directory_Link_queryInterface(ILink *me, REFUUID iid, vo
 static REFCOUNT Executive_Directory_Link_retain(ILink *me);
 static REFCOUNT Executive_Directory_Link_release(ILink *me);
 /* ILink */
+static const char *Executive_Directory_Link_target(ILink *me);
 
 static struct ILink_vtable_ Executive_Directory_Link_vtable = {
     Executive_Directory_Link_queryInterface,
     Executive_Directory_Link_retain,
     Executive_Directory_Link_release,
+    Executive_Directory_Link_target
 };
 
 /** Executive::Directory::Link **/
 
 Executive_Directory_Link *
-Executive_Directory_Link_create()
+Executive_Directory_Link_create(const char *target)
 {
     Executive_Directory_Link *p;
 
     EXLOGF((LOG_TRACE, "Executive::Directory::Link::create()"));
 
+    ExAssert(NULL != target);
     if(NULL == (p = ExAlloc(sizeof(Executive_Directory_Link))))
     {
         EXLOGF((LOG_CONDITION, "%%E-NOMEM: ExAlloc(%u) failed", sizeof(Executive_Directory_Link)));
@@ -52,6 +56,8 @@ Executive_Directory_Link_create()
     p->Object.lpVtbl = (void *) &Executive_Directory_Link_vtable;
     p->Object.instptr = p;
     p->data.refCount = 1;
+    p->data.target = ExStrDup(target);
+    ExAssert(p->data.target);
     return p;
 }
 
@@ -73,5 +79,15 @@ Executive_Directory_Link_retain(ILink *me)
 static REFCOUNT
 Executive_Directory_Link_release(ILink *me)
 {
-    EXEC_COMMON_RELEASE(Executive_Directory_Link, {});
+    EXEC_COMMON_RELEASE(Executive_Directory_Link, {
+        ExFree(self->data.target);
+    });
+}
+
+static const char *
+Executive_Directory_Link_target(ILink *me)
+{
+    Executive_Directory_Link *self = INTF_TO_CLASS(me);
+    
+    return self->data.target;
 }

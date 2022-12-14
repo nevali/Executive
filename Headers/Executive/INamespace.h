@@ -64,6 +64,7 @@ DECLARE_INTERFACE_(INamespace, IContainer)
 	STDMETHOD_(STATUS, open)(THIS_ const char *path, IContainer *scope, REFUUID iid, void **container) PURE;
 	STDMETHOD_(STATUS, create)(THIS_ const char *name, IContainer *scope, REFUUID clsid, REFUUID iid, void **container) PURE;
 	STDMETHOD_(STATUS, add)(THIS_ const char *name, IContainer *scope, REFUUID clsid, IObject *target) PURE;
+	STDMETHOD_(STATUS, createLink)(THIS_ const char *name, IContainer *scope, const char *target, bool force) PURE;
 	STDMETHOD_(STATUS, setFlags)(THIS_ const char *name, IContainer *scope, DirectoryEntryFlags flags) PURE;
 
 	END_INTERFACE
@@ -80,6 +81,7 @@ DECLARE_INTERFACE_(INamespace, IContainer)
 #   define INamespace_open(__this, path, scope, iid, container) __this->lpVtbl->open(__this, path, scope, iid, container)
 #   define INamespace_create(__this, name, scope, clsid, iid, container) __this->lpVtbl->create(__this, name, scope, clsid, iid, container)
 #   define INamespace_add(__this, name, scope, clsid, target) __this->lpVtbl->add(__this, name, scope, clsid, target)
+#   define INamespace_createLink(__this, name, scope, target, force) __this->lpVtbl->createLink(__this, name, scope, target, force)
 #   define INamespace_setFlags(__this, name, scope, flags) __this->lpVtbl->setFlags(__this, name, scope, flags)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE

@@ -52,6 +52,7 @@ DECLARE_INTERFACE_(ILink, IObject)
 # endif /*!__cplusplus*/
 
 	/* ILink */
+	STDMETHOD_(const char*, target)(THIS) PURE;
 
 	END_INTERFACE
 };
@@ -60,6 +61,7 @@ DECLARE_INTERFACE_(ILink, IObject)
 #   define ILink_queryInterface(__this, riid, object) __this->lpVtbl->queryInterface(__this, riid, object)
 #   define ILink_retain(__this) __this->lpVtbl->retain(__this)
 #   define ILink_release(__this) __this->lpVtbl->release(__this)
+#   define ILink_target(__this) __this->lpVtbl->target(__this)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__ILink_INTERFACE_DEFINED__*/

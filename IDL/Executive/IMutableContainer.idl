@@ -39,4 +39,6 @@ interface IMutableContainer: IContainer
 	STATUS create([in, string] const char *name, [in] REFUUID clsid, [in] REFUUID iid, [out, iid_is(iid)] void **out);
 	/* add an existing object to the container with the specified name and class */
 	STATUS add([in, string] const char *name, [in] REFUUID clsid, [in] IObject *target);
+	/* create a symbolic link to another object by name */
+	STATUS createLink([in, string] const char *name, [in, string] const char *target, [in] bool force);
 }

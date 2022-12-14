@@ -30,4 +30,6 @@ interface ILink: IObject
 	cpp_quote("#ifndef W_NO_UNSTABLE_INTERFACES");
 	cpp_quote("# warning The ILink interface is currently considered unstable; source and binary compatibility is not assured.");
 	cpp_quote("#endif");
+
+	[local] const char *target(void);
 }

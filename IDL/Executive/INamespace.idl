@@ -47,6 +47,9 @@ interface INamespace: IContainer
 	/* add an existing object at the specified path */
 	STATUS add([in] const char *name, [in] IContainer *scope, [in] REFUUID clsid, [in] IObject *target);
 
+	/* create a link to another named object */
+	STATUS createLink([in] const char *name, [in] IContainer *scope, [in] const char *target, [in] bool force);
+
 	/* attempt to set the flags on an existing directory entry */
 	STATUS setFlags([in] const char *name, [in] IContainer *scope, [in] DirectoryEntryFlags flags);
 }

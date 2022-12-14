@@ -61,6 +61,7 @@ DECLARE_INTERFACE_(IMutableContainer, IContainer)
 	/* IMutableContainer */
 	STDMETHOD_(STATUS, create)(THIS_ const char *name, REFUUID clsid, REFUUID iid, void **out) PURE;
 	STDMETHOD_(STATUS, add)(THIS_ const char *name, REFUUID clsid, IObject *target) PURE;
+	STDMETHOD_(STATUS, createLink)(THIS_ const char *name, const char *target, bool force) PURE;
 
 	END_INTERFACE
 };
@@ -73,6 +74,7 @@ DECLARE_INTERFACE_(IMutableContainer, IContainer)
 #   define IMutableContainer_iterator(__this) __this->lpVtbl->iterator(__this)
 #   define IMutableContainer_create(__this, name, clsid, iid, out) __this->lpVtbl->create(__this, name, clsid, iid, out)
 #   define IMutableContainer_add(__this, name, clsid, target) __this->lpVtbl->add(__this, name, clsid, target)
+#   define IMutableContainer_createLink(__this, name, target, force) __this->lpVtbl->createLink(__this, name, target, force)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__IMutableContainer_INTERFACE_DEFINED__*/
