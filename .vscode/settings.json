@@ -1,0 +1,8 @@
+{
+	"C_Cpp.dimInactiveRegions": false,
+	"files.associations": {
+		"*.idl": "idl",
+		"*.ac": "m4",
+		"*.mk": "automake"
+	}
+}

@@ -1,0 +1,75 @@
+cpp_quote("/* Executive Microkernel");
+cpp_quote(" * UUID.idl");
+cpp_quote(" *   Defines the UUID type used to identify interfaces, classes, and");
+cpp_quote(" *   many other types of object")
+cpp_quote(" */")
+cpp_quote("");
+cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
+cpp_quote(" *");
+cpp_quote(" *  Licensed under the Apache License, Version 2.0 (the \"License\");");
+cpp_quote(" *  you may not use this file except in compliance with the License.");
+cpp_quote(" *  You may obtain a copy of the License at");
+cpp_quote(" *");
+cpp_quote(" *      http://www.apache.org/licenses/LICENSE-2.0");
+cpp_quote(" *");
+cpp_quote(" *  Unless required by applicable law or agreed to in writing, software");
+cpp_quote(" *  distributed under the License is distributed on an \"AS IS\" BASIS,");
+cpp_quote(" *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
+cpp_quote(" *  See the License for the specific language governing permissions and");
+cpp_quote(" *  limitations under the License.");
+cpp_quote(" */");
+
+import "Types.idl";
+
+[
+	cheader("Executive/UUID.h")
+]
+interface UUID
+{
+cpp_quote("#if 0");
+	/* Provide a definition of types for the benefit of comidl */
+	typedef unsigned char uuid_t[16];
+	typedef const uuid_t REFUUID;
+cpp_quote("#endif");
+
+	/* The IDL compiler can't handle this yet */
+cpp_quote("typedef union UUID \
+{ \
+	struct \
+	{ \
+		uint32_t time_low; \
+		uint16_t time_mid; \
+		uint16_t time_hi_and_version; \
+		uint8_t clock_seq_hi_and_reserved; \
+		uint8_t clock_seq_low; \
+		uint8_t node[6]; \
+	} uuid; \
+	uint8_t bytes[16]; \
+	struct \
+	{
+		uint32_t d1; \
+		uint32_t d2; \
+		uint32_t d3; \
+		uint32_t d4; \
+	} d; \
+	struct \
+	{ \
+		uint32_t data1; \
+		uint16_t data2; \
+		uint16_t data3; \
+		uint8_t data4[8]; \
+	} guid; \
+} UUID;");
+cpp_quote("#ifndef _UUID_T")
+cpp_quote("#define _UUID_T")
+cpp_quote("typedef union UUID uuid_t;");
+cpp_quote("#endif");
+cpp_quote("#ifdef __cplusplus");
+cpp_quote("#define REFUUID const union UUID &");
+cpp_quote("#else");
+cpp_quote("#define REFUUID const union UUID * const");
+cpp_quote("#endif");
+}
+
+/* Include an initial definition for DEFINE_GUID */
+cpp_quote("#include <Executive/initguid.h>");

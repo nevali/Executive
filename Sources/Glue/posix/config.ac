@@ -1,0 +1,93 @@
+# Executive Microkernel
+#
+# Glue configuration for hosted builds targeting Posix-like systems
+
+if test $host_type = hosted ; then
+
+	AC_MSG_CHECKING([POSIX version])
+	AC_EGREP_CPP([posix_version_198808L],[
+#define _POSIX_C_SOURCE 200809L
+#include <unistd.h>
+#ifdef _POSIX_VERSION
+#if _POSIX_VERSION == 198808L
+posix_version_198808L
+#endif
+#endif],[posix_version="POSIX.1-1988"])
+
+	AC_EGREP_CPP([posix_version_199009L],[
+#define _POSIX_C_SOURCE 200809L
+#include <unistd.h>
+#ifdef _POSIX_VERSION
+#if _POSIX_VERSION == 199009L
+posix_version_199009L
+#endif
+#endif],[posix_version="ISO/IEC 9945-1:1990 (POSIX.1-1990)"])
+
+	AC_EGREP_CPP([posix_version_199309L],[
+#define _POSIX_C_SOURCE 200809L
+#include <unistd.h>
+#ifdef _POSIX_VERSION
+#if _POSIX_VERSION == 199309L
+posix_version_199309L
+#endif
+#endif],[posix_version="IEEE 1003.1b-1993 (POSIX.1b-1993)"])
+
+AC_EGREP_CPP([posix_version_199506L],[
+#define _POSIX_C_SOURCE 200809L
+#include <unistd.h>
+#ifdef _POSIX_VERSION
+#if _POSIX_VERSION == 199506L
+posix_version_199506L
+#endif
+#endif],[posix_version="IEEE 1003.1-1996 (POSIX.1-1996)"])
+
+AC_EGREP_CPP([posix_version_200112L],[
+#define _POSIX_C_SOURCE 200809L
+#include <unistd.h>
+#ifdef _POSIX_VERSION
+#if _POSIX_VERSION == 200112L
+posix_version_200112L
+#endif
+#endif],[posix_version="IEEE 1003.1-2001 (POSIX.1-2001)"])
+
+AC_EGREP_CPP([posix_version_200809L],[
+#define _POSIX_C_SOURCE 200809L
+#include <unistd.h>
+#ifdef _POSIX_VERSION
+#if _POSIX_VERSION == 200809L
+posix_version_200809L
+#endif
+#endif],[posix_version="IEEE 1003.1-2008 (POSIX.1-2008)"])
+
+	if test -z "$posix_version" ; then
+		AC_EGREP_CPP([posix_version_other],[
+#define _POSIX_C_SOURCE 200809L
+#include <unistd.h>
+#ifdef _POSIX_VERSION
+posix_version_other
+#endif],[posix_version="other (unknown)"])
+	fi
+
+	if test -z "$posix_version" ; then
+		AC_MSG_RESULT([none])
+	else
+		AC_MSG_RESULT([$posix_version])
+		exec_glue_enabled=yes
+		AC_CHECK_HEADERS([dlfcn.h])
+		AC_CHECK_FUNCS([dlopen])
+		AC_CHECK_LIB([dl],[dlopen])
+		if ! test -z "$LIBTOOL" ; then
+			if test x$can_build_shared = xyes && \
+				test x$enable_shared = xyes && \
+				test x$ac_cv_header_dlfcn_h = xyes && \
+				test x$ac_cv_func_dlopen = xyes ; then
+				EXEC_GLUE_OBJECT_DYNAMIC='Glue/posix/Glue_Dynamic_la-entry.lo ../Stubs/PAL-stubs.lo'
+			fi
+			EXEC_GLUE_OBJECT_MODULAR='Glue/posix/Glue_Modular_la-entry.lo'
+			EXEC_GLUE_OBJECT_TARGETED='Glue/posix/Glue_Targeted_la-entry.lo'
+			EXEC_GLUE_OBJECT_MONOLITH='Glue/posix/Glue_Monolith_la-entry.lo'
+		else
+			EXEC_GLUE_OBJECT_TARGETED='Glue/posix/entry.o'
+		fi
+	fi
+fi

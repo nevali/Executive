@@ -1,0 +1,55 @@
+cpp_quote("/* Executive Microkernel");
+cpp_quote(" * IPlatformDiagnostics.idl");
+cpp_quote(" *   Defines the diagnostic interface the PAL provides to the Executive");
+cpp_quote(" */");
+cpp_quote("");
+cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
+cpp_quote(" *");
+cpp_quote(" *  Licensed under the Apache License, Version 2.0 (the \"License\");");
+cpp_quote(" *  you may not use this file except in compliance with the License.");
+cpp_quote(" *  You may obtain a copy of the License at");
+cpp_quote(" *");
+cpp_quote(" *      http://www.apache.org/licenses/LICENSE-2.0");
+cpp_quote(" *");
+cpp_quote(" *  Unless required by applicable law or agreed to in writing, software");
+cpp_quote(" *  distributed under the License is distributed on an \"AS IS\" BASIS,");
+cpp_quote(" *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
+cpp_quote(" *  See the License for the specific language governing permissions and");
+cpp_quote(" *  limitations under the License.");
+cpp_quote(" */");
+
+import "IObject.idl";
+
+[
+	object,
+	uuid(5915ac8d-93d9-48e6-bbdf-d6ecdd1a8faf),
+	cheader("Executive/IPlatformDiagnostics.h")
+]
+interface IPlatformDiagnostics: IObject
+{
+	typedef enum
+	{
+		LOG_EMERG = 99,
+		LOG_EMERGENCY = LOG_EMERG,
+		LOG_ALERT = 50,
+		LOG_CRIT = 40,
+		LOG_CRITICAL = LOG_CRIT,
+		LOG_ERR = 30,
+		LOG_ERROR = LOG_ERR,
+		LOG_WARN = 20,
+		LOG_WARNING = LOG_WARN,
+		LOG_NOTICE = 10,
+		LOG_INFO = 0,
+		LOG_CONDITION = -5,
+		LOG_DEBUG = -10,
+		LOG_DEBUG2 = -20,
+		LOG_DEBUG3 = -30,
+		LOG_DEBUG4 = -40,
+		LOG_DEBUG5 = -50,
+		LOG_DEBUG6 = -60,
+		LOG_DEBUG7 = -70,
+		LOG_TRACE = -99
+	} LogLevel;
+
+	void log(LogLevel level, const char *string);
+}

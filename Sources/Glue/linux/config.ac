@@ -1,0 +1,10 @@
+# Executive Microkernel
+#
+# Glue configuration for native Linux builds
+
+if test $host_type = native && test $host_platform = linux ; then
+	exec_glue_enabled=yes
+	EXEC_GLUE_OBJECT='Glue/linux/entry.o'
+	EXEC_GLUE_CPPFLAGS='-nostdinc'
+	EXEC_GLUE_LDFLAGS='-Wl,-nostartfiles -Wl,-nostdlib -Wl,-e __glue'
+fi

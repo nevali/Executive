@@ -1,0 +1,36 @@
+## Executive Microkernel
+##
+## Posix PAL
+
+## If we're building the Posix Glue, then we should build the Posix PAL
+
+if test $exec_glue = posix ; then
+	exec_pal_enabled=yes
+
+	EXEC_PAL_MOD="PAL/POSIX/PAL.la"
+
+	EXEC_PAL_DLL="PAL/POSIX/libPAL.POSIX.la"
+	EXEC_PAL_DLL_Free="PAL/POSIX/libPAL.POSIX.Free.la"
+	EXEC_PAL_DLL_Debug="PAL/POSIX/libPAL.POSIX.Debug.la"
+
+	EXEC_PAL_LIB="PAL/POSIX/libPAL.Static.Debug.la"
+	EXEC_PAL_LIB_Free="PAL/POSIX/libPAL.Static.Free.la"
+	EXEC_PAL_LIB_Debug="PAL/POSIX/libPAL.Static.Debug.la"
+
+	exec_pal_build_targeted=yes
+	exec_pal_build_monolith=yes
+	
+	case $host_platform in
+	darwin)
+		EXEC_POSIX_PAL_EXT=".bundle"
+		;;
+	*)
+		EXEC_POSIX_PAL_EXT=".so"
+		;;
+	esac
+	AC_SUBST([EXEC_POSIX_PAL_EXT])
+	AC_DEFINE_UNQUOTED([EXEC_POSIX_PAL_DEFAULT], ["PAL.POSIX$EXEC_POSIX_PAL_EXT"], ["define to the name of the PAL the dynamic Posix Glue should attempt to load by default"])
+
+	AC_CHECK_HEADERS([unistd.h sys/mman.h])
+	AC_CHECK_FUNCS([sysconf getpagesize])
+fi

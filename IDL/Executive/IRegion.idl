@@ -1,0 +1,84 @@
+cpp_quote("/* Executive Microkernel");
+cpp_quote(" * IRegion.idl");
+cpp_quote(" *");
+cpp_quote(" */");
+cpp_quote("");
+cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
+cpp_quote(" *");
+cpp_quote(" *");
+cpp_quote(" *  Licensed under the Apache License, Version 2.0 (the \"License\");");
+cpp_quote(" *  you may not use this file except in compliance with the License.");
+cpp_quote(" *  You may obtain a copy of the License at");
+cpp_quote(" *");
+cpp_quote(" *      http://www.apache.org/licenses/LICENSE-2.0");
+cpp_quote(" *");
+cpp_quote(" *  Unless required by applicable law or agreed to in writing, software");
+cpp_quote(" *  distributed under the License is distributed on an \"AS IS\" BASIS,");
+cpp_quote(" *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
+cpp_quote(" *  See the License for the specific language governing permissions and");
+cpp_quote(" *  limitations under the License.");
+cpp_quote(" */");
+
+import "IObject.idl";
+
+[
+	local,
+	object,
+	uuid(e739ecdb-06ec-40c9-95f7-99c22a0c4a7b),
+	cheader("Executive/IRegion.h")
+]
+interface IRegion: IObject
+{
+	typedef enum
+	{
+		RF_MASK_TYPE = 0x0000ff,
+		
+		RF_NORMAL = 0,
+		/* This region is RAM/swap-backed */
+		RF_TRANSIENT = (1<<0),
+		/* This region is suitable for performing DMA transfers */
+		RF_DMA = (1<<1),
+		/* This region will never use a bank-switched memory range */
+		RF_NOT_BANKED = (1<<2),
+		/* This region may be discarded by the kernel at will */
+		RF_PURGEABLE = (1<<3),
+		/* This region is suitable for thread stacks */
+		RF_STACK = (1<<4),
+		
+		RF_MASK_OPTIONS = 0x000f00,
+		/* The kernel may not block the calling thread to obtain this region */ 
+		RF_NO_WAIT = 0x0100,
+		/* The kernel may choose to not initialise this region */
+		RF_UNINITIALIZED = 0x000200,
+		
+		RF_MASK_PROT = 0x00f000,
+		RF_NONE = 0,
+		RF_READ = 0x1000,
+		RF_WRITE = 0x2000,
+		RF_EXEC = 0x4000,
+		
+		RF_MASK_HINTS = 0x0f0000,
+		
+		RF_MASK_LEVEL = 0xf00000,
+		RF_LVL_0 = 0,
+		RF_LVL_1 = (1 << 40),
+		RF_LVL_2 = (2 << 40)
+		
+		
+	} RegionFlags;
+
+	/* Obtain the flags for this region */
+	RegionFlags flags(void);
+	
+	/* Attempt to obtain interface <riid> from the region's owner */
+	int queryOwnerInterface([in] REFUUID riid, [out, iid_is(riid)] void **ptr);
+
+	/* Return the base address of the region */
+	uint8_t *base(void);
+
+	/* Return the size of this region in pages */
+	size_t pages(void);
+
+	/* Return the size of this region in bytes */
+	size_t bytes(void);
+}

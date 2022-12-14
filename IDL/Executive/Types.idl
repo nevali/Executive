@@ -1,0 +1,59 @@
+cpp_quote("/* Executive Microkernel");
+cpp_quote(" * Types.idl");
+cpp_quote(" *   Defines core types used by the Executive");
+cpp_quote(" */")
+cpp_quote("");
+cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
+cpp_quote(" *");
+cpp_quote(" *  Licensed under the Apache License, Version 2.0 (the \"License\");");
+cpp_quote(" *  you may not use this file except in compliance with the License.");
+cpp_quote(" *  You may obtain a copy of the License at");
+cpp_quote(" *");
+cpp_quote(" *      http://www.apache.org/licenses/LICENSE-2.0");
+cpp_quote(" *");
+cpp_quote(" *  Unless required by applicable law or agreed to in writing, software");
+cpp_quote(" *  distributed under the License is distributed on an \"AS IS\" BASIS,");
+cpp_quote(" *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
+cpp_quote(" *  See the License for the specific language governing permissions and");
+cpp_quote(" *  limitations under the License.");
+cpp_quote(" */");
+cpp_quote("");
+
+cpp_quote("#include <Executive/Linkage.h>");
+
+cpp_quote("#if defined(__STDC_VERSION__) && __STDC_VERSION__")
+cpp_quote("# include <stddef.h>");
+cpp_quote("# include <stdint.h>");
+cpp_quote("# include <stdarg.h>");
+cpp_quote("# include <limits.h>");
+cpp_quote("# if __STDC_VERSION__ >= 199901L")
+cpp_quote("#  ifndef __cplusplus");
+cpp_quote("#   include <stdbool.h>");
+cpp_quote("#  endif");
+cpp_quote("#  include <stdalign.h>");
+cpp_quote("#  include <stdnoreturn.h>");
+cpp_quote("# endif /*C99*/")
+cpp_quote("#endif /*__STDC__*/");
+cpp_quote("#if defined(__arm64__) || defined(__aarch64__)");
+cpp_quote("# include <Executive/arm64/Types.h>");
+cpp_quote("#else");
+cpp_quote("# error unsupported or unrecognised host architecture");
+cpp_quote("#endif");
+
+[
+	cheader("Executive/Types.h")
+]
+interface Types
+{
+	typedef int32_t REFCOUNT;
+
+/* The following declarations are needed only for the IDL compiler itself */
+cpp_quote("#if 0 /*IDL-ONLY*/");
+	/* stdarg.h */
+	typedef void *va_list;
+	/* stddef.h */
+	typedef unsigned long size_t;
+	/* stddef.h */
+	typedef long ptrdiff_t;
+cpp_quote("#endif /*IDL-ONLY*/")
+}

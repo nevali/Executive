@@ -1,0 +1,46 @@
+cpp_quote("/* Executive Microkernel");
+cpp_quote(" * IContainer.idl");
+cpp_quote(" *");
+cpp_quote(" */");
+cpp_quote("");
+cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
+cpp_quote(" *");
+cpp_quote(" *  Licensed under the Apache License, Version 2.0 (the \"License\");");
+cpp_quote(" *  you may not use this file except in compliance with the License.");
+cpp_quote(" *  You may obtain a copy of the License at");
+cpp_quote(" *");
+cpp_quote(" *      http://www.apache.org/licenses/LICENSE-2.0");
+cpp_quote(" *");
+cpp_quote(" *  Unless required by applicable law or agreed to in writing, software");
+cpp_quote(" *  distributed under the License is distributed on an \"AS IS\" BASIS,");
+cpp_quote(" *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
+cpp_quote(" *  See the License for the specific language governing permissions and");
+cpp_quote(" *  limitations under the License.");
+cpp_quote(" */");
+
+import "IObject.idl";
+import "IDirectoryEntry.idl";
+import "IIterator.idl";
+
+[
+	object,
+	uuid(46dbd10a-0915-4350-a689-f44ce9db70d2),
+	cheader("Executive/IContainer.h")
+]
+interface IContainer: IObject
+{
+	cpp_quote("#ifndef W_NO_UNSTABLE_INTERFACES");
+	cpp_quote("# warning The IContainer interface is currently considered unstable; source and binary compatibility is not assured.");
+	cpp_quote("#endif");
+
+	/* resolve a single path component to a directory entry within this
+	 * container
+	 *
+	 * note that access to the directory entry does not imply access to its
+	 * target object
+	 */
+	STATUS resolve([in] const char *name, [out] IDirectoryEntry **entry);
+
+	/* obtain an iterator for the directory entries within this container */
+	IIterator *iterator(void);
+}

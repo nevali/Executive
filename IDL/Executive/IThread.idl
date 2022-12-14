@@ -1,0 +1,62 @@
+cpp_quote("/* Executive Microkernel");
+cpp_quote(" * IThread.idl");
+cpp_quote(" *   Defines a Thread");
+cpp_quote(" */");
+cpp_quote("");
+cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
+cpp_quote(" *");
+cpp_quote(" *  Licensed under the Apache License, Version 2.0 (the \"License\");");
+cpp_quote(" *  you may not use this file except in compliance with the License.");
+cpp_quote(" *  You may obtain a copy of the License at");
+cpp_quote(" *");
+cpp_quote(" *      http://www.apache.org/licenses/LICENSE-2.0");
+cpp_quote(" *");
+cpp_quote(" *  Unless required by applicable law or agreed to in writing, software");
+cpp_quote(" *  distributed under the License is distributed on an \"AS IS\" BASIS,");
+cpp_quote(" *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
+cpp_quote(" *  See the License for the specific language governing permissions and");
+cpp_quote(" *  limitations under the License.");
+cpp_quote(" */");
+
+import "IObject.idl";
+
+interface ITask;
+interface IEvent;
+
+[
+	object,
+	uuid(fa016ec8-40e1-4e48-92dd-0698687bc83c),
+	cheader("Executive/IThread.h")
+]
+interface IThread: IObject
+{
+	typedef int32_t THREADID;
+
+	typedef void (*ThreadEntrypoint)(IThread *self);
+
+	typedef enum
+	{
+		THF_TYPEMASK = 7,
+
+		THF_DEFAULT = 0,
+		/* Thread is internal to the Executive itself (typically only task 0) */
+		THF_EXECUTIVE = 1,
+		/* reserved = 2..7 */
+
+		/* Task status flags (exclusive) */
+		THF_STATUSMASK = (31 << 3),
+		THF_NEW     = 0,
+		THF_READY   = (1 << 3),
+		THF_RUNNING = (2 << 3),
+		THF_SUSPENDED = (3 << 3),
+		THF_WAITING = (4 << 3),
+		THF_COMPLETED = (5 << 3),
+		THF_TERMINATED = (6 << 3)
+
+		/* Condition flags */
+	} ThreadFlags;
+
+	THREADID id(void);
+	ThreadFlags flags(void);
+	ITask *task(void);
+}

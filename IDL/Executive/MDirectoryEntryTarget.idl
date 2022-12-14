@@ -1,0 +1,53 @@
+cpp_quote("/* Executive Microkernel");
+cpp_quote(" * MDirectoryEntryTarget.idl");
+cpp_quote(" *   Metaclass interface used in the creation of directory entries");
+cpp_quote(" */");
+cpp_quote("");
+cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
+cpp_quote(" *");
+cpp_quote(" *  Licensed under the Apache License, Version 2.0 (the \"License\");");
+cpp_quote(" *  you may not use this file except in compliance with the License.");
+cpp_quote(" *  You may obtain a copy of the License at");
+cpp_quote(" *");
+cpp_quote(" *      http://www.apache.org/licenses/LICENSE-2.0");
+cpp_quote(" *");
+cpp_quote(" *  Unless required by applicable law or agreed to in writing, software");
+cpp_quote(" *  distributed under the License is distributed on an \"AS IS\" BASIS,");
+cpp_quote(" *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
+cpp_quote(" *  See the License for the specific language governing permissions and");
+cpp_quote(" *  limitations under the License.");
+cpp_quote(" */");
+
+import "IObject.idl";
+
+interface IDirectoryEntry;
+interface IDirectoryEntryTarget;
+
+[
+	object,
+	uuid(2c71beb1-3296-4fc5-b9fb-7aac6654be36),
+	cheader("Executive/MDirectoryEntryTarget.h")
+]
+interface MDirectoryEntryTarget: IObject
+{
+	cpp_quote("#ifndef W_NO_UNSTABLE_INTERFACES");
+	cpp_quote("# warning The MDirectoryEntryTarget interface is currently considered unstable; source and binary compatibility is not assured.");
+	cpp_quote("#endif");
+
+	/* This interface is requested from a metaclass by IContainer::create(),
+	 * in order to pass directory entry information as parameters and trigger
+	 * the creation of any subsidiary entries once the directory entry has
+	 * been added.
+	 *
+	 * Objects can be added to containers that don't support this mechanism,
+	 * but it's used to facilitate the orderly setup of key objects within
+	 * the Executive's Object Directory.
+	 */
+	
+	/* Create a new instance, returning its IDirectoryEntryTarget interface,
+	 * which allows the container to notify it of changes
+	 */
+	STATUS createInstance([in] IDirectoryEntry *dirEntry, [out] IDirectoryEntryTarget **out);
+	
+}
+

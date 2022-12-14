@@ -1,0 +1,14 @@
+## Executive Microkernel
+##   Sources/Subsystems/Makefile.am
+##   External subsystems
+
+## Subsystems are the programs executed by the Executive directly, and they are
+## used to provide critical system services
+##
+## Some subsystems constitute Personalities: that is, they provide a defined
+## operating environment for user programs to execute within
+##
+## There is not necessarily any technical difference between a "subsystem
+## executable" and a "user program executable"
+
+SUBDIRS = VER
