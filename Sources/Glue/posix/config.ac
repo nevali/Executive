@@ -75,13 +75,13 @@ posix_version_other
 		exec_glue_enabled=yes
 		AC_CHECK_HEADERS([dlfcn.h])
 		AC_CHECK_FUNCS([dlopen])
-		AC_CHECK_LIB([dl],[dlopen])
+		AC_CHECK_LIB([dl],[dlopen],[EXEC_GLUE_DYNAMIC_LIBS="-ldl"])
 		if ! test -z "$LIBTOOL" ; then
 			if test x$can_build_shared = xyes && \
 				test x$enable_shared = xyes && \
 				test x$ac_cv_header_dlfcn_h = xyes && \
 				test x$ac_cv_func_dlopen = xyes ; then
-				EXEC_GLUE_OBJECT_DYNAMIC='Glue/posix/Glue_Dynamic_la-entry.lo ../Stubs/PAL-stubs.lo'
+				EXEC_GLUE_OBJECT_DYNAMIC="Glue/posix/Glue_Dynamic_la-entry.lo ../Stubs/PAL-stubs.lo"
 			fi
 			EXEC_GLUE_OBJECT_MODULAR='Glue/posix/Glue_Modular_la-entry.lo'
 			EXEC_GLUE_OBJECT_TARGETED='Glue/posix/Glue_Targeted_la-entry.lo'
