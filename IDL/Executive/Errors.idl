@@ -57,7 +57,10 @@ interface Errors
 	const int E_EXISTS = -9;
 	/* End of file/end of list */
 	const int E_EOF = -10;
-	
+	/* Object is not a container */
+	const int E_NOT_CONTAINER = -11;
+	const int E_NOTDIR = E_NOT_CONTAINER;
+
 	/* Out of memory */
 	const int E_NOMEM = -3;
 

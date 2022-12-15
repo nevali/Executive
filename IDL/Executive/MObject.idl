@@ -1,0 +1,12 @@
+import "IObject.idl";
+import "IAllocator.idl";
+
+[
+        object,
+        uuid(8e0b94ab-06e9-4b01-8fd3-26da890a8af5),
+        cheader("Executive/MObject.h")
+]
+interface MObject: IObject
+{
+    STATUS create([in] IAllocator *allocator, [in] REFUUID iid, [out, iid_is(iid)] void **out);
+}

@@ -103,6 +103,7 @@ Sources/Runtime/arm64/Makefile
 Sources/Glue/Makefile
 Sources/Glue/posix/Makefile
 Sources/Glue/linux/Makefile
+Sources/Directory/Makefile
 PAL/Makefile
 PAL/Stand-in/Makefile
 PAL/POSIX/Makefile

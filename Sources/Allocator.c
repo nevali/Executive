@@ -32,6 +32,10 @@ union Executive_Allocator {
 		/* a reference to the first region allocated to us by the Memory
 		 * Manager */
 		IRegion *firstRegion;
+		/* our region list */
+		size_t regionsSize;
+		size_t regionsCount;
+		IRegion **regions;
 	} data;
 };
 
@@ -109,6 +113,16 @@ Executive_Allocator_create(IMemoryManager *mm)
 	alloc->data.mm = mm;
 	alloc->data.pageSize = IMemoryManager_pageSize(mm);
 	alloc->data.msp = create_mspace_MemoryManager(alloc, 0, 0);
+	ExAssert(NULL != alloc->data.msp);
+	/* create the region list */
+	alloc->data.regionsCount = 0;
+	alloc->data.regionsSize = 2;
+	alloc->data.regions = (IRegion **) mspace_calloc(alloc->data.msp, (alloc->data.regionsSize), sizeof(IRegion *));
+	ExAssert(NULL != alloc->data.regions);
+	/* that allocation operation will have triggered the mapping of the first region */
+	ExAssert(NULL != alloc->data.firstRegion);
+	alloc->data.regions[0] = alloc->data.firstRegion;
+	alloc->data.regionsCount = 1;
 	return &(alloc->Allocator);
 }
 

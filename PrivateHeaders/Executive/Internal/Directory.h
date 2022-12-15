@@ -7,6 +7,8 @@
 # include <Executive/IDirectoryEntryTarget.h>
 # include <Executive/INamespace.h>
 # include <Executive/ILink.h>
+
+# include <Executive/MObject.h>
 # include <Executive/MFactory.h>
 # include <Executive/MDirectoryEntryTarget.h>
 
@@ -36,55 +38,14 @@ typedef enum
 } DirectoryKind;
 
 
-/** Executive::Directory **/
-struct Executive_Directory
-{
-	IDirectoryEntryTarget DirectoryEntryTarget;
-	IMutableContainer MutableContainer;
-	IContainer Container;
-	IObject Object;
-	INamespace Namespace;
-	struct
-	{
-		REFCOUNT refCount;
-		DirectoryKind kind;
-		Executive_Directory_Entry *first, *last;
-	} data;
-};
-
-/** Executive::Directory::Entry **/
-struct Executive_Directory_Entry
-{
-	IDirectoryEntry DirectoryEntry;
-	IObject Object;
-	struct
-	{
-		REFCOUNT refCount;
-		Executive_Directory_Entry *next;
-		char *name;
-		UUID clsid;
-		DirectoryEntryFlags flags;
-		DirectoryEntryFlags userFlags;
-		/* the basic target object */
-		IObject *object;
-		/* the target delegate interface */
-		IDirectoryEntryTarget *delegate;
-		/* if flags & DEF_LINK*/
-		ILink *link;
-		/* if flags & DEF_CONTAINER */
-		IContainer *container;
-	} data;
-};
-
 /* Metaclasses */
+
+/* This callback, registered in Classes.c, is the only "public" interface */
 STATUS Executive_Directory_metaClass(REFUUID clsid, REFUUID iid, void **out);
 
-extern struct MDirectoryEntryTarget Executive_Directory_Container_MDirectoryEntryTarget;
-extern struct MDirectoryEntryTarget Executive_Directory_Root_MDirectoryEntryTarget;
-extern struct MDirectoryEntryTarget Executive_Directory_System_MDirectoryEntryTarget;
-extern struct MDirectoryEntryTarget Executive_Directory_Network_MDirectoryEntryTarget;
-extern struct MDirectoryEntryTarget Executive_Directory_Cluster_MDirectoryEntryTarget;
-extern struct MDirectoryEntryTarget Executive_Directory_Local_MDirectoryEntryTarget;
+extern struct MObject_vtable_ Executive_Directory_MetaClass_MObject_vtable;
+extern struct MFactory_vtable_ Executive_Directory_MetaClass_MFactory_vtable;
+extern struct MDirectoryEntryTarget_vtable_ Executive_Directory_MetaClass_MDirectoryEntryTarget_vtable;
 
 /** Executive::Directory **/
 

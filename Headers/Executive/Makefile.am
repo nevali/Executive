@@ -19,7 +19,7 @@
 ## Most of the headers are generated from IDL source
 
 idlgenerated = Types.h Errors.h UUID.h \
-	IObject.h IAllocator.h MFactory.h \
+	IObject.h IAllocator.h MObject.h MFactory.h \
 	IIterator.h \
 	IPlatform.h IBootEnvironment.h IMemoryManager.h \
 	IRegion.h IRegionHolder.h IPlatformDiagnostics.h \

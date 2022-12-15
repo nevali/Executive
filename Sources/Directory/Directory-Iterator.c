@@ -2,9 +2,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Executive.h"
-
-#include "Executive/Internal/Directory.h"
+#include "p_Directory.h"
 
 #undef INTF_TO_CLASS
 #define INTF_TO_CLASS(i)               (union Executive_Directory_Iterator *)(void *)(i)

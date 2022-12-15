@@ -21,14 +21,15 @@ Executive_StartupTask_mainThread(IThread *self)
 void
 Executive_BootstrapTask_mainThread(IThread *self)
 {
+	STATUS status;
 	struct TaskCreationParameters taskInfo;
-	IWriteChannel *diag;
+	IWriteChannel *diag, *console;
 
 	UNUSED__(self);
 
 	EXLOGF((LOG_TRACE, "Executive::BootstrapTask::mainThread() started"));
 	diag = NULL;
-	if(E_SUCCESS == ExOpen("/System/Diagnostics", &IID_IWriteChannel, &diag))
+	if(E_SUCCESS == (status = ExOpen("/System/Diagnostics", &IID_IWriteChannel, &diag)))
 	{
 		const char *message = "========================================================================\n"
 			" Executive -- Bootstrap Task -- Diagnostic Interface\n"
@@ -38,8 +39,9 @@ Executive_BootstrapTask_mainThread(IThread *self)
 	}
 	else
 	{
-		EXLOGF((LOG_DEBUG7, "unable to open diagnostic channel"));
+		EXLOGF((LOG_DEBUG7, "unable to open diagnostic channel - %d", status));
 	}
+	console = NULL;
 	/* Ask the PAL for its device manager */
 	/* Add the device manager as /System/Nodes/localhost/Devices */
 	/* Add /System/Devices as link to /System/Nodes/localhost/Devices */
@@ -56,6 +58,21 @@ Executive_BootstrapTask_mainThread(IThread *self)
 	ITasker_createTask(executive.data.tasker, &taskInfo, &IID_ITask, NULL);
 
 	Executive_Directory_dump((IContainer *) (void *) executive.data.rootNS);
+
+	if(E_SUCCESS == (status = ExOpen("/System/Devices/Console", &IID_IWriteChannel, &console)))
+	{
+		const char *message = "========================================================================\n"
+			" Executive -- Bootstrap Task -- Console Interface\n"
+			"========================================================================\n";
+		EXLOGF((LOG_DEBUG7, "successfully opened console channel"));
+		IWriteChannel_write(console, (const uint8_t *) message, ExStrLen(message));
+	}
+	else
+	{
+		EXLOGF((LOG_DEBUG7, "unable to open console channel - %d", status));
+		ExPanic("no console");
+	}
+
 
 	if(diag)
 	{

@@ -34,8 +34,6 @@
 # include <Executive/Internal/Entry.h>
 # include <Executive/Internal/Runtime.h>
 
-# include <Executive/MFactory.h>
-
 # include <Executive/IAllocator.h>
 # include <Executive/IBootEnvironment.h>
 # include <Executive/IPlatformDiagnostics.h>
@@ -57,9 +55,12 @@
 # include <Executive/IJob.h>
 # include <Executive/IEvent.h>
 
+# include <Executive/MObject.h>
+# include <Executive/MFactory.h>
 # include <Executive/MDirectoryEntryTarget.h>
 
 # include <Executive/Classes.h>
+# include <Executive/Internal/Classes.h>
 
 # define EXEC_THREAD_STACK_SIZE        32768
 
@@ -168,7 +169,6 @@ extern IAllocator *Executive_Allocator_create(IMemoryManager *mm);
 extern void *Executive_Allocator_map(Executive_Allocator *me, size_t size, RegionFlags flags);
 extern int Executive_Allocator_unmap(Executive_Allocator *me, void *addr, size_t size);
 
-STATUS Executive_metaClass(REFUUID clsid, REFUUID iid, void **out);
 STATUS Executive_Directory_metaClass(REFUUID clsid, REFUUID iid, void **out);
 
 extern IBootEnvironment *Executive_BootEnvironment_create(void);

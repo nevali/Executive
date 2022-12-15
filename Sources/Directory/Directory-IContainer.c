@@ -2,12 +2,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Executive.h"
-
-#include "Executive/Internal/Directory.h"
-
-#undef INTF_TO_CLASS
-#define INTF_TO_CLASS(i)               (struct Executive_Directory *)((i)->instptr)
+#include "p_Directory.h"
 
 /** Executive::Directory<IContainer> **/
 
@@ -66,6 +61,8 @@ dumpDir(IContainer *self, const char *name, int depth)
 	IContainer *container;
 	ILink *link;
 
+	UNUSED__(name);
+	
 	for(c = 0; c < sizeof(space)-1 && c < (size_t) depth; c++)
 	{
 		space[c] = '-';

@@ -2,9 +2,12 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Executive.h"
+#include "p_Directory.h"
 
-#include "Executive/Internal/Directory.h"
+#undef INTF_TO_CLASS
+#define INTF_TO_CLASS(i)               (struct Executive_Directory_Link *)((i)->instptr)
+
+/** Executive::Directory::Link **/
 
 struct Executive_Directory_Link
 {
@@ -16,11 +19,6 @@ struct Executive_Directory_Link
         char *target;
 	} data;
 };
-
-#undef INTF_TO_CLASS
-#define INTF_TO_CLASS(i)               (struct Executive_Directory_Link *)((i)->instptr)
-
-/** Executive::Directory::Link **/
 
 /* IObject */
 static STATUS Executive_Directory_Link_queryInterface(ILink *me, REFUUID iid, void **out);

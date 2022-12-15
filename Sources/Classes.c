@@ -68,8 +68,42 @@ static struct MetaClassEntry metaClass_entries[] = {
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
+/* create an instance using MObject or MFactory */
+STATUS
+Executive_createObject(REFUUID clsid, REFUUID iid, void **out)
+{
+	STATUS status;
+	MObject *constructor;
+	MFactory *factory;
+#ifndef NDEBUG
+	UUIDBUF cbuf, ibuf;
+
+	ExUuidStr(clsid, cbuf);
+	ExUuidStr(iid, ibuf);
+	EXLOGF((LOG_TRACE, "Executive::createObject(clsid:%s, iid:%s", cbuf, ibuf));
+#endif
+	if(E_SUCCESS == (status = Executive_metaClass(clsid, &IID_MObject, (void **) &constructor)))
+	{
+		status = MObject_create(constructor, executive.data.allocator, iid, out);
+		EXLOGF((LOG_DEBUG7, "Executive::createObject(): MObject::create() -> %d", status));
+		MObject_release(constructor);
+		return status;
+	}
+	if(E_SUCCESS == (status = Executive_metaClass(clsid, &IID_MFactory, (void **) &factory)))
+	{
+		status = MFactory_createInstance(factory, NULL, iid, out);
+		EXLOGF((LOG_DEBUG7, "Executive::createObject(): MFactory::createInstance() -> %d", status));
+		MFactory_release(factory);
+		return status;
+	}
+	EXLOGF((LOG_CONDITION, "%%E-NOENT: unable to obtain a suitable metaclass interface with which to create an instance of the requested class"));
+	return E_NOENT;
+}
+
 /* request an interface from the metaclass identified by the specified class
  * UUID
+ *
+ * broadly equivalent to Co/DllGetClassObject()
  */
 STATUS
 Executive_metaClass(REFUUID clsid, REFUUID iid, void **out)
@@ -129,6 +163,45 @@ Executive_nameOfClass(REFUUID clsid)
 		}
 	}
 	return NULL;
+}
+
+STATUS
+Executive_classIdForName(const char *name, UUID *clsid)
+{
+	ExAssert(NULL != name);
+	ExAssert(NULL != clsid);
+
+	size_t n;
+
+	for(n = 0; metaClass_entries[n].className; n++)
+	{
+		if(ExStrEqual(name, metaClass_entries[n].className))
+		{
+			*clsid = *(metaClass_entries[n].clsid);
+			return E_SUCCESS;
+		}
+	}
+	return E_NOENT;
+}
+
+STATUS
+Executive_createObjectByName(const char *name, REFUUID iid, void **out)
+{
+	STATUS status;
+	UUID clsid;
+#ifndef NDEBUG
+	UUIDBUF ibuf;
+
+	ExUuidStr(iid, ibuf);
+	EXLOGF((LOG_TRACE, "Executive::createObjectByName('%s', iid:%s", name, ibuf));
+#endif
+	status = Executive_classIdForName(name, &clsid);
+	if(E_SUCCESS != status)
+	{
+		EXLOGF((LOG_DEBUG, "classIdForName() failed %d", status));
+		return status;
+	}
+	return Executive_createObject(&clsid, iid, out);
 }
 
 static STATUS

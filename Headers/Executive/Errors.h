@@ -39,6 +39,8 @@ typedef int STATUS;
 #  define E_NOENT -5
 #  define E_EXISTS -9
 #  define E_EOF -10
+#  define E_NOT_CONTAINER -11
+#  define E_NOTDIR E_NOT_CONTAINER
 #  define E_NOMEM -3
 #  define E_IO -4
 #  define E_USER -1024

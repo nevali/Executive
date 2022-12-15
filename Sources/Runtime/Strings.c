@@ -10,7 +10,7 @@ Executive_String_length(const char *str)
 	size_t c;
 
 	ExAssert(NULL != str);
-	for(c = 0; *str; str++)
+	for(c = 1; *str; str++)
 	{
 		c++;
 	}

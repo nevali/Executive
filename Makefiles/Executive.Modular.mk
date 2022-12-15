@@ -8,7 +8,7 @@ sbin_PROGRAMS += Executive.Modular
 Executive_Modular_CPPFLAGS =  @AM_CPPFLAGS@ @EXEC_GLUE_CPPFLAGS@ -DEXEC_BUILD_MODULAR=1 ${WARNING_CPPFLAGS}
 Executive_Modular_SOURCES = $(ENTRYPOINT)
 Executive_Modular_LDADD = @EXEC_GLUE_OBJECT_MODULAR@ \
-	$(top_builddir)/Sources/libExecutiveServices.la \
+	$(top_builddir)/Sources/libExecutiveServices.Debug.la \
 	$(top_builddir)/Stubs/libPAL.la
 Executive_Modular_LDFLAGS = @AM_LDFLAGS@ @EXEC_GLUE_LDFLAGS@
 Executive_Modular_DEPENDENCIES = $(ENTRYPOINT) $(Executive_Modular_LDADD)

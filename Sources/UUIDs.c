@@ -3,6 +3,7 @@
 #define INITGUID
 #include <Executive/initguid.h>
 
+#include <Executive/MObject.h>
 #include <Executive/MFactory.h>
 
 #include <Executive/IObject.h>

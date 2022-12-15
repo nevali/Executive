@@ -24,8 +24,14 @@
 # include <Executive/Errors.h>
 # include <PAL/PAL.h>
 # include <Executive/IWriteChannel.h>
+# include <Executive/IContainer.h>
+# include <Executive/IMutableContainer.h>
+# include <Executive/MFactory.h>
 
-typedef union PAL_POSIX_Platform PAL_POSIX_Platform;
+# include <Executive/Classes.h>
+# include <Executive/Internal/Classes.h>
+
+typedef struct PAL_POSIX_Platform PAL_POSIX_Platform;
 typedef union PAL_POSIX_MemoryManager PAL_POSIX_MemoryManager;
 typedef union PAL_POSIX_Region PAL_POSIX_Region;
 typedef union PAL_POSIX_BootEnvironment PAL_POSIX_BootEnvironment;
@@ -42,14 +48,15 @@ extern PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics;
  * containing a set of distinct interfaces, each with their own backreference,
  * would be required (and traversal logic in method bodies).
  */
-union PAL_POSIX_Platform
+struct PAL_POSIX_Platform
 {
-	IPlatform Platform;
 	IObject Object;
+	IPlatform Platform;
+	IContainer Container;
 	struct
 	{
-		void *vtable;
 		IAllocator *allocator;
+		IMutableContainer *platformContainer;
 	} data;	
 };
 

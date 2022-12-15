@@ -4,22 +4,39 @@
 
 #include "p_POSIX.h"
 
-#define INTF_TO_CLASS(i) (PAL_POSIX_Platform *)((void *)(i))
+#define INTF_TO_CLASS(i) (PAL_POSIX_Platform *)((void *)(i)->instptr)
 
-static int PAL_POSIX_Platform_queryInterface(struct IPlatform *self, REFUUID iid, void **out);
-static int32_t PAL_POSIX_Platform_retain(struct IPlatform *self);
-static int32_t PAL_POSIX_Platform_release(struct IPlatform *self);
+static STATUS PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out);
+static REFCOUNT PAL_POSIX_Platform_retain(IObject *self);
+static REFCOUNT PAL_POSIX_Platform_release(IObject *self);
 static void PAL_POSIX_Platform_panic(struct IPlatform *self, const char *str);
 static void PAL_POSIX_Platform_setDefaultAllocator(struct IPlatform *self, IAllocator *allocator);
 static void PAL_POSIX_Platform_nap(struct IPlatform *self);
+static STATUS PAL_POSIX_Platform_resolve(IContainer *self, const char *name, IDirectoryEntry **entry);
+static IIterator *PAL_POSIX_Platform_iterator(IContainer *self);
 
-static struct IPlatform_vtable_ platform_vtable = {
+/* IObject */
+static struct IObject_vtable_ platform_IObject_vtable = {
 	PAL_POSIX_Platform_queryInterface,
 	PAL_POSIX_Platform_retain,
 	PAL_POSIX_Platform_release,
+};
+/* IPlatform */
+static struct IPlatform_vtable_ platform_IPlatform_vtable = {
+	(STATUS (*)(IPlatform *, REFUUID, void **)) &PAL_POSIX_Platform_queryInterface,
+	(REFCOUNT (*)(IPlatform *)) &PAL_POSIX_Platform_retain,
+	(REFCOUNT (*)(IPlatform *)) &PAL_POSIX_Platform_release,
 	PAL_POSIX_Platform_panic,
 	PAL_POSIX_Platform_setDefaultAllocator,
 	PAL_POSIX_Platform_nap
+};
+/* IContainer */
+static struct IContainer_vtable_ platform_IContainer_vtable = {
+	(STATUS (*)(IContainer *, REFUUID, void **)) &PAL_POSIX_Platform_queryInterface,
+	(REFCOUNT (*)(IContainer *)) &PAL_POSIX_Platform_retain,
+	(REFCOUNT (*)(IContainer *)) &PAL_POSIX_Platform_release,
+	PAL_POSIX_Platform_resolve,
+	PAL_POSIX_Platform_iterator
 };
 
 PAL_POSIX_Platform PAL_POSIX_platform;
@@ -28,21 +45,26 @@ void
 PAL_POSIX_Platform_init(void)
 {
 	memset(&PAL_POSIX_platform, 0, sizeof(PAL_POSIX_platform));
-	PAL_POSIX_platform.Platform.lpVtbl = &platform_vtable;
+	PAL_POSIX_platform.Object.lpVtbl = &platform_IObject_vtable;
+	PAL_POSIX_platform.Object.instptr = &PAL_POSIX_platform;
+	PAL_POSIX_platform.Platform.lpVtbl = &platform_IPlatform_vtable;
+	PAL_POSIX_platform.Platform.instptr = &PAL_POSIX_platform;
+	PAL_POSIX_platform.Container.lpVtbl = &platform_IContainer_vtable;
+	PAL_POSIX_platform.Container.instptr = &PAL_POSIX_platform;
 }
 
 /* IObject */
 
-static int
-PAL_POSIX_Platform_queryInterface(struct IPlatform *self, REFUUID iid, void **out)
+static STATUS
+PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 {
+	STATUS status;
 	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
 
 	if(0 == memcmp(iid, &IID_IObject, sizeof(UUID)))
 	{
 		if(*out)
 		{
-			IPlatform_retain(self);
 			*out = &(me->Object);
 		}
 		return E_SUCCESS;
@@ -51,8 +73,26 @@ PAL_POSIX_Platform_queryInterface(struct IPlatform *self, REFUUID iid, void **ou
 	{
 		if(*out)
 		{
-			IPlatform_retain(self);
 			*out = &(me->Platform);
+		}
+		return E_SUCCESS;
+	}
+	if(0 == memcmp(iid, &IID_IContainer, sizeof(UUID)))
+	{
+		if(!me->data.platformContainer)
+		{
+			PALDebug("PAL::Platform::queryInterface(): creating platform container");
+			if(E_SUCCESS != (status = Executive_createObjectByName("Executive::Container", &IID_IMutableContainer, (void **) &(me->data.platformContainer))))
+			{
+				PAL_panic("Executive::createObject(Executive::Container, IMutableContainer) failed");
+				return status;
+			}
+			PALDebug("PAL::Platform::queryInterface(): created platform container!");
+			IMutableContainer_create((me->data.platformContainer), "Devices", &CLSID_Executive_Container, NULL, NULL);
+		}
+		if(*out)
+		{
+			*out = &(me->Container);
 		}
 		return E_SUCCESS;
 	}
@@ -62,16 +102,16 @@ PAL_POSIX_Platform_queryInterface(struct IPlatform *self, REFUUID iid, void **ou
 /* The Platform object is a singleton and cannot be destroyed, therefore
  * reference-counting is not implemented
  */
-static int32_t
-PAL_POSIX_Platform_retain(struct IPlatform *self)
+static REFCOUNT
+PAL_POSIX_Platform_retain(IObject *self)
 {
 	UNUSED__(self);
 
 	return 2;
 }
 
-static int32_t
-PAL_POSIX_Platform_release(struct IPlatform *self)
+static REFCOUNT
+PAL_POSIX_Platform_release(IObject *self)
 {
 	UNUSED__(self);
 
@@ -81,7 +121,7 @@ PAL_POSIX_Platform_release(struct IPlatform *self)
 /* IPlatform */
 
 static void
-PAL_POSIX_Platform_panic(struct IPlatform *self, const char *string)
+PAL_POSIX_Platform_panic(IPlatform *self, const char *string)
 {
 	UNUSED__(self);
 
@@ -89,7 +129,7 @@ PAL_POSIX_Platform_panic(struct IPlatform *self, const char *string)
 }
 
 static void
-PAL_POSIX_Platform_setDefaultAllocator(struct IPlatform *self, IAllocator *allocator)
+PAL_POSIX_Platform_setDefaultAllocator(IPlatform *self, IAllocator *allocator)
 {
 	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
 
@@ -103,10 +143,40 @@ PAL_POSIX_Platform_setDefaultAllocator(struct IPlatform *self, IAllocator *alloc
 }
 
 static void
-PAL_POSIX_Platform_nap(struct IPlatform *self)
+PAL_POSIX_Platform_nap(IPlatform *self)
 {
 	UNUSED__(self);
 	
 	PALDebug("PAL::POSIX::Platform::nap()");
 	sleep(1);
+}
+
+static STATUS
+PAL_POSIX_Platform_resolve(IContainer *self, const char *name, IDirectoryEntry **entry)
+{
+	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
+
+	fprintf(stderr, "PAL::POSIX::Platform<IContainer>::resolve('%s')\n", name);
+	if(entry)
+	{
+		*entry = NULL;
+	}
+	if(!me->data.platformContainer)
+	{
+		return E_NOTIMPL;
+	}
+	return IMutableContainer_resolve(me->data.platformContainer, name, entry);
+}
+
+static IIterator *
+PAL_POSIX_Platform_iterator(IContainer *self)
+{
+	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
+
+	fprintf(stderr, "PAL::POSIX::Platform<IContainer>::iterator()\n");
+	if(!me->data.platformContainer)
+	{
+		return NULL;
+	}
+	return IMutableContainer_iterator(me->data.platformContainer);
 }

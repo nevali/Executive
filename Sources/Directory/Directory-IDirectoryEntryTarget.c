@@ -2,12 +2,10 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Executive.h"
+#include "p_Directory.h"
 
-#include "Executive/Internal/Directory.h"
-
-#undef INTF_TO_CLASS
-#define INTF_TO_CLASS(i)               (struct Executive_Directory *)((i)->instptr)
+/* for CLSID_PAL_xxx */
+#include <PAL/PAL.h>
 
 /** Executive::Directory<IDirectoryEntryTarget> **/
 
@@ -24,18 +22,13 @@ Executive_Directory_linked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
 {
 	Executive_Directory *self = INTF_TO_CLASS(me);
 
+	UNUSED__(entry);
+
 	EXLOGF((LOG_TRACE, "Executive::Directory::<IDirectoryEntryTarget>linked('%s')", IDirectoryEntry_name(entry)));
 	switch(self->data.kind)
 	{
 	case DK_SYSTEM:
 		EXLOGF((LOG_DEBUG, "Executive::Directory: populating the /System domain"));
-		ExAssert(E_SUCCESS == IMutableContainer_add((&(self->MutableContainer)), "Platform", &CLSID_PAL_Platform, (IObject *) (void *) (executive.data.platform)));
-		self->data.last->data.flags |= DEF_HIDDEN;
-		if(executive.data.diagnostics)
-		{
-			ExAssert(E_SUCCESS == IMutableContainer_add((&(self->MutableContainer)), "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) (executive.data.diagnostics)));
-			self->data.last->data.flags |= DEF_HIDDEN;
-		}
 		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Nodes", &CLSID_Executive_Container, NULL, NULL));
 		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Volumes", &CLSID_Executive_Container, NULL, NULL));
 		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Boot", &CLSID_Executive_Container, NULL, NULL));
@@ -89,6 +82,7 @@ Executive_Directory_unlinked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
 	Executive_Directory *self = INTF_TO_CLASS(me);
 
 	UNUSED__(self);
+	UNUSED__(entry);
 
 	EXLOGF((LOG_TRACE, "Executive::Directory::<IDirectoryEntryTarget>unlinked(): %s", IDirectoryEntry_name(entry)));
 }

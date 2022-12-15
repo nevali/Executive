@@ -2,12 +2,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Executive.h"
-
-#include "Executive/Internal/Directory.h"
-
-#undef INTF_TO_CLASS
-#define INTF_TO_CLASS(i)               (struct Executive_Directory *)((i)->instptr)
+#include "p_Directory.h"
 
 /** Executive::Directory<INamespace> **/
 
@@ -32,174 +27,198 @@ Executive_Directory_resolveEntry(INamespace *me, const char *path, IContainer *s
 {
 	Executive_Directory *self = INTF_TO_CLASS(me);
 	STATUS status;
-	const char *head, *tail;
-	char objname[32];
-	IDirectoryEntry *cur;
-	IContainer *dscope;
+	IContainer *parent;
+	const char *basename;
+
+	UNUSED__(self);
 
 	ExAssert(NULL != dentry);
 	ExAssert(NULL != path);
+	parent = NULL;
+	basename = NULL;
+	EXLOGF((LOG_TRACE, "Executive::Directory<INamespace>::resolveEntry('%s')", path));
 
-	*dentry = NULL;
-	dscope = NULL;
-	cur = NULL;	
-	if(!scope || path[0] == '/')
+	/* resolve all but the final path component to a container */
+	if(E_SUCCESS != (status = Executive_Directory_resolveContainer(me, path, scope, &parent, &basename)))
 	{
-		scope = &(self->Container);
+		EXLOGF((LOG_DEBUG, "Executive::Directory<INamespace>::resolveEntry(): resolveContainer() failed - %d", status));
+		return status;
 	}
-	head = path;
-	do
-	{
-		for(; head[0] == '/'; head++);
-		if(!head[0])
-		{
-			break;
-		}
-		for(tail = head; tail[0] && tail[0] != '/'; tail++);
-		if((size_t) (tail - head) >= sizeof(objname))
-		{
-			EXLOGF((LOG_CONDITION, "path component too long in INamespace::resolvePath()"));
-			if(dscope)
-			{
-				IContainer_release(dscope);
-			}		
-			return E_NOENT;
-		}
-		/* copy the path from head .. tail to our buffer, null-terminating it */
-		ExStrLCopy(objname, sizeof(objname), head, tail - head);
-		/* attempt to resolve the path component within the current scope */
-		status = IContainer_resolve(scope, objname, &cur);
-		if(dscope)
-		{
-			/* if the current scope was retained by us, release it */
-			IContainer_release(dscope);
-		}
-		if(status != E_SUCCESS)
-		{
-			/* if the path component could not be resolved, return failure */
-			return status;
-		}
-		/* was this the last path component? */
-		if(!tail[0])
-		{
-			/* no more path components - resolved successfully */
-			*dentry = cur;
-			return E_SUCCESS;
-		}
-		/* attempt to open the entry's target as a container */
-		status = IDirectoryEntry_queryTargetInterface(cur, &IID_IContainer, (void **) &dscope);
-		if(status != E_SUCCESS)
-		{
-			/* cannot traverse if it doesn't support IContainer */
-			EXLOGF((LOG_DEBUG, "object %s is not a container", objname));
-			return E_NOENT;
-		}
-		/* the scope is now the container interface we just obtained */
-		scope = dscope;
-		/* continue processing the path at the slash character */
-		head = tail;
-	}
-	while(scope && head[0]);
-	/* if we reached this point, there were trailing slashes, or
-	 * an empty path was provided; if cur is non-NULL, it means
-	 * we successfully resolved the path up until this point, and
-	 * were simply expecting another path component to resolve
-	 */
-	/* if the scope was retained by us, release it*/
-	if(dscope)
-	{
-		IContainer_release(dscope);
-	}
-	if(cur)
-	{
-		*dentry = cur;
-		return E_SUCCESS;
-	}
-	EXLOGF((LOG_CONDITION, "%%E-NOENT: empty path provided to INamespace::resolvePath()"));
-	return E_NOENT;
+	/* resolve the remainder within that container */
+	EXLOGF((LOG_DEBUG, "Executive::Directory<INamespace>::resolveEntry(): resolving '%s' within parent %p", basename, parent));
+	ExAssert(NULL != parent);
+	status = IContainer_resolve(parent, basename, dentry);
+	IContainer_release(parent);
+	return status;
 }
 
+/* INamespace::resolveContainer() implements the core path traversal logic
+ *
+ * its purpose is to return to the caller the container the object at a given
+ * path (which may not exist yet), and which may be absolute, or relative to
+ * a particular scope
+ *
+ * any links encountered along the way are followed, up to a maximum limit
+ */
 STATUS
 Executive_Directory_resolveContainer(INamespace *me, const char *path, IContainer *scope, IContainer **container, const char **basename)
 {
 	Executive_Directory *self = INTF_TO_CLASS(me);
 	STATUS status;
-	const char *head, *tail;
-	char objname[32];
-	IDirectoryEntry *cur;
-	IContainer *dscope;
+	size_t linkCount;
+	char *buffer, *head, *tail;
+	int save;
+	IDirectoryEntry *dentry, *linkEntry;
+	ILink *link;
+	DirectoryEntryFlags flags;
+	IContainer *childContainer;
 
 	ExAssert(NULL != container);
 	ExAssert(NULL != path);
 
+	EXLOGF((LOG_TRACE, "Executive::Directory<INamespace>::resolveContainer('%s')", path));
+
 	*container = NULL;
-	dscope = NULL;
-	cur = NULL;	
-	if(!scope || path[0] == '/')
+	if(basename)
+	{
+		*basename = NULL;
+	}
+	dentry = NULL;
+	link = NULL;
+	linkEntry = NULL;
+	linkCount = 0;
+	status = E_SUCCESS;
+	/* the supplied path is duplicated into a buffer */
+	buffer = ExStrDup(path);
+	if(NULL == buffer)
+	{
+		return E_NOMEM;
+	}
+	/* ensure we have a starting scope */
+	if(!scope || buffer[0] == '/')
 	{
 		scope = &(self->Container);
 	}
-	head = path;
-	do
+	head = tail = buffer;
+	IContainer_retain(scope);
+	while(scope && head[0])
 	{
+		/* skip any extraneous slashes */
 		for(; head[0] == '/'; head++);
+		/* if there are no characters remaining, stop processing */
 		if(!head[0])
 		{
 			break;
 		}
+		/* start at head and continue until a slash or the end of the string
+		 * is reached, storing the position in tail, thus head .. tail consists
+		 * of a single path component with trailing slash
+		 */
 		for(tail = head; tail[0] && tail[0] != '/'; tail++);
+		/* if there is no trailing slash, perform no further processing - the
+		 * purpose of this function is to locate the container of the named
+		 * path
+		 */
 		if(!tail[0])
 		{
 			break;
 		}
-		if((size_t) (tail - head) >= sizeof(objname))
-		{
-			EXLOGF((LOG_CONDITION, "path component too long in INamespace::resolveContainer()"));
-			if(dscope)
-			{
-				IContainer_release(dscope);
-			}		
-			return E_NOENT;
-		}
-		/* copy the path from head .. tail to our buffer, null-terminating it */
-		ExStrLCopy(objname, sizeof(objname), head, tail - head);
+		/* save the path separator and terminate the string at tail */
+		save = tail[0];
+		tail[0] = 0;
+
+		EXLOGF((LOG_DEBUG, "*** will attempt to resolve path component '%s' to a container", head));
+
 		/* attempt to resolve the path component within the current scope */
-		status = IContainer_resolve(scope, objname, &cur);
-		if(dscope)
+		if(E_SUCCESS != (status = IContainer_resolve(scope, head, &dentry))) break;
+		flags = IDirectoryEntry_flags(dentry);
+		/* attempt to resolve any link chains */
+		for(; linkCount < 16 && flags & DEF_LINK; linkCount++)
 		{
-			/* if the current scope was retained by us, release it */
-			IContainer_release(dscope);
+			/* attempt to read the link */
+			status = IDirectoryEntry_queryTargetInterface(dentry, &IID_ILink, (void **) &link);
+			if(status != E_SUCCESS)
+			{
+				/* cannot traverse if it doesn't support ILink */
+				EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: Executive::Directory::ResolveContainer(): '%s' does not support ILink", buffer));
+				break;
+			}
+			EXLOGF((LOG_DEBUG, "attempting to resolve '%s'", ILink_target(link)));
+			status = Executive_Directory_resolveEntry(me, ILink_target(link), scope, &linkEntry);
+			ILink_release(link);
+			if(E_SUCCESS != status)
+			{
+				EXLOGF((LOG_DEBUG, "resolveEntry() failed %d", status));
+				break;
+			}
+			EXLOGF((LOG_DEBUG, "have resolved link to a new entry"));
+			/* replace the entry and fetch the flags again */
+			IDirectoryEntry_release(dentry);
+			dentry = linkEntry;
+			flags = IDirectoryEntry_flags(dentry);
 		}
-		if(status != E_SUCCESS)
+		/* if flags still assert DEF_LINK, we didn't process all of the links
+		 * in the chain
+		 */
+		if(flags & DEF_LINK)
 		{
-			/* if the path component could not be resolved, return failure */
-			return status;
+			EXLOGF((LOG_CONDITION, "%%E-???: %s: too many levels of links (stopped at %d)", linkCount));
+			status = E_NOT_CONTAINER;
+			break;
 		}
+		if(E_SUCCESS != status)
+		{
+			EXLOGF((LOG_DEBUG, "link traversal failed"));
+			break;
+		}
+		if(!(flags & DEF_CONTAINER))
+		{
+			/* this object must be either a container or a link to a container */
+			EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: Executive::Directory::ResolveContainer(): '%s' is not a containerr", buffer));
+			status = E_NOT_CONTAINER;
+			break;
+		}	
 		/* attempt to open the entry's target as a container */
-		status = IDirectoryEntry_queryTargetInterface(cur, &IID_IContainer, (void **) &dscope);
+		status = IDirectoryEntry_queryTargetInterface(dentry, &IID_IContainer, (void **) &childContainer);
+		IDirectoryEntry_release(dentry);
+		dentry = NULL;
 		if(status != E_SUCCESS)
 		{
-			/* cannot traverse if it doesn't support IContainer */
-			EXLOGF((LOG_DEBUG, "object %s is not a container", objname));
-			return E_NOENT;
+			EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: Executive::Directory::ResolveContainer(): '%s' does not support IContainer", buffer));
+			break;
 		}
+		ExAssert(NULL != childContainer);
 		/* the scope is now the container interface we just obtained */
-		scope = dscope;
-		/* continue processing the path at the slash character */
+		IContainer_release(scope);
+		scope = childContainer;
+		childContainer = NULL;
+		/* continue processing the path at the path separator */
 		head = tail;
+		head[0] = save;
 	}
-	while(scope && head[0]);
-	if(basename)
+	if(E_SUCCESS == status)
 	{
-		*basename = head;
+		EXLOGF((LOG_DEBUG, "%s: successfully resolved to container", buffer));
+		if(basename)
+		{
+			/* skip any leftover slashes */
+			for(; head[0] == '/'; head++);
+			*basename = path + (head - buffer);
+			EXLOGF((LOG_DEBUG7, "buffer = '%s', basename = '%s'", buffer, *basename));
+		}
+		*container = scope;
 	}
-	*container = scope;
-	if(!dscope)
+	else
 	{
-		/* we're returning a reference to ourselves */
-		self->data.refCount++;
+		EXLOGF((LOG_DEBUG, "%s: failed to resolve to container %d", buffer, status));
+		IContainer_release(scope);
 	}
-	return E_SUCCESS;
+	if(dentry)
+	{
+		IDirectoryEntry_release(dentry);
+	}
+	ExFree(buffer);
+	return status;
 }
 
 /* resolve the given path to a directory entry, then attempt to obtain the

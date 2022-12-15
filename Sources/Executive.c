@@ -91,6 +91,14 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	/* Create the System domain */
 	ExAssert(E_SUCCESS == ExCreate("/System", &CLSID_Executive_System, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/System", DEF_SYSTEM|DEF_IMMUTABLE));
+
+	ExAssert(E_SUCCESS == ExAdd("/System/Platform", &CLSID_PAL_Platform, (IObject *) (void *) (executive.data.platform)));
+	ExAssert(E_SUCCESS == ExSetFlags("/System/Platform", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN));	
+	if(executive.data.diagnostics)
+	{
+		ExAssert(E_SUCCESS == ExAdd("/System/Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) (executive.data.diagnostics)));
+		ExAssert(E_SUCCESS == ExSetFlags("/System/Diagnostics", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN));	
+	}
 	ExAssert(E_SUCCESS == ExCreate("/Users", &CLSID_Executive_Container, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/Users", DEF_IMMUTABLE));
 	ExAssert(E_SUCCESS == ExCreate("/Volumes", &CLSID_Executive_Container, NULL, NULL));
