@@ -25,8 +25,9 @@ EXTRA_DIST = README.md LICENSE-2.0 Dockerfile docker-bake.hcl
 ## else has been built
 
 sbin_PROGRAMS =
+CLEANFILES =
 
-ENTRYPOINT = Sources/entrypoint.c Sources/UUIDs.c
+ENTRYPOINT = Sources/entrypoint.c
 
 include $(top_srcdir)/Makefiles/Executive.Monolith.mk
 include $(top_srcdir)/Makefiles/Executive.Targeted.mk

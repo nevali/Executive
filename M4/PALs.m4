@@ -44,18 +44,18 @@ AC_REQUIRE([EX_ARG_ENABLE_PALS])dnl
 AS_VAR_SET([exec_pal_]$1[_enabled], ["no"])
 AS_VAR_SET([exec_pal_]$1[_build_targeted], [no])
 AS_VAR_SET([exec_pal_]$1[_build_monolith], [no])
-AS_VAR_SET([EXEC_PAL_]$1[_MOD], [""])
-AS_VAR_SET([EXEC_PAL_]$1[_DLL], [""])
-AS_VAR_SET([EXEC_PAL_]$1[_LIB], [""])
+m4_foreach([BUILDTYPE],[[Release], [Free], [Debug]], [
+	m4_foreach([OBJTYPE],[[MOD], [DLL], [LIB]],[
+		AS_VAR_SET([EXEC_PAL_]OBJTYPE[_]BUILDTYPE, [""])
+		AS_VAR_SET([EXEC_PAL_]$1[_]OBJTYPE[_]BUILDTYPE, [""])
+	])
+])
 AS_VAR_SET([EXEC_PAL_]$1[_CPPFLAGS], [""])
 AS_VAR_SET([EXEC_PAL_]$1[_LDFLAGS], [""])
 
 AS_VAR_SET([exec_pal_enabled],["no"])
 AS_VAR_SET([exec_pal_build_targeted], [no])
 AS_VAR_SET([exec_pal_build_monolith], [no])
-AS_VAR_SET([EXEC_PAL_MOD], [""])
-AS_VAR_SET([EXEC_PAL_DLL], [""])
-AS_VAR_SET([EXEC_PAL_LIB], [""])
 AS_VAR_SET([EXEC_PAL_CPPFLAGS], [""])
 AS_VAR_SET([EXEC_PAL_LDFLAGS], [""])
 
@@ -69,12 +69,15 @@ if test $exec_pal_enabled = yes ; then
 	AC_SUBST([exec_pal_]$1[_build_targeted])
 	AS_VAR_SET([exec_pal_]$1[_build_monolith], [$exec_pal_build_monolith])
 	AC_SUBST([exec_pal_]$1[_build_monolith])
-	AS_VAR_SET([EXEC_PAL_]$1[_MOD], ["$EXEC_PAL_MOD"])
-	AC_SUBST([EXEC_PAL_]$1[_MOD])
-	AS_VAR_SET([EXEC_PAL_]$1[_DLL], ["$EXEC_PAL_DLL"])
-	AC_SUBST([EXEC_PAL_]$1[_DLL])
-	AS_VAR_SET([EXEC_PAL_]$1[_LIB], ["$EXEC_PAL_LIB"])
-	AC_SUBST([EXEC_PAL_]$1[_LIB])
+	m4_foreach([BUILDTYPE],[[Release], [Free], [Debug]], [
+		m4_foreach([OBJTYPE],[[MOD], [DLL], [LIB]],[
+			if test -z "$[EXEC_PAL_]OBJTYPE[_]BUILDTYPE" ; then
+				[EXEC_PAL_]OBJTYPE[_]BUILDTYPE[="$EXEC_PAL_]OBJTYPE["]
+			fi
+			AS_VAR_SET([EXEC_PAL_]$1[_]OBJTYPE[_]BUILDTYPE, ["$EXEC_PAL_]OBJTYPE[_]BUILDTYPE["])
+			AC_SUBST([EXEC_PAL_]$1[_]OBJTYPE[_]BUILDTYPE)
+		])
+	])
 	AS_VAR_SET([EXEC_PAL_]$1[_CPPFLAGS], ["$EXEC_PAL_CPPFLAGS"])
 	AC_SUBST([EXEC_PAL_]$1[_CPPFLAGS])
 	AS_VAR_SET([EXEC_PAL_]$1[_LDFLAGS], ["$EXEC_PAL_LDFLAGS"])

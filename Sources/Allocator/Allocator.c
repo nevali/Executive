@@ -2,9 +2,9 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Executive.h"
+#include "../p_Executive.h"
 
-#include "Runtime/dlmalloc/malloc.h"
+#include "dlmalloc/malloc.h"
 
 #define INTF_TO_CLASS(i)               (Executive_Allocator *)((void *)(i))
 

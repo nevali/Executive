@@ -7,15 +7,9 @@
 if test $exec_glue = posix ; then
 	exec_pal_enabled=yes
 
-	EXEC_PAL_MOD="PAL/POSIX/PAL.la"
-
-	EXEC_PAL_DLL="PAL/POSIX/libPAL.POSIX.la"
-	EXEC_PAL_DLL_Free="PAL/POSIX/libPAL.POSIX.Free.la"
-	EXEC_PAL_DLL_Debug="PAL/POSIX/libPAL.POSIX.Debug.la"
-
-	EXEC_PAL_LIB="PAL/POSIX/libPAL.Static.Debug.la"
-	EXEC_PAL_LIB_Free="PAL/POSIX/libPAL.Static.Free.la"
-	EXEC_PAL_LIB_Debug="PAL/POSIX/libPAL.Static.Debug.la"
+	EXEC_PAL_MOD="PAL/PAL.POSIX${EXEC_BUILD_SUFFIX}.la"
+	EXEC_PAL_DLL="PAL/libPAL.POSIX${EXEC_BUILD_SUFFIX}.la"
+	EXEC_PAL_LIB="PAL/POSIX/libPAL.POSIX${EXEC_BUILD_SUFFIX}.Static.la"
 
 	exec_pal_build_targeted=yes
 	exec_pal_build_monolith=yes

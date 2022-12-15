@@ -63,6 +63,8 @@ LT_INIT
 LT_LANG([C])
 ## Check that the host architecture is supported
 EX_CHECK_ARCHITECTURE
+## Check which build types to perform
+EX_CHECK_BUILDTYPES
 ## Determine which Glue module to use
 EX_CHECK_GLUE
 ## Check which Platform Adaptation Layers (PALs) to build
@@ -83,6 +85,7 @@ fi
 ## Silence the #warning embedded in header files generated from IDL not yet
 ## considered to be stable
 AS_VAR_APPEND([AM_CPPFLAGS],[" -DW_NO_UNSTABLE_INTERFACES"])
+
 ## Specify substituted output files
 AC_CONFIG_FILES([
 Makefile
@@ -97,13 +100,14 @@ PrivateHeaders/Executive/Internal/Makefile
 Stubs/Makefile
 Sources/Makefile
 Sources/Runtime/Makefile
-Sources/Runtime/dlmalloc/Makefile
 Sources/Runtime/snprintf/Makefile
 Sources/Runtime/arm64/Makefile
+Sources/Allocator/Makefile
+Sources/Allocator/dlmalloc/Makefile
+Sources/Directory/Makefile
 Sources/Glue/Makefile
 Sources/Glue/posix/Makefile
 Sources/Glue/linux/Makefile
-Sources/Directory/Makefile
 PAL/Makefile
 PAL/Stand-in/Makefile
 PAL/POSIX/Makefile

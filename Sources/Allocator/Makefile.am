@@ -1,6 +1,6 @@
 ## Executive Microkernel
-##   Sources/PAL/Makefile.am
-##   Platform Adaptation Layers (PALs)
+## Allocator
+##  
 
 ## Copyright 2015-2022 Mo McRoberts.
 ##
@@ -16,10 +16,12 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-DIST_SUBDIRS = POSIX
+noinst_LTLIBRARIES = libAllocator.la libAllocatorThirdParty.la
 
-EXTRA_DIST = PAL.mk
+libAllocator_la_SOURCES =  p_Allocator.h \
+	Allocator.c
+libAllocatorThirdParty_la_SOURCES = p_Runtime.h \
+	dlmalloc/malloc.h dlmalloc/malloc.c
 
-SUBDIRS = Stand-in . @exec_pal_list@
-
-CLEANFILES = *.la
+libAllocator_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
+libAllocator_la_LIBADD = libAllocatorThirdParty.la

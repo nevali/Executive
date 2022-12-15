@@ -16,9 +16,9 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-noinst_LTLIBRARIES = libDirectory.Debug.la libDirectory.Free.la libDirectory.Release.la
+noinst_LTLIBRARIES = libDirectory.la
 
-libDirectory_Release_la_SOURCES = p_Directory.h \
+libDirectory_la_SOURCES = p_Directory.h \
 	Directory.c Directory-MObject.c Directory-MDirectoryEntryTarget.c \
 	\
 	Directory-IObject.c Directory-IContainer.c Directory-IMutableContainer.c \
@@ -30,11 +30,4 @@ libDirectory_Release_la_SOURCES = p_Directory.h \
 	\
 	Directory-Link.c
 
-libDirectory_Release_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} ${RELEASE_CPPFLAGS}
-
-
-libDirectory_Free_la_SOURCES = $(libDirectory_Release_la_SOURCES)
-libDirectory_Free_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} ${FREE_CPPFLAGS}
-
-libDirectory_Debug_la_SOURCES = $(libDirectory_Release_la_SOURCES)
-libDirectory_Debug_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} ${DEBUG_CPPFLAGS}
+libDirectory_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}

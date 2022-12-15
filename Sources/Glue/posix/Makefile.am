@@ -10,7 +10,7 @@ GLUESRC = entry.c
 
 include $(top_srcdir)/Makefiles/Glue.mk
 
-noinst_PROGRAMS = GlueTest
+check_PROGRAMS = GlueTest
 
 GlueTest_SOURCES = entry.c test-stubs.c
 GlueTest_CPPFLAGS = ${AM_CPPFLAGS} -DEXEC_BUILD_DYNAMIC=1
