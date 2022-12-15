@@ -141,7 +141,7 @@ struct Executive
 # undef ExAlloc
 # define ExAlloc(nbytes)               IAllocator_alloc(executive.data.allocator, nbytes)
 # undef ExReAlloc
-# define ExReAlloc(ptr, nbytes)        IAllocator_realloc(executive.data.allocator, ptr nbytes)
+# define ExReAlloc(ptr, nbytes)        IAllocator_realloc(executive.data.allocator, ptr, nbytes)
 # undef ExFree
 # define ExFree(ptr)                   IAllocator_free(executive.data.allocator, ptr)
 # undef ExYield

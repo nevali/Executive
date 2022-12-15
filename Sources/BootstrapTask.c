@@ -6,6 +6,8 @@
 
 extern void Executive_Directory_dump(IContainer *me);
 
+extern void abort(void);
+
 void
 Executive_StartupTask_mainThread(IThread *self)
 {
@@ -71,6 +73,7 @@ Executive_BootstrapTask_mainThread(IThread *self)
 	{
 		EXLOGF((LOG_DEBUG7, "unable to open console channel - %d", status));
 		ExPanic("no console");
+		abort();
 	}
 
 

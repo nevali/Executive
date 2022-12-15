@@ -10,10 +10,10 @@ Executive_String_length(const char *str)
 	size_t c;
 
 	ExAssert(NULL != str);
-	for(c = 1; *str; str++)
+	for(c = 0; str[c]; c++)
 	{
-		c++;
 	}
+/*	EXLOGF((LOG_TRACE, "Executive_String_length('%s') = %u", str, c)); */
 	return c;
 }
 
