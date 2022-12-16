@@ -18,7 +18,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_POSIX.h"
+#include "p_MemoryManager.h"
 
 #define INTF_TO_CLASS(i)               (PAL_POSIX_Region *)((void *)(i))
 

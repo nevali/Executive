@@ -21,7 +21,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_POSIX.h"
+#include "p_MemoryManager.h"
 
 #define INTF_TO_CLASS(i) (PAL_POSIX_MemoryManager *)((void *)(i))
 
@@ -30,6 +30,8 @@
 static int PAL_POSIX_MemoryManager_queryInterface(IMemoryManager *self, REFUUID riid, void **ptr);
 static int32_t PAL_POSIX_MemoryManager_retain(IMemoryManager *self);
 static int32_t PAL_POSIX_MemoryManager_release(IMemoryManager *self);
+
+/* XXX should be MMemoryManager - there can only be one */
 
 /* IMemoryManager */
 
@@ -48,14 +50,13 @@ static struct IMemoryManager_vtable_ PAL_POSIX_MemoryManager_vtable = {
 	PAL_POSIX_MemoryManager_obtainTransientRegion
 };
 
-PAL_POSIX_MemoryManager PAL_POSIX_memoryManager;
+static PAL_POSIX_MemoryManager PAL_POSIX_memoryManager = { { &PAL_POSIX_MemoryManager_vtable, NULL } };
 
 /* INTERNAL: perform one-time initialisation */
 void
 PAL_POSIX_MemoryManager_init(void)
 {
-	memset(&PAL_POSIX_memoryManager, 0, sizeof(PAL_POSIX_memoryManager));
-	PAL_POSIX_memoryManager.MemoryManager.lpVtbl = &PAL_POSIX_MemoryManager_vtable;
+	PALLOGF((LOG_TRACE, "PAL::POSIX::MemoryManager(%p)::init()", &PAL_POSIX_memoryManager));
 #if defined(HAVE_SYSCONF) && defined(_SC_PAGESIZE)
 	PAL_POSIX_memoryManager.data.pagesize = sysconf(_SC_PAGESIZE);
 #elif defined(HAVE_GETPAGESIZE)
@@ -64,6 +65,8 @@ PAL_POSIX_MemoryManager_init(void)
 # warning PAL_POSIX_MemoryManager: no available API to determine default page size
 	PAL_POSIX_memoryManager.data.pagesize = 4096; /* Default to 4KB pages without other info */
 #endif
+	PALLOGF((LOG_DEBUG, "PAL::POSIX::MemoryManager: page size is %u", PAL_POSIX_memoryManager.data.pagesize));
+	PAL_POSIX_Platform_setMemoryManager(&(PAL_POSIX_memoryManager.MemoryManager));
 }
 
 static int
@@ -73,7 +76,7 @@ PAL_POSIX_MemoryManager_queryInterface(IMemoryManager *self, REFUUID riid, void 
 	
 	if(!memcmp(riid, &IID_IObject, sizeof(UUID)))
 	{
-		if(*ptr)
+		if(ptr)
 		{
 			/* no retain() because this class is a singleton */
 			*ptr = &(me->Object);
@@ -82,7 +85,7 @@ PAL_POSIX_MemoryManager_queryInterface(IMemoryManager *self, REFUUID riid, void 
 	}
 	if(!memcmp(riid, &IID_IMemoryManager, sizeof(UUID)))
 	{
-		if(*ptr)
+		if(ptr)
 		{
 			/* no retain() because this class is a singleton */
 			*ptr = &(me->MemoryManager);

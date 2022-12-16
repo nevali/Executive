@@ -42,6 +42,7 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	 * heap
 	 */
 	ExAssert(E_SUCCESS == ExMetaClass(&CLSID_PAL_MemoryManager, &IID_IMemoryManager, &(executive.data.mm)));
+	ExAssert(NULL != executive.data.mm);
 	/* Create an instance of the Executive's built-in allocator, which will
 	 * obtain transient regions from the PAL's memory manager
 	 */

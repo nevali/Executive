@@ -23,17 +23,26 @@ AC_MSG_RESULT([$exec_build_type])
 
 case "$exec_build_type" in
 	debug)
+		if test x"$GCC" = x"yes" ; then
+			AS_VAR_APPEND([AM_CPPFLAGS],[" -g -O0"])
+		fi		
 		AS_VAR_APPEND([AM_CPPFLAGS],[" -DEXEC_BUILD_DEBUG=1 -DEXEC_BUILD_CONFIG='\"Debug\"'"])
 		AS_VAR_SET([EXEC_BUILD_SUFFIX],[".Debug"])
 		AC_SUBST([EXEC_BUILD_SUFFIX])
 		enable_debug=yes ; enable_free=no ; enable_release=no ;;
 	free)
+		if test x"$GCC" = x"yes" ; then
+			AS_VAR_APPEND([AM_CPPFLAGS],[" -O0"])
+		fi		
 		AS_VAR_APPEND([AM_CPPFLAGS],[" -DNDEBUG -DEXEC_BUILD_FREE=1 -DEXEC_BUILD_CONFIG='\"Free\"'"])
 		AS_VAR_SET([EXEC_BUILD_SUFFIX],[".Free"])
 		AC_SUBST([EXEC_BUILD_SUFFIX])
 		enable_debug=no ; enable_free=yes ; enable_release=no ;;
 	release)
 		AS_VAR_APPEND([AM_CPPFLAGS],[" -DNDEBUG -DEXEC_BUILD_RELEASE=1 -DEXEC_BUILD_CONFIG='\"Release\"'"])
+		if test x"$GCC" = x"yes" ; then
+			AS_VAR_APPEND([AM_CPPFLAGS],[" -O2"])
+		fi		
 		AS_VAR_SET([EXEC_BUILD_SUFFIX],[""])
 		AC_SUBST([EXEC_BUILD_SUFFIX])
 		enable_debug=no ; enable_free=no ; enable_release=yes ;;

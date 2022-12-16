@@ -72,7 +72,7 @@ Executive_BootstrapTask_mainThread(IThread *self)
 	else
 	{
 		EXLOGF((LOG_DEBUG7, "unable to open console channel - %d", status));
-		ExPanic("no console");
+		ExPanic("PANIC: unable to open /System/Devices/Console");
 		abort();
 	}
 

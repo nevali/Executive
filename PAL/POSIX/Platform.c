@@ -53,50 +53,79 @@ PAL_POSIX_Platform_init(void)
 	PAL_POSIX_platform.Container.instptr = &PAL_POSIX_platform;
 }
 
+/* INTERNAL */
+void
+PAL_POSIX_Platform_setMemoryManager(IMemoryManager *mm)
+{
+	if(!PAL_POSIX_platform.data.memoryManager)
+	{
+		PAL_POSIX_platform.data.memoryManager = mm;
+	}
+}
+
+/* INTERNAL */
+void
+PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag)
+{
+	if(!PAL_POSIX_platform.data.diagnostics)
+	{
+		PAL_POSIX_platform.data.diagnostics = diag;
+	}
+}
+
 /* IObject */
 
 static STATUS
 PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 {
 	STATUS status;
-	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
+	UNUSED__(self);
 
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::queryInterface(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(iid)));
+	if(out)
+	{
+		*out = NULL;
+	}
 	if(0 == memcmp(iid, &IID_IObject, sizeof(UUID)))
 	{
-		if(*out)
+		if(out)
 		{
-			*out = &(me->Object);
+			*out = &(PAL_POSIX_platform.Object);
 		}
+		PALLOGF((LOG_DEBUG7, "returning PAL::POSIX::Platform<IObject>"));
 		return E_SUCCESS;
 	}
 	if(0 == memcmp(iid, &IID_IPlatform, sizeof(UUID)))
 	{
-		if(*out)
+		if(out)
 		{
-			*out = &(me->Platform);
+			*out = &(PAL_POSIX_platform.Platform);
 		}
+		PALLOGF((LOG_DEBUG7, "returning PAL::POSIX::Platform<IPlatform>"));
 		return E_SUCCESS;
 	}
 	if(0 == memcmp(iid, &IID_IContainer, sizeof(UUID)))
 	{
-		if(!me->data.platformContainer)
+		if(!PAL_POSIX_platform.data.platformContainer)
 		{
-			PALDebug("PAL::Platform::queryInterface(): creating platform container");
-			if(E_SUCCESS != (status = Executive_createObjectByName("Executive::Container", &IID_IMutableContainer, (void **) &(me->data.platformContainer))))
+			/* XXX wait until we have a namespace */
+			PALDebug("PAL::POSIX::Platform::queryInterface(): creating platform container");
+			if(E_SUCCESS != (status = Executive_createObjectByName("Executive::Container", &IID_IMutableContainer, (void **) &(PAL_POSIX_platform.data.platformContainer))))
 			{
 				PAL_panic("Executive::createObject(Executive::Container, IMutableContainer) failed");
 				return status;
 			}
-			PALDebug("PAL::Platform::queryInterface(): created platform container!");
-			IMutableContainer_create((me->data.platformContainer), "Devices", &CLSID_Executive_Container, NULL, NULL);
+			PALDebug("PAL::POSIX::Platform::queryInterface(): created platform container!");
+			IMutableContainer_create((PAL_POSIX_platform.data.platformContainer), "Devices", &CLSID_Executive_Container, NULL, NULL);
 		}
-		if(*out)
+		if(out)
 		{
-			*out = &(me->Container);
+			*out = &(PAL_POSIX_platform.Container);
 		}
+		PALLOGF((LOG_DEBUG7, "returning PAL::POSIX::Platform<IContainer>"));
 		return E_SUCCESS;
 	}
-	return E_NOENT;
+	return E_NOTIMPL;
 }
 
 /* The Platform object is a singleton and cannot be destroyed, therefore
@@ -156,7 +185,7 @@ PAL_POSIX_Platform_resolve(IContainer *self, const char *name, IDirectoryEntry *
 {
 	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
 
-	fprintf(stderr, "PAL::POSIX::Platform<IContainer>::resolve('%s')\n", name);
+/*	fprintf(stderr, "PAL::POSIX::Platform<IContainer>::resolve('%s')\n", name); */
 	if(entry)
 	{
 		*entry = NULL;
@@ -173,7 +202,7 @@ PAL_POSIX_Platform_iterator(IContainer *self)
 {
 	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
 
-	fprintf(stderr, "PAL::POSIX::Platform<IContainer>::iterator()\n");
+/*	fprintf(stderr, "PAL::POSIX::Platform<IContainer>::iterator()\n"); */
 	if(!me->data.platformContainer)
 	{
 		return NULL;

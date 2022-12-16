@@ -31,6 +31,10 @@ Executive_start(struct ExecutiveEntryParameters *params)
 {
 	IPlatform *platform;
 
+	if(!params)
+	{
+		return;
+	}
 	/* Obtain an interface pointer to the PAL's Platform object */
 	if(!params->PAL_metaClass)
 	{
@@ -47,6 +51,10 @@ Executive_start(struct ExecutiveEntryParameters *params)
 		}
 	}
 	if(params->PAL_metaClass(&CLSID_PAL_Platform, &IID_IPlatform, (void *) &platform) != E_SUCCESS)
+	{
+		return;
+	}
+	if(!platform)
 	{
 		return;
 	}

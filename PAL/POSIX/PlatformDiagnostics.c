@@ -56,6 +56,7 @@ PAL_POSIX_PlatformDiagnostics_init(void)
 	PAL_POSIX_diagnostics.Object.instptr = &PAL_POSIX_diagnostics;
 	PAL_POSIX_diagnostics.WriteChannel.lpVtbl = &PAL_POSIX_PlatformDiagnostics_IWriteChannel_vtable;
 	PAL_POSIX_diagnostics.WriteChannel.instptr = &PAL_POSIX_diagnostics;
+	PAL_POSIX_Platform_setDiagnostics(&(PAL_POSIX_diagnostics.PlatformDiagnostics));
 }
 
 static int
@@ -119,6 +120,22 @@ PAL_POSIX_PlatformDiagnostics_log(struct IPlatformDiagnostics *self, LogLevel le
 		fprintf(stderr, "<%d> %s\n", level, str);
 	}
 }
+
+/* XXX PRIVATE */
+void
+PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str, ...)
+{
+	va_list ap;
+
+	va_start(ap, str);
+	if(level >= PAL_POSIX_diagnostics.data.level)
+	{
+		fprintf(stderr, "<%d> ", level);
+		vfprintf(stderr, str, ap);
+		fputc('\n', stderr);
+	}
+}
+
 
 size_t
 PAL_POSIX_PlatformDiagnostics_write(IWriteChannel *self, const uint8_t *buf, size_t nbytes)

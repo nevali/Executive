@@ -10,21 +10,21 @@
 
 /* Diagnostics and panic output */
 #  include <stdio.h>
-/* File I/O, host memory management */
-#  include <unistd.h>
 /* Errno values */
 #  include <errno.h>
 /* malloc(), free(), etc. */
 #  include <stdlib.h>
-/* mmap() */
-#  include <sys/mman.h>
 /* memcmp() */
 #  include <string.h>
+/* sleep()  */
+#  include <unistd.h>
 
-# include <Executive/Errors.h>
 # include <PAL/PAL.h>
+
 # include <Executive/IWriteChannel.h>
 # include <Executive/IContainer.h>
+# include <Executive/INamespace.h>
+
 # include <Executive/IMutableContainer.h>
 # include <Executive/MFactory.h>
 
@@ -32,16 +32,11 @@
 # include <Executive/Internal/Classes.h>
 
 typedef struct PAL_POSIX_Platform PAL_POSIX_Platform;
-typedef union PAL_POSIX_MemoryManager PAL_POSIX_MemoryManager;
-typedef union PAL_POSIX_Region PAL_POSIX_Region;
 typedef union PAL_POSIX_BootEnvironment PAL_POSIX_BootEnvironment;
 typedef struct PAL_POSIX_PlatformDiagnostics PAL_POSIX_PlatformDiagnostics;
 
 /* These are well-known metaclasses retrievable via PAL$metaClass() */
 extern PAL_POSIX_Platform PAL_POSIX_platform;
-extern PAL_POSIX_MemoryManager PAL_POSIX_memoryManager;
-extern PAL_POSIX_BootEnvironment PAL_POSIX_bootEnvironment;
-extern PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics;
 
 /* This construction is valid for as long as the interfaces are all part of a
  * single-inheritance chain; for interfaces that are divergent, a structure
@@ -56,41 +51,18 @@ struct PAL_POSIX_Platform
 	struct
 	{
 		IAllocator *allocator;
+		INamespace *namespace;
 		IMutableContainer *platformContainer;
-	} data;	
-};
-
-union PAL_POSIX_MemoryManager
-{
-	IMemoryManager MemoryManager;
-	IObject Object;
-	struct
-	{
-		void *vtable;
-		int pagesize;
-	} data;
-};
-
-union PAL_POSIX_Region
-{
-	IRegion Region;
-	IObject Object;
-	struct
-	{
-		void *vtable;
-		uint32_t refcount;
-		PAL_POSIX_MemoryManager *mm;
-		IRegionHolder *holder;
-		RegionFlags flags;
-		uint8_t *base;
-		size_t count;
+		IMemoryManager *memoryManager;
+		IBootEnvironment *BootEnvironment;
+		IPlatformDiagnostics *diagnostics;
 	} data;
 };
 
 union PAL_POSIX_BootEnvironment
 {
-	IBootEnvironment BootEnvironment;
 	IObject Object;
+	IBootEnvironment BootEnvironment;
 	struct
 	{
 		void *vtable;
@@ -99,8 +71,8 @@ union PAL_POSIX_BootEnvironment
 
 struct PAL_POSIX_PlatformDiagnostics
 {
-	IPlatformDiagnostics PlatformDiagnostics;
 	IObject Object;
+	IPlatformDiagnostics PlatformDiagnostics;
 	IWriteChannel WriteChannel;
 	struct
 	{
@@ -112,17 +84,38 @@ struct PAL_POSIX_PlatformDiagnostics
 extern "C" {
 # endif
 
-extern void PAL_POSIX_panic(const char *string);
-extern void PAL_POSIX_init(void);
-extern void PAL_POSIX_Platform_init();
-extern void PAL_POSIX_MemoryManager_init();
-extern void PAL_POSIX_PlatformDiagnostics_init();
-extern void PAL_POSIX_PlatformDiagnostics_log(IPlatformDiagnostics *me, LogLevel level, const char *str);
-extern int PAL_POSIX_Region_create(PAL_POSIX_MemoryManager *mm, RegionFlags flags, IRegionHolder *owner, void *ptr, size_t size, PAL_POSIX_Region **out);
+void PAL_POSIX_panic(const char *string);
+void PAL_POSIX_init(void);
+void PAL_POSIX_Platform_init(void);
+void PAL_POSIX_Platform_setMemoryManager(IMemoryManager *mm);
+void PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag);
+void PAL_POSIX_MemoryManager_init(void);
+void PAL_POSIX_PlatformDiagnostics_init(void);
 
-# define PALLog(level, str)            PAL_POSIX_PlatformDiagnostics_log(NULL, level, str)
-# define PALDebug(str)                 PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG, str)
-# define PALDebug2(str)                PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG2, str)
+
+# ifdef NDEBUG
+#  define PALLOGF(x)
+#  define PALLog(level, str)
+#  define PALDebug(str)
+#  define PALDebug2(str)
+#  define PALDebug3(str)
+#  define PALDebug4(str)
+#  define PALDebug5(str)
+#  define PALDebug6(str)
+#  define PALDebug7(str)
+#  define PALTrace(str)
+#  define PALCondition(str)
+# else
+extern void PAL_POSIX_PlatformDiagnostics_log(IPlatformDiagnostics *me, LogLevel level, const char *str);
+extern void PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str, ...);
+#  define PALLOGF(X)                    PAL_POSIX_PlatformDiagnostics__logf X
+#  define PALLog(level, str)            PAL_POSIX_PlatformDiagnostics_log(NULL, level, str)
+#  define PALDebug(str)                 PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG, str)
+#  define PALDebug2(str)                PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG2, str)
+#  define PALDebug7(str)                PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG7, str)
+#  define PALTrace(str)                 PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_TRACE, str)
+#  define PALCondition(str)             PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_CONDITION, str)
+# endif
 
 # ifdef __cplusplus
 }

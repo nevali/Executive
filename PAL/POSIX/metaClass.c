@@ -26,55 +26,36 @@ PAL_metaClass(REFUUID clsid, REFUUID iid, void **out)
 {
 	/* Perform any one-time initialisation that might be required */
 	PAL_POSIX_init();
+	PALLOGF((LOG_TRACE, "PAL::POSIX::metaClass(): clsid:" UUID_PRINTF_FORMAT " iid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid)));
+	if(out)
+	{
+		*out = NULL;
+	}
 	if(0 == memcmp(clsid, &CLSID_PAL_Platform, sizeof(UUID)))
 	{
-		if(0 == memcmp(iid, &IID_IObject, sizeof(UUID)) ||
-			0 == memcmp(iid, &IID_IPlatform, sizeof(UUID)))
-		{
-			PALDebug2("PAL::POSIX::metaClass(): Executive requesting a supported interface from CLSID_PAL_Platform");
-			if(out)
-			{
-				*out = &PAL_POSIX_platform;
-			}
-			return E_SUCCESS;
-		}
-		/* Interface unsupported */
-		PALDebug("PAL::POSIX::metaClass(): unsupported interface requested from CLSID_PAL_Platform");
-		return E_NOENT;
+		return IObject_queryInterface((&(PAL_POSIX_platform.Object)), iid, out);
 	}
 	if(0 == memcmp(clsid, &CLSID_PAL_MemoryManager, sizeof(UUID)))
 	{
-		if(0 == memcmp(iid, &IID_IObject, sizeof(UUID)) ||
-			0 == memcmp(iid, &IID_IMemoryManager, sizeof(UUID)))
+		if(PAL_POSIX_platform.data.memoryManager)
 		{
-			PALDebug2("PAL::POSIX::metaClass(): Executive requesting a supported interface from CLSID_PAL_MemoryManager");
-			if(out)
-			{
-				*out = &PAL_POSIX_memoryManager;
-			}
-			return E_SUCCESS;
+			return IMemoryManager_queryInterface(PAL_POSIX_platform.data.memoryManager, iid, out);
 		}
-		/* Interface unsupported */
-		PALDebug("PAL::POSIX::metaClass(): unsupported interface requested from CLSID_PAL_MemoryManager");
-		return E_NOENT;
+		PALLOGF((LOG_CONDITION, "%%E-NOT-AVAIL: the memory manager object is not available"));
 	}
 	if(0 == memcmp(clsid, &CLSID_PAL_PlatformDiagnostics, sizeof(UUID)))
 	{
-		if(0 == memcmp(iid, &IID_IObject, sizeof(UUID)) ||
-			0 == memcmp(iid, &IID_IPlatformDiagnostics, sizeof(UUID)))
+		if(PAL_POSIX_platform.data.diagnostics)
 		{
-			PALDebug2("PAL::POSIX::metaClass(): Executive requesting a supported interface from CLSID_PAL_PlatformDiagnostics");
-			if(out)
-			{
-				*out = &PAL_POSIX_diagnostics;
-			}
-			return E_SUCCESS;
+			return IPlatformDiagnostics_queryInterface(PAL_POSIX_platform.data.diagnostics, iid, out);
 		}
-		/* Interface unsupported */
-		PALDebug("PAL::POSIX::metaClass(): unsupported interface requested from CLSID_PAL_MemoryManager");
-		return E_NOENT;
+		PALLOGF((LOG_CONDITION, "%%E-NOT-AVAIL: the platform diagnostics object is not available"));
 	}
 	/* Class unsupported */
-	PALDebug("PAL::POSIX::metaClass(): unsupported class requested via PAL$metaClass()");
+	PALLOGF((LOG_CONDITION, "%%E-NOENT: PAL::POSIX::metaClass(): unsupported clsid:{ %08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x } requested via PAL$metaClass()",
+		clsid->uuid.time_low, clsid->uuid.time_mid, clsid->uuid.time_hi_and_version,
+		clsid->uuid.clock_seq_hi_and_reserved, clsid->uuid.clock_seq_low,
+		clsid->uuid.node[0], clsid->uuid.node[1], clsid->uuid.node[2],
+		clsid->uuid.node[3], clsid->uuid.node[4], clsid->uuid.node[5]));
 	return E_NOENT;
 }
