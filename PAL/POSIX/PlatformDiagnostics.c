@@ -26,29 +26,31 @@ static struct IWriteChannel_vtable_ PAL_POSIX_PlatformDiagnostics_IWriteChannel_
 	PAL_POSIX_PlatformDiagnostics_write
 };
 
-PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics = {
+static PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics = {
 	{ NULL, NULL }, /* PlatformDiagnostics*/
 	{ NULL, NULL }, /* Object */
 	{ NULL, NULL }, /* WriteChannel */
 	{
-#if EXEC_BUILD_DEBUG
+#if EXEC_BUILD_RELEASE
+		LOG_CONDITION
+#elif EXEC_BUILD_DEBUG
 		LOG_TRACE
 #else
-		LOG_CONDITION
+		LOG_INFO
 #endif
 	}
 };
 
+
+#ifndef EXEC_BUILD_RELEASE
+static void PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel(void);
+#endif
+
 void
 PAL_POSIX_PlatformDiagnostics_init(void)
 {
-	memset(&PAL_POSIX_diagnostics, 0, sizeof(PAL_POSIX_PlatformDiagnostics));
-#if EXEC_BUILD_DEBUG
-	PAL_POSIX_diagnostics.data.level = LOG_TRACE;
-#elif EXEC_BUILD_FREE
-	PAL_POSIX_diagnostics.data.level = LOG_INFO;
-#else
-	PAL_POSIX_diagnostics.data.level = LOG_NOTICE;
+#ifndef EXEC_BUILD_RELEASE
+	PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel();
 #endif
 	PAL_POSIX_diagnostics.PlatformDiagnostics.lpVtbl = &PAL_POSIX_PlatformDiagnostics_vtable;
 	PAL_POSIX_diagnostics.PlatformDiagnostics.instptr = &PAL_POSIX_diagnostics;
@@ -148,3 +150,38 @@ PAL_POSIX_PlatformDiagnostics_write(IWriteChannel *self, const uint8_t *buf, siz
 	return nbytes;
 }
 
+#ifndef EXEC_BUILD_RELEASE
+/* INTERNAL */
+static void
+PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel(void)
+{
+	const char *level;
+	size_t c;
+	const struct { const char *name; LogLevel level; } levels[] = {
+		{ "emerg", LOG_EMERGENCY },
+		{ "emergency", LOG_EMERGENCY },
+		{ "alert", LOG_ALERT },
+		{ "crit", LOG_CRITICAL },
+		{ "critical", LOG_CRITICAL },
+		{ "info", LOG_INFO },
+		{ "debug", LOG_DEBUG },
+		{ "debug7", LOG_DEBUG7 },
+		{ "trace", LOG_TRACE },
+		{ NULL, 0 }
+	};
+	if(NULL != (level = getenv("EXEC_PAL_LOGLEVEL")))
+	{
+		PALLOGF((LOG_DEBUG, "PAL::POSIX::PlatformDiagnostics: EXEC_PAL_LOGLEVEL='%s'\n", level));
+		for(c = 0; levels[c].name; c++)
+		{
+			if(!strcasecmp(levels[c].name, level))
+			{
+				PAL_POSIX_diagnostics.data.level = levels[c].level;
+				PALLOGF((LOG_INFO, "Diagnostic level set to '%s' (%d) via EXEC_PAL_LOGLEVEL environment variable", level, levels[c].level));
+				return;
+			}
+		}
+		fprintf(stderr, "POSIX: WARNING: unknown log level '%s'\n", level);
+	}
+}
+#endif

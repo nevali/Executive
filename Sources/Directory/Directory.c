@@ -106,14 +106,8 @@ STATUS
 Executive_Directory_MetaClass_queryInterface(IObject *me, REFUUID iid, void **out)
 {
 	Executive_Directory_MetaClass *self = (Executive_Directory_MetaClass *) me->instptr;
-#ifndef NDEBUG
-	UUIDBUF ibuf;
-#endif
 
-#ifndef NDEBUG
-	ExUuidStr(iid, ibuf);
-	EXLOGF((LOG_TRACE, "Executive::Directory::+queryInterface(iid:%s)", ibuf));
-#endif
+	EXTRACEF(("Executive::Directory::+queryInterface(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(iid)));
 	/* The only metaclass interfaces supported by Executive::Directory::[Generic]
 	 * are IObject and MObject
 	 */
@@ -144,7 +138,7 @@ Executive_Directory_MetaClass_queryInterface(IObject *me, REFUUID iid, void **ou
 		}
 		return E_SUCCESS;
 	}
-	EXLOGF((LOG_CONDITION, "E-NOTIMPL: metaclass interface iid:%s is not implemented by Executive::Directory", ibuf));
+	EXLOGF((LOG_CONDITION, "E-NOTIMPL: metaclass interface iid:" UUID_PRINTF_FORMAT " is not implemented by Executive::Directory", UUID_PRINTF_ARGS(iid)));
 	return E_NOTIMPL;
 }
 

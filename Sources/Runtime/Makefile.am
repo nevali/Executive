@@ -7,7 +7,7 @@ noinst_LTLIBRARIES = libRuntime.la libRuntimeThirdParty.la
 
 libRuntime_la_SOURCES = \
 	p_Runtime.h \
-	UUID.c Strings.c Memory.c Debug.c
+	UUID.c Strings.c Memory.c Debug.c Diagnostics.c
 libRuntimeThirdParty_la_SOURCES = \
 	p_Runtime.h \
 	snprintf/snprintf.c

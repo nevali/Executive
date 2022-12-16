@@ -29,37 +29,30 @@ Executive_Directory_IMutableContainer_create(IMutableContainer *me, const char *
 	MDirectoryEntryTarget *dtmeta;
 	IDirectoryEntryTarget *target;
 	STATUS status;
-#ifndef NDEBUG
-	UUIDBUF cbuf, ibuf;
-#endif
 
-#ifndef NDEBUG
-	ExUuidStr(clsid, cbuf);
-	ExUuidStr(iid, ibuf);
-	EXLOGF((LOG_TRACE, "Executive::Directory::<IMutableContainer>create('%s', clsid:%s, iid:%s)", name, cbuf, ibuf));
-#endif
-	EXLOGF((LOG_DEBUG7, "Executive::Directory::create(): checking that entry does not already exist"));
+	EXTRACEF(("Executive::Directory::<IMutableContainer>create('%s', clsid:" UUID_PRINTF_FORMAT ", iid:" UUID_PRINTF_FORMAT ")", name, UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid)));
+	EXDBGF((LOG_DEBUG7, "Executive::Directory::create(): checking that entry does not already exist"));
 	if(E_SUCCESS == Executive_Directory_resolve(&(self->Container), name, &dentry))
 	{
 		IDirectoryEntry_release(dentry);
 		EXLOGF((LOG_CONDITION, "%%E-EXISTS: an object named '%s' already exists within this container", name));
 		return E_EXISTS;
 	}
-	EXLOGF((LOG_DEBUG7, "Executive::Directory::create(): attempting to obtain a suitable metaclass interface for clsid:%s", cbuf));
+	EXDBGF((LOG_DEBUG7, "Executive::Directory::create(): attempting to obtain a suitable metaclass interface for clsid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid)));
 	if(E_SUCCESS == Executive_metaClass(clsid, &IID_MDirectoryEntryTarget, (void **) &dtmeta))
 	{
-		EXLOGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>create(): obtained MDirectoryEntryTarget metaclass interface"));
+		EXDBGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>create(): obtained MDirectoryEntryTarget metaclass interface"));
 		/* first create the directory entry */
 		if(NULL == (entry = Executive_Directory_Entry_create(name, clsid, DEF_NONE)))
 		{
 			MDirectoryEntryTarget_release(dtmeta);
 			return E_NOMEM;
 		}
-		EXLOGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>create(): entry created"));
+		EXDBGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>create(): entry created"));
 		/* next call the createInstance method on the metaclass interface */
 		if(E_SUCCESS != (status = MDirectoryEntryTarget_createInstance(dtmeta, &(entry->DirectoryEntry), &target)))
 		{
-			EXLOGF((LOG_DEBUG, "Executive::Directory::<IMutableContainer>create(): MDirectoryEntryTarget::createInstance() failed with status %d", status));
+			EXDBGF((LOG_DEBUG, "Executive::Directory::<IMutableContainer>create(): MDirectoryEntryTarget::createInstance() failed with status %d", status));
 			MDirectoryEntryTarget_release(dtmeta);
 			return status;
 		}
@@ -74,15 +67,13 @@ Executive_Directory_IMutableContainer_create(IMutableContainer *me, const char *
 		 */
 		if(iid)
 		{
-			EXLOGF((LOG_DEBUG7, "Executive::Directory::<IMutableContainer>create(): handing off control to IDirectoryEntryTarget::queryInterface()"));
+			EXDBGF((LOG_DEBUG7, "Executive::Directory::<IMutableContainer>create(): handing off control to IDirectoryEntryTarget::queryInterface()"));
 			return IDirectoryEntryTarget_queryInterface(target, iid, out);
 		}
 		return E_SUCCESS;
 	}
 	/* XXX we should support MFactory */
-#ifndef NDEBUG
-	EXLOGF((LOG_CONDITION, "%%E-PERM: Executive::Directory::<IMutableContainer>create(): no supported metaclass interfaces available for clsid:%s", cbuf));
-#endif
+	EXLOGF((LOG_CONDITION, "%%E-PERM: Executive::Directory::<IMutableContainer>create(): no supported metaclass interfaces available for clsid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid)));
 	return E_PERM;
 }
 
@@ -92,17 +83,11 @@ Executive_Directory_add(IMutableContainer *me, const char *name, REFUUID clsid, 
 	Executive_Directory *self = INTF_TO_CLASS(me);
 	Executive_Directory_Entry *entry;
 	IDirectoryEntry *dentry;
-#ifndef NDEBUG
-	UUIDBUF cbuf;
-#endif
 
 	UNUSED__(self);
 
-#ifndef NDEBUG
-	ExUuidStr(clsid, cbuf);
-	EXLOGF((LOG_DEBUG2, "Executive::Directory::<IMutableContainer>add('%s', clsid:%s)", name, cbuf));
-#endif
-	EXLOGF((LOG_DEBUG7, "checking that entry does not already exist"));
+	EXTRACEF(("Executive::Directory::<IMutableContainer>add('%s', clsid:" UUID_PRINTF_FORMAT ")", name, clsid));
+	EXDBGF((LOG_DEBUG7, "checking that entry does not already exist"));
 	if(E_SUCCESS == Executive_Directory_resolve(&(self->Container), name, &dentry))
 	{
 		IDirectoryEntry_release(dentry);
@@ -113,7 +98,7 @@ Executive_Directory_add(IMutableContainer *me, const char *name, REFUUID clsid, 
 	{
 		return E_NOMEM;
 	}
-	EXLOGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>add(): entry created"));
+	EXDBGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>add(): entry created"));
 	IObject_retain(target);
 	Executive_Directory_addEntry(self, entry);
 	Executive_Directory_Entry_populateObject(entry, target, NULL);
@@ -131,7 +116,7 @@ STATUS Executive_Directory_createLink(IMutableContainer *me, const char *name, c
 	IDirectoryEntry *dentry;
 	Executive_Directory_Link *link;
 
-	EXLOGF((LOG_DEBUG7, "checking that entry does not already exist"));
+	EXDBGF((LOG_DEBUG7, "checking that entry does not already exist"));
 	if(E_SUCCESS == Executive_Directory_resolve(&(self->Container), name, &dentry))
 	{
 		IDirectoryEntry_release(dentry);
@@ -142,7 +127,7 @@ STATUS Executive_Directory_createLink(IMutableContainer *me, const char *name, c
 	{
 		return E_NOMEM;
 	}
-	EXLOGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>add(): entry created"));
+	EXDBGF((LOG_DEBUG6, "Executive::Directory::<IMutableContainer>add(): entry created"));
 	link = Executive_Directory_Link_create(target);
 	Executive_Directory_addEntry(self, entry);
 	Executive_Directory_Entry_populateObject(entry, (void *)(IObject *) link, NULL);
@@ -166,12 +151,12 @@ Executive_Directory_Entry_populateObject(Executive_Directory_Entry *self, IObjec
 	/* First, determine what kind of an object it is */
 	if(E_SUCCESS == IObject_queryInterface(object, &IID_ILink, (void **) &(self->data.link)))
 	{
-		EXLOGF((LOG_DEBUG6, "target object supports ILink; setting DEF_LINK"));
+		EXDBGF((LOG_DEBUG6, "target object supports ILink; setting DEF_LINK"));
 		self->data.flags |= DEF_LINK;
 	}
 	else if(E_SUCCESS == IObject_queryInterface(object, &IID_IContainer, (void **) &(self->data.container)))
 	{
-		EXLOGF((LOG_DEBUG6, "target object supports IContainer; setting DEF_CONTAINER"));
+		EXDBGF((LOG_DEBUG6, "target object supports IContainer; setting DEF_CONTAINER"));
 		self->data.flags |= DEF_CONTAINER;
 	}
 	if(delegate)
@@ -181,14 +166,14 @@ Executive_Directory_Entry_populateObject(Executive_Directory_Entry *self, IObjec
 	}
 	else
 	{
-		EXLOGF((LOG_DEBUG, "checking if target supports the delegate interface"));
+		EXDBGF((LOG_DEBUG, "checking if target supports the delegate interface"));
 		if(E_SUCCESS == IObject_queryInterface(object, &IID_IDirectoryEntryTarget, (void **) &(self->data.delegate)))
 		{
-			EXLOGF((LOG_DEBUG, "target object supports IDirectoryEntryTarget"));
+			EXDBGF((LOG_DEBUG, "target object supports IDirectoryEntryTarget"));
 		}
 		else
 		{
-			EXLOGF((LOG_DEBUG, "target object does NOT support IDirectoryEntryTarget, it will not receive notifications"));
+			EXDBGF((LOG_DEBUG, "target object does NOT support IDirectoryEntryTarget, it will not receive notifications"));
 		}
 	}
 }

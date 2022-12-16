@@ -9,9 +9,10 @@
 static STATUS PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out);
 static REFCOUNT PAL_POSIX_Platform_retain(IObject *self);
 static REFCOUNT PAL_POSIX_Platform_release(IObject *self);
-static void PAL_POSIX_Platform_panic(struct IPlatform *self, const char *str);
-static void PAL_POSIX_Platform_setDefaultAllocator(struct IPlatform *self, IAllocator *allocator);
-static void PAL_POSIX_Platform_nap(struct IPlatform *self);
+static void PAL_POSIX_Platform_panic(IPlatform *self, const char *str);
+static void PAL_POSIX_Platform_setDefaultAllocator(IPlatform *self, IAllocator *allocator);
+static void PAL_POSIX_Platform_nap(IPlatform *self);
+static void PAL_POSIX_Platform_phaseDidChange(IPlatform *self, PHASE phase);
 static STATUS PAL_POSIX_Platform_resolve(IContainer *self, const char *name, IDirectoryEntry **entry);
 static IIterator *PAL_POSIX_Platform_iterator(IContainer *self);
 
@@ -28,7 +29,8 @@ static struct IPlatform_vtable_ platform_IPlatform_vtable = {
 	(REFCOUNT (*)(IPlatform *)) &PAL_POSIX_Platform_release,
 	PAL_POSIX_Platform_panic,
 	PAL_POSIX_Platform_setDefaultAllocator,
-	PAL_POSIX_Platform_nap
+	PAL_POSIX_Platform_nap,
+	PAL_POSIX_Platform_phaseDidChange
 };
 /* IContainer */
 static struct IContainer_vtable_ platform_IContainer_vtable = {
@@ -39,24 +41,62 @@ static struct IContainer_vtable_ platform_IContainer_vtable = {
 	PAL_POSIX_Platform_iterator
 };
 
-PAL_POSIX_Platform PAL_POSIX_platform;
+static PAL_POSIX_Platform PAL_POSIX_platform;
+PAL_POSIX_Platform *PAL_POSIX = NULL;
+PHASE PAL_POSIX_phase = PHASE_UNKNOWN;
 
 void
 PAL_POSIX_Platform_init(void)
 {
-	memset(&PAL_POSIX_platform, 0, sizeof(PAL_POSIX_platform));
+	if(PAL_POSIX)
+	{
+		return;
+	}
+#ifdef EXEC_BUILD_CONFIG
+	PALLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - POSIX Platform Adaptation Layer [" EXEC_BUILD_CONFIG " build " PRODUCT_BUILD_ID_STR "]");
+#else
+	PALLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - POSIX Platform Adaptation Layer [build " PRODUCT_BUILD_ID_STR "]");
+#endif
+	PALLOGF((LOG_DEBUG6, "PAL::POSIX::Platform::init(): initialising PAL metaclasses"));
 	PAL_POSIX_platform.Object.lpVtbl = &platform_IObject_vtable;
 	PAL_POSIX_platform.Object.instptr = &PAL_POSIX_platform;
 	PAL_POSIX_platform.Platform.lpVtbl = &platform_IPlatform_vtable;
 	PAL_POSIX_platform.Platform.instptr = &PAL_POSIX_platform;
 	PAL_POSIX_platform.Container.lpVtbl = &platform_IContainer_vtable;
 	PAL_POSIX_platform.Container.instptr = &PAL_POSIX_platform;
+	PALLOGF((LOG_DEBUG7, "- PAL::POSIX = %p, <IObject> = %p", &(PAL_POSIX_platform), &(PAL_POSIX_platform.Object)));
+	PAL_POSIX_MemoryManager_init();
+	PALLOGF((LOG_DEBUG7, "- PAL::POSIX::memoryManager<IMemoryManager> = %p", PAL_POSIX_platform.data.memoryManager));
+	PAL_POSIX_PlatformDiagnostics_init();
+	PALLOGF((LOG_DEBUG7, "- PAL::POSIX::diagnostics<IPlatformDiagnostics> = %p", PAL_POSIX_platform.data.diagnostics));
+	PAL_POSIX = &PAL_POSIX_platform;
+	PALLOGF((LOG_DEBUG6, "PAL::POSIX::init(): early initialisation complete"));
 }
 
-/* INTERNAL */
+static void
+PAL_POSIX_Platform_phaseDidChange(IPlatform *me, PHASE phase)
+{
+	UNUSED__(me);
+
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::phaseDidChange(%04x)", phase));
+#if EXEC_BUILD_DEBUG
+	fprintf(stderr, "\n\n"
+"***********************************************************************\n"
+"             P H A S E    S H I F T   O C C U R R E D\n"
+"***********************************************************************\n"
+"     previous phase = %04x, new phase = %04x\n"
+"***********************************************************************\n",
+	PAL_POSIX_phase, phase);
+#endif
+	PAL_POSIX_phase = phase;
+}
+
+
+
 void
 PAL_POSIX_Platform_setMemoryManager(IMemoryManager *mm)
 {
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setMemoryManager(): MemoryManager object is available"));
 	if(!PAL_POSIX_platform.data.memoryManager)
 	{
 		PAL_POSIX_platform.data.memoryManager = mm;
@@ -67,6 +107,7 @@ PAL_POSIX_Platform_setMemoryManager(IMemoryManager *mm)
 void
 PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag)
 {
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setDiagnostics(): PlatformDiagnostics object is available"));
 	if(!PAL_POSIX_platform.data.diagnostics)
 	{
 		PAL_POSIX_platform.data.diagnostics = diag;
@@ -180,6 +221,7 @@ PAL_POSIX_Platform_nap(IPlatform *self)
 	sleep(1);
 }
 
+/* IContainer */
 static STATUS
 PAL_POSIX_Platform_resolve(IContainer *self, const char *name, IDirectoryEntry **entry)
 {

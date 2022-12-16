@@ -36,8 +36,11 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	MDirectoryEntryTarget *meta;
 	IDirectoryEntryTarget *target;
 
+	IPlatform_phaseDidChange(platform, PHASE_STARTUP_EXECINIT);
 	executive.data.PAL_metaClass = params->PAL_metaClass;
 	executive.data.platform = platform;
+	
+	ExPhaseShift(PHASE_STARTUP_MM);
 	/* Initialise a memory manager first, before we need to allocate any
 	 * heap
 	 */
@@ -46,6 +49,8 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	/* Create an instance of the Executive's built-in allocator, which will
 	 * obtain transient regions from the PAL's memory manager
 	 */
+
+	ExPhaseShift(PHASE_STARTUP_ALLOCATOR);
 	executive.data.allocator = Executive_Allocator_create(executive.data.mm);
 	if(!executive.data.allocator)
 	{
@@ -54,6 +59,7 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	/* Inform the Platform of the new allocator's availability */
 	IPlatform_setDefaultAllocator(executive.data.platform, executive.data.allocator);
 	/* Obtain the PAL's boot environment, if it has one */
+	ExPhaseShift(PHASE_STARTUP_BOOTENV);
 	if(E_SUCCESS != Executive_metaClass(&CLSID_PAL_BootEnvironment, &IID_IBootEnvironment, (void *) &(executive.data.bootEnvironment)))
 	{
 		/* XXX this should happen via Executive_metaClass() */
@@ -64,12 +70,14 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	 * incident (in this event the ExNotice() calls that follow become
 	 * no-ops)
 	 */
+	ExPhaseShift(PHASE_STARTUP_DIAG);
 	ExAssert(E_SUCCESS == Executive_metaClass(&CLSID_PAL_PlatformDiagnostics, &IID_IPlatformDiagnostics, (void *) &(executive.data.diagnostics)));
 
 	ExNotice(PRODUCT_FULLNAME " " PACKAGE_NAME " [" HOST_FAMILY "] - " PRODUCT_RELEASE);
 	ExNotice("  version " PACKAGE_VERSION ", build " PRODUCT_BUILD_ID_STR ", built at " PRODUCT_BUILD_DATE " " PRODUCT_BUILD_TIME " by " PRODUCT_BUILD_USER "@" PRODUCT_BUILD_HOST);
 
 	/* Request the MDirectoryEntryTarget metaclass interface from Executive::Directory::Root */
+	ExPhaseShift(PHASE_STARTUP_ROOT);
 	ExAssert(E_SUCCESS == Executive_metaClass(&CLSID_Executive_Root, &IID_MDirectoryEntryTarget, (void **) &meta));
 	/* invoke the constructor on the metaclass interface, MDirectoryEntryTarget::createInstance()
 	 * to create the root instance itself
@@ -90,6 +98,7 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	
 	EXLOGF((LOG_DEBUG, "Executive::Directory: populating the root directory"));
 	/* Create the System domain */
+	ExPhaseShift(PHASE_STARTUP_SYSTEM);
 	ExAssert(E_SUCCESS == ExCreate("/System", &CLSID_Executive_System, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/System", DEF_SYSTEM|DEF_IMMUTABLE));
 
@@ -100,40 +109,50 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 		ExAssert(E_SUCCESS == ExAdd("/System/Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) (executive.data.diagnostics)));
 		ExAssert(E_SUCCESS == ExSetFlags("/System/Diagnostics", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN));	
 	}
-	ExAssert(E_SUCCESS == ExCreate("/Users", &CLSID_Executive_Container, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Users", DEF_IMMUTABLE));
-	ExAssert(E_SUCCESS == ExCreate("/Volumes", &CLSID_Executive_Container, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Volumes", DEF_IMMUTABLE));
-	ExAssert(E_SUCCESS == ExCreate("/Local", &CLSID_Executive_Local, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Local", DEF_IMMUTABLE));
-	ExAssert(E_SUCCESS == ExCreate("/Network", &CLSID_Executive_Network, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Network", DEF_IMMUTABLE));
-	ExAssert(E_SUCCESS == ExCreate("/Cluster", &CLSID_Executive_Cluster, NULL, NULL));
-	ExAssert(E_SUCCESS == ExSetFlags("/Cluster", DEF_IMMUTABLE));
-
-	/* Create an instance of the built-in co-operative tasker */
-	/* XXX this should be via a metaclass interface */
-	executive.data.tasker = Executive_CooperativeTasker_create();
-	ExAssert(NULL != executive.data.tasker);
-	ExAssert(E_SUCCESS == ExAdd("/System/Tasks", &CLSID_Executive_Tasker, (IObject *) (void *) executive.data.tasker));
-	ExSetFlags("/System/Tasks", DEF_SYSTEM);
-	/* XXX this should be ExAdd() */
-	ExAssert(E_SUCCESS == ExCreate("/System/Classes", &CLSID_Executive_Container, NULL, NULL));
-	ExSetFlags("/System/Classes", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN);
-	if(executive.data.bootEnvironment)
-	{
-		ExAssert(E_SUCCESS == ExAdd("/System/Boot/Environment", &CLSID_PAL_BootEnvironment, (IObject *) (void *) executive.data.bootEnvironment));
-		ExAssert(E_SUCCESS == ExSetFlags("/System/Boot/Environment", DEF_SYSTEM|DEF_IMMUTABLE));
-	}
 	ExAssert(E_SUCCESS == ExCreate("/System/Volumes/Boot", &CLSID_Executive_Container, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/System/Volumes/Boot", DEF_SYSTEM|DEF_MOUNTPOINT|DEF_IMMUTABLE));
 	ExAssert(E_SUCCESS == ExCreate("/System/Volumes/System", &CLSID_Executive_Container, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/System/Volumes/System", DEF_SYSTEM|DEF_MOUNTPOINT|DEF_IMMUTABLE));
 	ExAssert(E_SUCCESS == ExCreate("/System/Volumes/Data", &CLSID_Executive_Container, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/System/Volumes/Data", DEF_SYSTEM|DEF_MOUNTPOINT|DEF_IMMUTABLE));
+	if(executive.data.bootEnvironment)
+	{
+		ExAssert(E_SUCCESS == ExAdd("/System/Boot/Environment", &CLSID_PAL_BootEnvironment, (IObject *) (void *) executive.data.bootEnvironment));
+		ExAssert(E_SUCCESS == ExSetFlags("/System/Boot/Environment", DEF_SYSTEM|DEF_IMMUTABLE));
+	}
+
+	ExPhaseShift(PHASE_STARTUP_USERS);
+	ExAssert(E_SUCCESS == ExCreate("/Users", &CLSID_Executive_Container, NULL, NULL));
+	ExAssert(E_SUCCESS == ExSetFlags("/Users", DEF_IMMUTABLE));
+	ExPhaseShift(PHASE_STARTUP_VOLUMES);
+	ExAssert(E_SUCCESS == ExCreate("/Volumes", &CLSID_Executive_Container, NULL, NULL));
+	ExAssert(E_SUCCESS == ExSetFlags("/Volumes", DEF_IMMUTABLE));
+	ExPhaseShift(PHASE_STARTUP_LOCAL);
+	ExAssert(E_SUCCESS == ExCreate("/Local", &CLSID_Executive_Local, NULL, NULL));
+	ExAssert(E_SUCCESS == ExSetFlags("/Local", DEF_IMMUTABLE));
+	ExPhaseShift(PHASE_STARTUP_CLUSTER);
+	ExAssert(E_SUCCESS == ExCreate("/Cluster", &CLSID_Executive_Cluster, NULL, NULL));
+	ExAssert(E_SUCCESS == ExSetFlags("/Cluster", DEF_IMMUTABLE));
+	ExPhaseShift(PHASE_STARTUP_NETWORK);
+	ExAssert(E_SUCCESS == ExCreate("/Network", &CLSID_Executive_Network, NULL, NULL));
+	ExAssert(E_SUCCESS == ExSetFlags("/Network", DEF_IMMUTABLE));
+
+	/* Create an instance of the built-in co-operative tasker */
+	ExPhaseShift(PHASE_STARTUP_TASKER);
+	/* XXX this should be via a metaclass interface */
+	executive.data.tasker = Executive_CooperativeTasker_create();
+	ExAssert(NULL != executive.data.tasker);
+	ExAssert(E_SUCCESS == ExAdd("/System/Tasks", &CLSID_Executive_Tasker, (IObject *) (void *) executive.data.tasker));
+	ExSetFlags("/System/Tasks", DEF_SYSTEM);
+	/* XXX this should be ExAdd() */
+
+	ExPhaseShift(PHASE_STARTUP_CLASSES);
+	ExAssert(E_SUCCESS == ExCreate("/System/Classes", &CLSID_Executive_Container, NULL, NULL));
+	ExSetFlags("/System/Classes", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN);
 	EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the object directory completed"));
 
 	/* Ask the tasker to create a task in the Executive's address space */
+	ExPhaseShift(PHASE_STARTUP_EXECTASK);
 	taskInfo.flags = TF_EXECUTIVE;
 	taskInfo.name = "System";
 	taskInfo.mainThread_entrypoint = Executive_BootstrapTask_mainThread;
@@ -142,6 +161,7 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	/* Ask the task to create the first thread */
 	/* Schedule the task and thread */
 	/* Yield to the scheduler forever */
+	ExPhaseShift(PHASE_RUNNING);
 	for(;;)
 	{
 		ITasker_yield(executive.data.tasker);

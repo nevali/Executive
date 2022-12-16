@@ -37,15 +37,11 @@ Executive_Directory_Entry *
 Executive_Directory_Entry_create(const char *name, REFUUID clsid, DirectoryEntryFlags flags)
 {
     Executive_Directory_Entry *p;
-#ifndef NDEBUG
-    UUIDBUF cbuf;
-    ExUuidStr(clsid, cbuf);
-#endif
 
     ExAssert(NULL != name);
     ExAssert(NULL != clsid);
 
-    EXLOGF((LOG_TRACE, "Executive::Directory::Entry::create('%s', clsid:%s)", name, cbuf));
+    EXTRACEF(("Executive::Directory::Entry::create('%s', clsid:" UUID_PRINTF_FORMAT ")", name, UUID_PRINTF_ARGS(clsid)));
 
     if(NULL == (p = ExAlloc(sizeof(Executive_Directory_Entry))))
     {
@@ -69,6 +65,7 @@ Executive_Directory_Entry_queryInterface(IDirectoryEntry *me, REFUUID iid, void 
 {
     Executive_Directory_Entry *self = INTF_TO_CLASS(me);
 
+    EXTRACEF(("Executive::Directory::Entry::queryInterface(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(iid)));
     EXEC_COMMON_SUPPORTS(DirectoryEntry);
     EXEC_COMMON_SUPPORTS_DEFAULT;
 }

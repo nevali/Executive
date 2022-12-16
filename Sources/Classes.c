@@ -108,10 +108,8 @@ Executive_createObject(REFUUID clsid, REFUUID iid, void **out)
 STATUS
 Executive_metaClass(REFUUID clsid, REFUUID iid, void **out)
 {
-#ifndef NDEBUG
-	UUIDBUF cbuf, ibuf;
-#endif
 	size_t n;
+	STATUS status;
 
 	ExAssert(NULL != clsid);
 	ExAssert(NULL != iid);
@@ -119,11 +117,9 @@ Executive_metaClass(REFUUID clsid, REFUUID iid, void **out)
 	{
 		return E_SUCCESS;
 	}
-#ifndef NDEBUG
-	ExUuidStr(clsid, cbuf);
-	ExUuidStr(iid, ibuf);
-	EXLOGF((LOG_TRACE, "Executive::metaClass(clsid:%s, iid:%s)", cbuf, ibuf));
-#endif
+	EXTRACEF(("Executive::metaClass(clsid:" UUID_PRINTF_FORMAT ", iid:" UUID_PRINTF_FORMAT ")",
+		UUID_PRINTF_ARGS(clsid),
+		UUID_PRINTF_ARGS(iid)));
 	if(out)
 	{
 		*out = NULL;
@@ -134,19 +130,21 @@ Executive_metaClass(REFUUID clsid, REFUUID iid, void **out)
 		{
 			if(metaClass_entries[n].fn)
 			{
-				EXLOGF((LOG_DEBUG6, "Executive::metaClass(): invoking callback for clsid:%s", cbuf));
+				EXDBGF((LOG_DEBUG6, "Executive::metaClass(): invoking callback for clsid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid)));
 				return metaClass_entries[n].fn(clsid, iid, out);
 			}
 			if(metaClass_entries[n].factory)
 			{
-				EXLOGF((LOG_DEBUG6, "Executive::metaClass(): providing factory for clsid:%s", cbuf));
+				EXDBGF((LOG_DEBUG6, "Executive::metaClass(): providing factory for clsid:%s", cbuf));
 				return MFactory_queryInterface(metaClass_entries[n].factory, iid, out);
 			}
-			EXLOGF((LOG_CONDITION, "Executive::metaClass(): clsid:%s does not provide a callback or a factory", cbuf));
+			status = E_NOTIMPL;
+			EXLOGF((LOG_CONDITION, "%s: Executive::metaClass(): clsid:" UUID_PRINTF_FORMAT " does not provide a callback or factory", ExStatusName(status), UUID_PRINTF_ARGS(clsid)));
 			return E_NOTIMPL;
 		}
 	}
-	EXLOGF((LOG_CONDITION, "%%E-NOENT: Executive::metaClass(): clsid:%s is not registered", cbuf));
+	status = E_NOTIMPL;
+	EXLOGF((LOG_CONDITION, "%s: Executive::metaClass(): clsid:" UUID_PRINTF_FORMAT " is not registered", ExStatusName(status), UUID_PRINTF_ARGS(clsid)));
 	return E_NOENT;
 }
 
@@ -189,16 +187,12 @@ Executive_createObjectByName(const char *name, REFUUID iid, void **out)
 {
 	STATUS status;
 	UUID clsid;
-#ifndef NDEBUG
-	UUIDBUF ibuf;
 
-	ExUuidStr(iid, ibuf);
-	EXLOGF((LOG_TRACE, "Executive::createObjectByName('%s', iid:%s", name, ibuf));
-#endif
+	EXTRACEF((LOG_TRACE, "Executive::createObjectByName('%s', iid:" UUID_PRINTF_FORMAT ")", name, UUID_PRINTF_ARGS(iid)));
 	status = Executive_classIdForName(name, &clsid);
 	if(E_SUCCESS != status)
 	{
-		EXLOGF((LOG_DEBUG, "classIdForName() failed %d", status));
+		ExLogCondition(status, name);
 		return status;
 	}
 	return Executive_createObject(&clsid, iid, out);

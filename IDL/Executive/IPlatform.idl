@@ -20,6 +20,7 @@ cpp_quote(" */");
 
 import "IObject.idl";
 import "IAllocator.idl";
+import "IPlatformDiagnostics.idl";
 
 [
 	object,
@@ -35,4 +36,5 @@ interface IPlatform: IObject
 	void panic([in] const char *string);
 	void setDefaultAllocator([in] IAllocator *allocator);
 	void nap(void);
+	void phaseDidChange(PHASE newPhase);
 }

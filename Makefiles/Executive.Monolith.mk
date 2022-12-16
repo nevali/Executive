@@ -16,19 +16,19 @@ Executive_Monolith_POSIX_CPPFLAGS = $(Monolith_POSIX_cppflags)
 Executive_Monolith_POSIX_SOURCES = $(Monolith_POSIX_sources)
 Executive_Monolith_POSIX_LDADD = $(Monolith_POSIX_glue) $(top_builddir)/@EXEC_PAL_POSIX_LIB_Release@ $(top_builddir)/Sources/libExecutiveServices.la
 Executive_Monolith_POSIX_LDFLAGS = $(Monolith_POSIX_ldflags)
-Executive_Monolith_POSIX_DEPENDENCIES = $(Monolith_POSIX_sources) $(Executive_Monolith_POSIX_LDADD)
+Executive_Monolith_POSIX_DEPENDENCIES = $(Executive_Monolith_POSIX_LDADD)
 
 Executive_Monolith_POSIX_Free_CPPFLAGS = $(Monolith_POSIX_cppflags)
 Executive_Monolith_POSIX_Free_SOURCES = $(Monolith_POSIX_sources)
 Executive_Monolith_POSIX_Free_LDADD = $(Monolith_POSIX_glue) $(top_builddir)/@EXEC_PAL_POSIX_LIB_Free@ $(top_builddir)/Sources/libExecutiveServices.la
 Executive_Monolith_POSIX_Free_LDFLAGS = $(Monolith_POSIX_ldflags)
-Executive_Monolith_POSIX_Free_DEPENDENCIES = $(Monolith_POSIX_sources) $(Executive_Monolith_Free_POSIX_LDADD)
+Executive_Monolith_POSIX_Free_DEPENDENCIES = $(Executive_Monolith_POSIX_Free_LDADD)
 
 Executive_Monolith_POSIX_Debug_CPPFLAGS = $(Monolith_POSIX_cppflags) 
 Executive_Monolith_POSIX_Debug_SOURCES = $(Monolith_POSIX_sources)
 Executive_Monolith_POSIX_Debug_LDADD =  $(Monolith_POSIX_glue) $(top_builddir)/@EXEC_PAL_POSIX_LIB_Debug@ $(top_builddir)/Sources/libExecutiveServices.la
 Executive_Monolith_POSIX_Debug_LDFLAGS = $(Monolith_POSIX_ldflags)
-Executive_Monolith_POSIX_Debug_DEPENDENCIES = $(Monolith_POSIX_sources) $(Executive_Monolith_Debug_POSIX_LDADD)
+Executive_Monolith_POSIX_Debug_DEPENDENCIES = $(Executive_Monolith_POSIX_Debug_LDADD)
 
 if EXEC_BUILD_MONOLITH
 if EXEC_BUILD_MONOLITH_POSIX

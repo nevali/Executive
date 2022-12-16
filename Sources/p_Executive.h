@@ -158,6 +158,8 @@ struct Executive
 # define ExCreateLink(filename, target, force) INamespace_createLink(executive.data.rootNS, filename, NULL, target, force)
 # undef ExSetFlags
 # define ExSetFlags(filename, flags)   INamespace_setFlags(executive.data.rootNS, filename, NULL, flags)
+# undef ExPhaseShift
+# define ExPhaseShift(phase)           IPlatform_phaseDidChange(executive.data.platform, phase)
 
 # ifdef __cplusplus
 extern "C" {

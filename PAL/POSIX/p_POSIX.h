@@ -35,8 +35,7 @@ typedef struct PAL_POSIX_Platform PAL_POSIX_Platform;
 typedef union PAL_POSIX_BootEnvironment PAL_POSIX_BootEnvironment;
 typedef struct PAL_POSIX_PlatformDiagnostics PAL_POSIX_PlatformDiagnostics;
 
-/* These are well-known metaclasses retrievable via PAL$metaClass() */
-extern PAL_POSIX_Platform PAL_POSIX_platform;
+extern PAL_POSIX_Platform *PAL_POSIX;
 
 /* This construction is valid for as long as the interfaces are all part of a
  * single-inheritance chain; for interfaces that are divergent, a structure
@@ -92,8 +91,11 @@ void PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag);
 void PAL_POSIX_MemoryManager_init(void);
 void PAL_POSIX_PlatformDiagnostics_init(void);
 
+extern void PAL_POSIX_PlatformDiagnostics_log(IPlatformDiagnostics *me, LogLevel level, const char *str);
 
-# ifdef NDEBUG
+extern PHASE PAL_POSIX_phase;
+
+# if EXEC_BUILD_RELEASE
 #  define PALLOGF(x)
 #  define PALLog(level, str)
 #  define PALDebug(str)
@@ -106,7 +108,6 @@ void PAL_POSIX_PlatformDiagnostics_init(void);
 #  define PALTrace(str)
 #  define PALCondition(str)
 # else
-extern void PAL_POSIX_PlatformDiagnostics_log(IPlatformDiagnostics *me, LogLevel level, const char *str);
 extern void PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str, ...);
 #  define PALLOGF(X)                    PAL_POSIX_PlatformDiagnostics__logf X
 #  define PALLog(level, str)            PAL_POSIX_PlatformDiagnostics_log(NULL, level, str)

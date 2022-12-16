@@ -32,7 +32,7 @@ case "$exec_build_type" in
 		enable_debug=yes ; enable_free=no ; enable_release=no ;;
 	free)
 		if test x"$GCC" = x"yes" ; then
-			AS_VAR_APPEND([AM_CPPFLAGS],[" -O0"])
+			AS_VAR_APPEND([AM_CPPFLAGS],[" -g -O0"])
 		fi		
 		AS_VAR_APPEND([AM_CPPFLAGS],[" -DNDEBUG -DEXEC_BUILD_FREE=1 -DEXEC_BUILD_CONFIG='\"Free\"'"])
 		AS_VAR_SET([EXEC_BUILD_SUFFIX],[".Free"])

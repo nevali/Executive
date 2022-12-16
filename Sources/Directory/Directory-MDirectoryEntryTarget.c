@@ -29,18 +29,20 @@ Executive_Directory_MDirectoryEntryTarget_createInstance(MDirectoryEntryTarget *
 	EXLOGF((LOG_TRACE, "Executive::Directory::[Generic]<MDirectoryEntryTarget>::+createInstance(%d, %s)", self->kind, (entry ? IDirectoryEntry_name(entry) : "NULL" )));
 
 	*out = NULL;
-#ifndef NDEBUG
 	if(self->kind == DK_ROOT)
 	{
 		ExAssert(NULL == entry);
+		if(NULL != entry)
+		{
+			return E_INVAL;
+		}
 	}
 	else
-#endif
 	{
 		ExAssert(NULL != entry);
 		if(NULL == entry)
 		{
-			EXLOGF((LOG_CONDITION, "%%E-INVAL: Executive::Directory::[Generic]::+createInstance() invoked with entry == NULL"));
+			EXLOGF((LOG_CONDITION, "%%E-INVAL: Executive::Directory::[Generic]::+createInstance() invoked with entry == NULL and self->kind = %d", self->kind));
 			return E_INVAL;
 		}
 	}

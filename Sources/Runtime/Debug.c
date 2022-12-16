@@ -2,7 +2,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-#if EXEC_BUILD_DEBUG
+#if !EXEC_BUILD_RELEASE
 
 #include "p_Runtime.h"
 #include "../p_Executive.h"
@@ -24,4 +24,4 @@ Executive_LogFormat(LogLevel level, const char *format, ...)
 	}
 }
 
-#endif /*EXEC_BUILD_DEBUG*/
+#endif /*!EXEC_BUILD_RELEASE*/
