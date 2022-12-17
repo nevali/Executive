@@ -1,6 +1,6 @@
 ## Executive Microkernel
-##
-## Public headers
+## Executive Framework
+##  
 
 ## Copyright 2015-2022 Mo McRoberts.
 ##
@@ -17,3 +17,4 @@
 ##  limitations under the License.
 
 SUBDIRS = Executive
+

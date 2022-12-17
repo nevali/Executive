@@ -7,19 +7,19 @@ Executive_Dynamic_CPPFLAGS = $(Dynamic_cppflags)
 Executive_Dynamic_SOURCES = $(Dynamic_sources)
 Executive_Dynamic_LDADD = $(Dynamic_libs) @EXEC_GLUE_DYNAMIC_LIBS@
 Executive_Dynamic_LDFLAGS = $(Dynamic_ldflags)
-Executive_Dynamic_DEPENDENCIES = $(Executive_Dynamic_SOURCES) $(Dynamic_libs)
+Executive_Dynamic_DEPENDENCIES = $(Dynamic_libs)
 
 Executive_Dynamic_Free_CPPFLAGS = $(Dynamic_cppflags)
 Executive_Dynamic_Free_SOURCES = $(Dynamic_sources)
 Executive_Dynamic_Free_LDADD = $(Dynamic_libs) @EXEC_GLUE_DYNAMIC_LIBS@
 Executive_Dynamic_Free_LDFLAGS = $(Dynamic_ldflags)
-Executive_Dynamic_Free_DEPENDENCIES = $(Executive_Dynamic_Free_SOURCES) $(Dynamic_libs)
+Executive_Dynamic_Free_DEPENDENCIES = $(Dynamic_libs)
 
 Executive_Dynamic_Debug_CPPFLAGS = $(Dynamic_cppflags)
 Executive_Dynamic_Debug_SOURCES = $(Dynamic_sources)
 Executive_Dynamic_Debug_LDADD = $(Dynamic_libs) @EXEC_GLUE_DYNAMIC_LIBS@
 Executive_Dynamic_Debug_LDFLAGS = $(Dynamic_ldflags)
-Executive_Dynamic_Debug_DEPENDENCIES = $(Executive_Dynamic_Debug_SOURCES) $(Dynamic_libs)
+Executive_Dynamic_Debug_DEPENDENCIES = $(Dynamic_libs)
 
 if EXEC_BUILD_DYNAMIC
 ## Dynamic configuration: the Executive has the capability to locate and

@@ -35,8 +35,12 @@ if test x"$GCC" = x"yes" ; then
 	fi
 fi
 
-AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_builddir}/PrivateHeaders -I\${top_srcdir}/PrivateHeaders"])
-AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_builddir}/Headers -I\${top_srcdir}/Headers"])
+AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_builddir}/PrivateHeaders"])
+AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_srcdir}/PrivateHeaders"])
+AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_builddir}/Frameworks/Executive/Headers"])
+AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_srcdir}/Frameworks/Executive/Headers"])
+AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_builddir}/Frameworks/PAL/Headers"])
+AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_srcdir}/Frameworks/PAL/Headers"])
 
 AC_SUBST([WARNING_CPPFLAGS])
 ])

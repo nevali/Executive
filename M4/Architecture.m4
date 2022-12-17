@@ -8,8 +8,8 @@ dnl containing a Types.h
 AC_MSG_CHECKING([if architecture $host_family is supported])
 if test -d "$srcdir/Sources/Runtime/${host_family}" && \
 	test -r "$srcdir/Sources/Runtime/${host_family}/Makefile.am" && \
-	test -d "$srcdir/Headers/Executive/${host_family}" && \
-	test -r "$srcdir/Headers/Executive/${host_family}/Types.h" ; then
+	test -d "$srcdir/Frameworks/Executive/Headers/Executive/${host_family}" && \
+	test -r "$srcdir/Frameworks/Executive/Headers/Executive/${host_family}/Types.h" ; then
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])

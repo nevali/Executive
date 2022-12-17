@@ -1,5 +1,6 @@
 ## Executive Microkernel
-## Top-level Makefile
+## Frameworks
+##  
 
 ## Copyright 2015-2022 Mo McRoberts.
 ##
@@ -15,19 +16,4 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-ACLOCAL_AMFLAGS = -I M4
-
-SUBDIRS = DeveloperTools Frameworks PrivateHeaders Sources PAL Subsystems .
-
-EXTRA_DIST = README.md LICENSE-2.0 Dockerfile docker-bake.hcl
-
-## If targeted or monolith build were requested, do so here, after everything
-## else has been built
-
-sbin_PROGRAMS =
-CLEANFILES =
-
-ENTRYPOINT = Sources/entrypoint.c
-
-include $(top_srcdir)/Makefiles/Executive.Monolith.mk
-include $(top_srcdir)/Makefiles/Executive.Targeted.mk
+SUBDIRS = Executive PAL

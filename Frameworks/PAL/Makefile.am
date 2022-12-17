@@ -1,5 +1,6 @@
 ## Executive Microkernel
-## Top-level Makefile
+## Platform Adaptation Layer Framework
+##
 
 ## Copyright 2015-2022 Mo McRoberts.
 ##
@@ -15,19 +16,10 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-ACLOCAL_AMFLAGS = -I M4
+SUBDIRS = Headers .
 
-SUBDIRS = DeveloperTools Frameworks PrivateHeaders Sources PAL Subsystems .
+noinst_LTLIBRARIES = libPAL.la
 
-EXTRA_DIST = README.md LICENSE-2.0 Dockerfile docker-bake.hcl
+libPAL_la_SOURCES = PAL-stubs.c
 
-## If targeted or monolith build were requested, do so here, after everything
-## else has been built
-
-sbin_PROGRAMS =
-CLEANFILES =
-
-ENTRYPOINT = Sources/entrypoint.c
-
-include $(top_srcdir)/Makefiles/Executive.Monolith.mk
-include $(top_srcdir)/Makefiles/Executive.Targeted.mk
+libPAL_la_LDFLAGS = -avoid-version -rpath $(libdir)

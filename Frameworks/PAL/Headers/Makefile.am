@@ -1,6 +1,8 @@
-## Odin: The Talisker nanokernel
+## Executive Microkernel
+## Platform Adaptation Layer Framework
+##
 
-## Copyright 2017 Mo McRoberts.
+## Copyright 2015-2022 Mo McRoberts.
 ##
 ##  Licensed under the Apache License, Version 2.0 (the "License");
 ##  you may not use this file except in compliance with the License.
@@ -14,4 +16,4 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = Executive
+SUBDIRS = PAL
