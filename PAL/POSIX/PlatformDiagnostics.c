@@ -34,7 +34,7 @@ static PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics = {
 #if EXEC_BUILD_RELEASE
 		LOG_INFO
 #elif EXEC_BUILD_DEBUG
-		LOG_TRACE
+		LOG_DEBUG2
 #else
 		LOG_CONDITION
 #endif
@@ -164,7 +164,11 @@ PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel(void)
 		{ "crit", LOG_CRITICAL },
 		{ "critical", LOG_CRITICAL },
 		{ "info", LOG_INFO },
+		{ "condition", LOG_CONDITION },
+		{ "cond", LOG_CONDITION },
 		{ "debug", LOG_DEBUG },
+		{ "debug2", LOG_DEBUG2 },
+		{ "debug6", LOG_DEBUG6 },
 		{ "debug7", LOG_DEBUG7 },
 		{ "trace", LOG_TRACE },
 		{ NULL, 0 }

@@ -27,6 +27,7 @@ typedef char UUIDBUF[42];
 # define ExStrCopy(dest, dsize, src)   Executive_String_copy(dest, dsize, src)
 # define ExStrLCopy(dest, dsize, src, srclen)   Executive_String_lcopy(dest, dsize, src, srclen)
 # define ExStrEqual(a, b)              Executive_String_equal(a, b)
+# define ExStrLEqual(a, b, max)        Executive_String_lequal(a, b, max)
 
 # define ExMemDup(base, len)           Executive_Memory_duplicate(base, len)
 # define ExMemCopy(dest, src, len)     Executive_Memory_copy(dest, src, len)
@@ -45,8 +46,8 @@ typedef char UUIDBUF[42];
 #  define ExDebug(str)
 #  define ExTrace(str)
 # else
-#  define EXTRACEF(P)                  Executive_TraceFormat
-#  define EXDBGF(P)                    Executive_DebugFormat
+#  define EXTRACEF(P)                  Executive_TraceFormat P
+#  define EXDBGF(P)                    Executive_DebugFormat P
 #  define ExDebug(str)				   ExLog(LOG_DEBUG, str)
 #  define ExTrace(str)				   ExLog(LOG_TRACE, str)
 # endif
@@ -91,6 +92,7 @@ const char *Executive_String_pos(const char *str, int ch);
 size_t Executive_String_copy(char *dest, size_t dsize, const char *src);
 size_t Executive_String_lcopy(char *dest, size_t dsize, const char *src, size_t srclen);
 int Executive_String_equal(const char *a, const char *b);
+int Executive_String_lequal(const char *a, const char *b, size_t max);
 
 void *Executive_Memory_duplicate(const void *src, size_t length);
 void Executive_Memory_copy(void *dest, const void *src, size_t nbytes);

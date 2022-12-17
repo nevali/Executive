@@ -30,7 +30,17 @@ Executive_Directory_IMutableContainer_create(IMutableContainer *me, const char *
 	IDirectoryEntryTarget *target;
 	STATUS status;
 
-	EXTRACEF(("Executive::Directory::<IMutableContainer>create('%s', clsid:" UUID_PRINTF_FORMAT ", iid:" UUID_PRINTF_FORMAT ")", name, UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid)));
+	ExAssert(NULL != clsid);
+#ifndef NDEBUG
+	if(iid)
+	{
+		EXTRACEF(("Executive::Directory::<IMutableContainer>create('%s', clsid:" UUID_PRINTF_FORMAT ", iid:" UUID_PRINTF_FORMAT ")", name, UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid)));
+	}
+	else
+	{
+		EXTRACEF(("Executive::Directory::<IMutableContainer>create('%s', clsid:" UUID_PRINTF_FORMAT ")", name, UUID_PRINTF_ARGS(clsid)));
+	}
+#endif
 	EXDBGF((LOG_DEBUG7, "Executive::Directory::create(): checking that entry does not already exist"));
 	if(E_SUCCESS == Executive_Directory_resolve(&(self->Container), name, &dentry))
 	{

@@ -25,3 +25,33 @@ Executive_LogFormat(LogLevel level, const char *format, ...)
 }
 
 #endif /*!EXEC_BUILD_RELEASE*/
+
+#ifndef NDEBUG
+
+void
+Executive_DebugFormat(LogLevel level, const char *format, ...)
+{
+	va_list args;
+
+	va_start(args, format);
+	rpl_vsnprintf(logbuf, sizeof(logbuf), format, args);
+	if(executive.data.diagnostics)
+	{
+		IPlatformDiagnostics_log(executive.data.diagnostics, level, logbuf);
+	}
+}
+
+void
+Executive_TraceFormat(const char *format, ...)
+{
+	va_list args;
+
+	va_start(args, format);
+	rpl_vsnprintf(logbuf, sizeof(logbuf), format, args);
+	if(executive.data.diagnostics)
+	{
+		IPlatformDiagnostics_log(executive.data.diagnostics, LOG_TRACE, logbuf);
+	}
+}
+
+#endif /*!NDEBUG*/

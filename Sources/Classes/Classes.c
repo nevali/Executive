@@ -31,63 +31,7 @@
  * Only some registered classes provide any metaclass interfaces
  */
 
-typedef STATUS (*MetaClassCallback)(REFUUID clsid, REFUUID iid, void **out);
-
-struct MetaClassEntry
-{
-	const char *className;
-	REFUUID clsid;
-	const char *displayName;
-	MetaClassCallback fn;
-	void /*IObject*/ *factory;
-};
-
-/* The Classes object represents the list of registered classes
- *
- * It's a singleton, and so its interface pointers can be retrieved directly
- * via Executive::metaClass()
- *
- * It implements the IContainer interface, so that it can be traversed
- *
- * At startup, a directory entry for the Classes object is created at
- * /System/Classes
- */
-
-static STATUS Executive_Classes_queryInterface(IContainer *me, REFUUID iid, void **out);
-static REFCOUNT Executive_Classes_retain(IContainer *me);
-static REFCOUNT Executive_Classes_release(IContainer *me);
-static STATUS Executive_Classes_resolve(IContainer *me, const char *name, IDirectoryEntry **entry);
-static IIterator *Executive_Classes_iterator(IContainer *me);
-
-static struct IContainer_vtable_ Executive_Classes_IContainer_vtable = {
-	Executive_Classes_queryInterface,
-	Executive_Classes_retain,
-	Executive_Classes_release,
-	Executive_Classes_resolve,
-	Executive_Classes_iterator
-};
-
-static IContainer Executive_Classes_IContainer = { &Executive_Classes_IContainer_vtable, NULL };
-
-/* Generic MFactory implementation */
-static STATUS Executive_MFactory_queryInterface(MFactory *me, REFUUID iid, void **out);
-static REFCOUNT Executive_MFactory_retain(MFactory *me);
-static REFCOUNT Executive_MFactory_release(MFactory *me);
-static STATUS Executive_MFactory_lock(MFactory *me, bool dolock);
-
-extern STATUS Executive_Allocator_MFactory_createInstance(MFactory *me, IObject *outer, REFUUID iid, void **out);
-
-static struct MFactory_vtable_ Executive_Allocator_MFactory_vtable = {
-	Executive_MFactory_queryInterface,
-	Executive_MFactory_retain,
-	Executive_MFactory_release,
-	Executive_Allocator_MFactory_createInstance,
-	Executive_MFactory_lock
-};
-
-static struct MFactory Executive_Allocator_MFactory = { &Executive_Allocator_MFactory_vtable, NULL };
-
-static struct MetaClassEntry metaClass_entries[] = {
+struct MetaClassEntry metaClass_entries[] = {
 	{ "Executive::Classes", &CLSID_Executive_Classes, "Classes", NULL, &Executive_Classes_IContainer },
 	{ "PAL::Platform", &CLSID_PAL_Platform, "Platform", NULL, NULL },
 	{ "PAL::PlatformDiagnostics", &CLSID_PAL_PlatformDiagnostics, "Platform Diagnostics", NULL, NULL },
@@ -139,7 +83,7 @@ Executive_metaClass(REFUUID clsid, REFUUID iid, void **out)
 			}
 			if(metaClass_entries[n].factory)
 			{
-				EXDBGF((LOG_DEBUG6, "Executive::metaClass(): providing factory for clsid:%s", cbuf));
+				EXDBGF((LOG_DEBUG6, "Executive::metaClass(): providing factory for clsid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid)));
 				return MFactory_queryInterface(((IObject *) metaClass_entries[n].factory), iid, out);
 			}
 			status = E_NOTIMPL;
@@ -159,29 +103,28 @@ Executive_createObject(REFUUID clsid, REFUUID iid, void **out)
 	STATUS status;
 	MObject *constructor;
 	MFactory *factory;
-#ifndef NDEBUG
-	UUIDBUF cbuf, ibuf;
 
-	ExUuidStr(clsid, cbuf);
-	ExUuidStr(iid, ibuf);
-	EXLOGF((LOG_TRACE, "Executive::createObject(clsid:%s, iid:%s", cbuf, ibuf));
-#endif
+	EXTRACEF(("Executive::createObject(clsid:" UUID_PRINTF_FORMAT ", iid:" UUID_PRINTF_FORMAT ")",
+		UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid)));
 	if(E_SUCCESS == (status = Executive_metaClass(clsid, &IID_MObject, (void **) &constructor)))
 	{
+		EXLOGF((LOG_DEBUG7, "Executive::createObject: using MObject metaclass interface"));
 		status = MObject_create(constructor, executive.data.allocator, iid, out);
-		EXLOGF((LOG_DEBUG7, "Executive::createObject(): MObject::create() -> %d", status));
+		EXLOGF((LOG_DEBUG7, "Executive::createObject(): MObject::create() -> %s", ExStatusName(status)));
 		MObject_release(constructor);
 		return status;
 	}
 	if(E_SUCCESS == (status = Executive_metaClass(clsid, &IID_MFactory, (void **) &factory)))
 	{
+		EXLOGF((LOG_DEBUG7, "Executive::createObject: using MFactory metaclass interface"));
 		status = MFactory_createInstance(factory, NULL, iid, out);
-		EXLOGF((LOG_DEBUG7, "Executive::createObject(): MFactory::createInstance() -> %d", status));
+		EXLOGF((LOG_DEBUG7, "Executive::createObject(): MFactory::createInstance() -> %s:", ExStatusName(status)));
 		MFactory_release(factory);
 		return status;
 	}
-	EXLOGF((LOG_CONDITION, "%%E-NOENT: unable to obtain a suitable metaclass interface with which to create an instance of the requested class"));
-	return E_NOENT;
+	status = E_NOENT;
+	EXLOGF((LOG_CONDITION, "%s: unable to obtain a suitable metaclass interface with which to create an instance of the requested class", ExStatusName(status)));
+	return status;
 }
 
 const char *
@@ -224,7 +167,7 @@ Executive_createObjectByName(const char *name, REFUUID iid, void **out)
 	STATUS status;
 	UUID clsid;
 
-	EXTRACEF((LOG_TRACE, "Executive::createObjectByName('%s', iid:" UUID_PRINTF_FORMAT ")", name, UUID_PRINTF_ARGS(iid)));
+	EXTRACEF(("Executive::createObjectByName('%s', iid:" UUID_PRINTF_FORMAT ")", name, UUID_PRINTF_ARGS(iid)));
 	status = Executive_classIdForName(name, &clsid);
 	if(E_SUCCESS != status)
 	{
@@ -232,105 +175,4 @@ Executive_createObjectByName(const char *name, REFUUID iid, void **out)
 		return status;
 	}
 	return Executive_createObject(&clsid, iid, out);
-}
-
-/* Executive::Classes */
-
-static STATUS
-Executive_Classes_queryInterface(IContainer *me, REFUUID iid, void **out)
-{
-	UNUSED__(me);
-	if(out)
-	{
-		*out = NULL;
-	}
-	if(ExUuidEqual(iid, &IID_IObject) || ExUuidEqual(iid, &IID_IContainer))
-	{
-		if(out)
-		{
-			*out = me;
-		}
-		return E_SUCCESS;
-	}
-	return E_NOTIMPL;
-}
-
-static REFCOUNT
-Executive_Classes_retain(IContainer *me)
-{
-	UNUSED__(me);
-
-	return 2;
-}
-
-static REFCOUNT
-Executive_Classes_release(IContainer *me)
-{
-	UNUSED__(me);
-
-	return 1;
-}
-
-STATUS
-Executive_Classes_resolve(IContainer *me, const char *name, IDirectoryEntry **entry)
-{
-	UNUSED__(me);
-
-	if(entry)
-	{
-		*entry = NULL;
-	}
-	UNUSED__(name);
-	UNUSED__(entry);
-	return E_NOTIMPL;
-}
-
-IIterator *
-Executive_Classes_iterator(IContainer *me)
-{
-	UNUSED__(me);
-
-	return NULL;
-}
-
-/* Generic MFactory */
-
-static STATUS
-Executive_MFactory_queryInterface(MFactory *me, REFUUID iid, void **out)
-{
-	if(ExUuidEqual(iid, &IID_IObject) || ExUuidEqual(iid, &IID_MFactory))
-	{
-		if(out)
-		{
-			*out = me;
-		}
-		return E_SUCCESS;
-	}
-	if(out)
-	{
-		*out = NULL;
-	}
-	return E_NOTIMPL;
-}
-
-static REFCOUNT Executive_MFactory_retain(MFactory *me)
-{
-	UNUSED__(me);
-
-	return 2;
-}
-
-static REFCOUNT Executive_MFactory_release(MFactory *me)
-{
-	UNUSED__(me);
-	
-	return 1;
-}
-
-static STATUS Executive_MFactory_lock(MFactory *me, bool dolock)
-{
-	UNUSED__(me);
-	UNUSED__(dolock);
-
-	return E_SUCCESS;
 }

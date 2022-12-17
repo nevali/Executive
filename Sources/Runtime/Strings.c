@@ -54,6 +54,23 @@ Executive_String_equal(const char *a, const char *b)
 	return 1;
 }
 
+int
+Executive_String_lequal(const char *a, const char *b, size_t max)
+{
+	ExAssert(NULL != a);
+	ExAssert(NULL != b);
+	
+	for(; *a && *b && max; ++a, ++b)
+	{
+		max--;
+		if(*a != *b)
+		{
+			return 0;
+		}
+	}
+	return 1;
+}
+
 size_t
 Executive_String_lcopy(char *dest, size_t size, const char *src, size_t max)
 {
