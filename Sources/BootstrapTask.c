@@ -31,7 +31,7 @@ Executive_BootstrapTask_mainThread(IThread *self)
 
 	EXLOGF((LOG_TRACE, "Executive::BootstrapTask::mainThread() started"));
 	diag = NULL;
-	if(E_SUCCESS == (status = ExOpen("/System/Diagnostics", &IID_IWriteChannel, &diag)))
+	if(E_SUCCESS == (status = ExOpen("/System/Devices/Diagnostics", &IID_IWriteChannel, &diag)))
 	{
 		const char *message = "========================================================================\n"
 			" Executive -- Bootstrap Task -- Diagnostic Interface\n"

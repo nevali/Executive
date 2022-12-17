@@ -7,6 +7,8 @@
 /* for CLSID_PAL_xxx */
 #include <PAL/PAL.h>
 
+#define ExPhaseShift(phase) /* */
+
 /** Executive::Directory<IDirectoryEntryTarget> **/
 
 const struct IDirectoryEntryTarget_vtable_ Executive_Directory_IDirectoryEntryTarget_vtable = {
@@ -24,52 +26,33 @@ Executive_Directory_linked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
 
 	UNUSED__(entry);
 
-	EXLOGF((LOG_TRACE, "Executive::Directory::<IDirectoryEntryTarget>linked('%s')", IDirectoryEntry_name(entry)));
+	EXLOGF((LOG_TRACE, "Executive::Directory::<IDirectoryEntryTarget>linked('%s')", (entry ? IDirectoryEntry_name(entry) : "(NULL)")));
 	switch(self->data.kind)
 	{
-	case DK_SYSTEM:
-		EXLOGF((LOG_DEBUG, "Executive::Directory: populating the /System domain"));
-		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Nodes", &CLSID_Executive_Container, NULL, NULL));
-		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Volumes", &CLSID_Executive_Container, NULL, NULL));
-		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Boot", &CLSID_Executive_Container, NULL, NULL));
-		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Subsystems", &CLSID_Executive_Container, NULL, NULL));
-		ExAssert(E_SUCCESS == IMutableContainer_createLink((&(self->MutableContainer)), "Devices", "Platform/Devices", true));
-		ExAssert(E_SUCCESS == IMutableContainer_createLink((&(self->MutableContainer)), "Applications", "Volumes/System/Applications", true));
-		ExAssert(E_SUCCESS == IMutableContainer_createLink((&(self->MutableContainer)), "Library", "Volumes/System/Library", true));
-		for(Executive_Directory_Entry *entry = self->data.first; entry; entry = entry->data.next)
+	case DK_ROOT:
 		{
-			entry->data.flags |= DEF_SYSTEM|DEF_IMMUTABLE;
+			ExAssert(E_SUCCESS == Executive_Directory_Root_populate(&(self->MutableContainer)));
 		}
-		EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the /System domain complete"));
 		break;
-	case DK_CLUSTER:
-		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Nodes", &CLSID_Executive_Container, NULL, NULL));
-		for(Executive_Directory_Entry *entry = self->data.first; entry; entry = entry->data.next)
+	case DK_SYSTEM:
 		{
-			entry->data.flags |= DEF_IMMUTABLE;
+			ExAssert(E_SUCCESS == Executive_Directory_System_populate(&(self->MutableContainer)));
 		}
-		EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the /Cluster domain complete"));
 		break;
 	case DK_LOCAL:
-		ExAssert(E_SUCCESS == IMutableContainer_createLink((&(self->MutableContainer)), "Applications", "/System/Volumes/Data/Applications", true));
-		ExAssert(E_SUCCESS == IMutableContainer_createLink((&(self->MutableContainer)), "Library", "/System/Volumes/Data/Library", true));
-		ExAssert(E_SUCCESS == IMutableContainer_createLink((&(self->MutableContainer)), "Users", "/System/Volumes/Data/Users", true));
-		ExAssert(E_SUCCESS == IMutableContainer_createLink((&(self->MutableContainer)), "Developer", "/System/Volumes/Data/Developer", true));
-		for(Executive_Directory_Entry *entry = self->data.first; entry; entry = entry->data.next)
 		{
-			entry->data.flags |= DEF_IMMUTABLE;
+			ExAssert(E_SUCCESS == Executive_Directory_Local_populate(&(self->MutableContainer)));
 		}
-		EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the /Local domain complete"));
+		break;
+	case DK_CLUSTER:
+		{
+			ExAssert(E_SUCCESS == Executive_Directory_Cluster_populate(&(self->MutableContainer)));
+		}
 		break;
 	case DK_NETWORK:
-		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Applications", &CLSID_Executive_Container, NULL, NULL));
-		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Library", &CLSID_Executive_Container, NULL, NULL));
-		ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Users", &CLSID_Executive_Container, NULL, NULL));
-		for(Executive_Directory_Entry *entry = self->data.first; entry; entry = entry->data.next)
 		{
-			entry->data.flags |= DEF_MOUNTPOINT|DEF_IMMUTABLE;
+			ExAssert(E_SUCCESS == Executive_Directory_Network_populate(&(self->MutableContainer)));
 		}
-		EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the /Network domain complete"));
 		break;
 	default:
 		return;

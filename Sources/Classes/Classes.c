@@ -35,7 +35,9 @@ struct MetaClassEntry metaClass_entries[] = {
 	{ "Executive::Classes", &CLSID_Executive_Classes, "Classes", NULL, &Executive_Classes_IContainer },
 	{ "PAL::Platform", &CLSID_PAL_Platform, "Platform", NULL, NULL },
 	{ "PAL::PlatformDiagnostics", &CLSID_PAL_PlatformDiagnostics, "Platform Diagnostics", NULL, NULL },
+	/* XXX the Executive's implementation should be retrievable here */
 	{ "PAL::BootEnvironment", &CLSID_PAL_BootEnvironment, "Boot Environment", NULL, NULL },
+	/* XXX missing PAL::MemoryManager */
 	{ "Executive::Container", &CLSID_Executive_Container, "Container", Executive_Directory_metaClass, NULL },
 	{ "Executive::Link", &CLSID_Executive_Link, "Link", NULL, NULL },
 	{ "Executive::Allocator", &CLSID_Executive_Allocator, "Memory Allocator", NULL, &Executive_Allocator_MFactory },

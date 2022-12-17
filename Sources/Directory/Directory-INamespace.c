@@ -41,11 +41,11 @@ Executive_Directory_resolveEntry(INamespace *me, const char *path, IContainer *s
 	/* resolve all but the final path component to a container */
 	if(E_SUCCESS != (status = Executive_Directory_resolveContainer(me, path, scope, &parent, &basename)))
 	{
-		EXLOGF((LOG_DEBUG, "Executive::Directory<INamespace>::resolveEntry(): resolveContainer() failed - %d", status));
+		EXLOGF((LOG_DEBUG6, "Executive::Directory<INamespace>::resolveEntry(): resolveContainer() failed - %d", status));
 		return status;
 	}
 	/* resolve the remainder within that container */
-	EXLOGF((LOG_DEBUG, "Executive::Directory<INamespace>::resolveEntry(): resolving '%s' within parent %p", basename, parent));
+	EXLOGF((LOG_DEBUG7, "Executive::Directory<INamespace>::resolveEntry(): resolving '%s' within parent %p", basename, parent));
 	ExAssert(NULL != parent);
 	status = IContainer_resolve(parent, basename, dentry);
 	IContainer_release(parent);

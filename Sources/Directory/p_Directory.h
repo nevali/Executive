@@ -111,4 +111,11 @@ struct Executive_Directory_Entry
 #undef INTF_TO_CLASS
 #define INTF_TO_CLASS(i)               (struct Executive_Directory *)((i)->instptr)
 
+STATUS Executive_Directory_Root_populate(IMutableContainer *me);
+STATUS Executive_Directory_System_populate(IMutableContainer *me);
+STATUS Executive_Directory_Local_populate(IMutableContainer *me);
+STATUS Executive_Directory_Cluster_populate(IMutableContainer *me);
+STATUS Executive_Directory_Network_populate(IMutableContainer *me);
+
+
 #endif /*!P_DIRECTORY_H_*/

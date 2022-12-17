@@ -115,6 +115,20 @@ Executive_Classes_resolve(IContainer *me, const char *name, IDirectoryEntry **en
 	}
 	UNUSED__(name);
 	UNUSED__(entry);
+	/* if name begins with "classid:", the remainder should be parsed as a UUID, and
+	 * a directory entry synthesised pointing at the corresponding metaclass's
+	 * IObject interface (if it exists)
+	 *
+	 * this means that querying for a metaclass interface on the target of any link to
+	 * /System/Classes/classid:... is directly equivalent to querying for that same
+	 * interface via ExMetaClass() - the only difference is the path resolution
+	 *
+	 * if that class supports one of the standard constructor metaclass
+	 * interfaces, then the standard namespace implementation can construct a
+	 * new instance of that class on demand, i.e., wrapping "create an object
+	 * named X of class Y" into a straightforward operation, where both X and Y
+	 * are (in effect) filesystem paths
+	 */
 	return E_NOTIMPL;
 }
 

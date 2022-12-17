@@ -28,6 +28,9 @@ libDirectory_la_SOURCES = p_Directory.h \
 	\
 	Directory-Iterator.c \
 	\
-	Directory-Link.c
+	Directory-Link.c \
+	\
+	Directory-Root.c Directory-System.c Directory-Local.c Directory-Cluster.c \
+	Directory-Network.c
 
 libDirectory_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
