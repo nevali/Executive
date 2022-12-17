@@ -5,7 +5,7 @@
 #include "p_Classes.h"
 
 #undef INTF_TO_CLASS
-#define INTF_TO_CLASS(i) EXEC_COMMON_INTF_TO(i, Executive_Classes_DirectoryEntry)
+#define INTF_TO_CLASS(i)               EXEC_COMMON_INTF_TO(i, Executive_Classes_DirectoryEntry)
 
 /** Executive::Classes::DirectoryEntry **/
 

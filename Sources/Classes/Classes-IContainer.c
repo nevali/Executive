@@ -31,7 +31,7 @@
  * It implements the IContainer interface, so that it can be traversed
  *
  * At startup, a directory entry for the Classes object is created at
- * /System/Classes
+ * /System/Classes, allowing class name resolution to occur
  */
 
 static STATUS Executive_Classes_queryInterface(IContainer *me, REFUUID iid, void **out);
@@ -176,7 +176,7 @@ Executive_Classes_subDirectoryEntry_iterator(Executive_Classes_DirectoryEntry *s
 {
 	Executive_Classes_Iterator *iterator;
 
-	EXTRACEF(("Executiev::Classes::subDirectoryEntry_iterator(%p)", self));
+	EXTRACEF(("Executive::Classes::subDirectoryEntry_iterator(%p)", self));
 
 	if(NULL == (iterator = Executive_Classes_Iterator_create()))
 	{

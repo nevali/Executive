@@ -73,60 +73,7 @@ PAL_POSIX_Platform_init(void)
 	PALLOGF((LOG_DEBUG6, "PAL::POSIX::init(): early initialisation complete"));
 }
 
-static void
-PAL_POSIX_Platform_phaseDidChange(IPlatform *me, PHASE phase)
-{
-	UNUSED__(me);
-
-	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::phaseDidChange(%04x)", phase));
-	if(phase == PAL_POSIX_phase)
-	{
-		return;
-	}
-	if(phase < PAL_POSIX_phase)
-	{
-		PALLOGF((LOG_EMERGENCY, "new phase %04x is less than previous %04x", phase, PAL_POSIX_phase));
-		PAL_panic("attempt to revert to a previous system phase");
-	}
-#if !EXEC_BUILD_RELEASE
-	if(phase / 0x1000 != PAL_POSIX_phase / 0x1000)
-	{
-		PALLOGF((LOG_INFO, ">>>> PHASE TRANSITION >>>> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
-#if EXEC_BUILD_DEBUG
-		fprintf(stderr, "\n\n"
-			"++===================================================================++\n"
-			"||            S Y S T E M    P H A S E    T R A N S I T I O N        ||\n"
-			"++===================================================================++\n"
-			"    NEW PHASE:       %04x\n"
-			"    PREVIOUS PHASE:  %04x\n"
-			"=======================================================================\n",
-			phase, PAL_POSIX_phase);
-#endif
-	}
-	else if(phase / 0x100 != PAL_POSIX_phase / 0x100)
-	{
-		PALLOGF((LOG_DEBUG, " >>> PHASE SHIFT       >>> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
-#if EXEC_BUILD_DEBUG
-		fprintf(stderr, "\n"
-			"||   P H A S E   S H I F T  > > >  NEW phase: %04x, previous phase = %04x\n"
-			"\n",
-			phase, PAL_POSIX_phase);
-#endif
-	}
-	else if(phase / 0x10 != PAL_POSIX_phase / 0x10)
-	{
-		PALLOGF((LOG_DEBUG2, "  >> PHASE STEP         >> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
-	}
-	else
-	{
-		PALLOGF((LOG_DEBUG3, "   > PHASE               > new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
-	}
-#endif
-	PAL_POSIX_phase = phase;
-}
-
-
-
+/* INTERNAL */
 void
 PAL_POSIX_Platform_setMemoryManager(IMemoryManager *mm)
 {
@@ -183,6 +130,8 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 	{
 		if(!PAL_POSIX_platform.data.platformContainer)
 		{
+			IMutableContainer *devices;
+
 			/* XXX wait until we have a namespace */
 			PALDebug("PAL::POSIX::Platform::queryInterface(): creating platform container");
 			if(E_SUCCESS != (status = Executive_createObjectByName("Executive::Container", &IID_IMutableContainer, (void **) &(PAL_POSIX_platform.data.platformContainer))))
@@ -191,7 +140,15 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 				return status;
 			}
 			PALDebug("PAL::POSIX::Platform::queryInterface(): created platform container!");
-			IMutableContainer_create((PAL_POSIX_platform.data.platformContainer), "Devices", &CLSID_Executive_Container, NULL, NULL);
+			if(E_SUCCESS != (status = IMutableContainer_create((PAL_POSIX_platform.data.platformContainer), "Devices", &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &devices)))
+			{
+				PAL_panic("IMutableContainer::create('Devices') failed");
+				return status;
+			}
+			IMutableContainer_add(devices, "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
+			IMutableContainer_add(devices, "Console", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
+			IMutableContainer_add(devices, "Memory", &CLSID_PAL_MemoryManager, (IObject *) (void *) PAL_POSIX_platform.data.memoryManager);
+			IMutableContainer_release(devices);
 		}
 		if(out)
 		{
@@ -254,6 +211,59 @@ PAL_POSIX_Platform_nap(IPlatform *self)
 	PALDebug("PAL::POSIX::Platform::nap()");
 	sleep(1);
 }
+
+static void
+PAL_POSIX_Platform_phaseDidChange(IPlatform *me, PHASE phase)
+{
+	UNUSED__(me);
+
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::phaseDidChange(%04x)", phase));
+	if(phase == PAL_POSIX_phase)
+	{
+		return;
+	}
+	if(phase < PAL_POSIX_phase)
+	{
+		PALLOGF((LOG_EMERGENCY, "new phase %04x is less than previous %04x", phase, PAL_POSIX_phase));
+		PAL_panic("attempt to revert to a previous system phase");
+	}
+#if !EXEC_BUILD_RELEASE
+	if(phase / 0x1000 != PAL_POSIX_phase / 0x1000)
+	{
+		PALLOGF((LOG_INFO, ">>>> PHASE TRANSITION >>>> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+#if EXEC_BUILD_DEBUG
+		fprintf(stderr, "\n\n"
+			"++===================================================================++\n"
+			"||            S Y S T E M    P H A S E    T R A N S I T I O N        ||\n"
+			"++===================================================================++\n"
+			"    NEW PHASE:       %04x\n"
+			"    PREVIOUS PHASE:  %04x\n"
+			"=======================================================================\n",
+			phase, PAL_POSIX_phase);
+#endif
+	}
+	else if(phase / 0x100 != PAL_POSIX_phase / 0x100)
+	{
+		PALLOGF((LOG_DEBUG, " >>> PHASE SHIFT       >>> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+#if EXEC_BUILD_DEBUG
+		fprintf(stderr, "\n"
+			"||   P H A S E   S H I F T  > > >  NEW phase: %04x, previous phase = %04x\n"
+			"\n",
+			phase, PAL_POSIX_phase);
+#endif
+	}
+	else if(phase / 0x10 != PAL_POSIX_phase / 0x10)
+	{
+		PALLOGF((LOG_DEBUG2, "  >> PHASE STEP         >> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+	}
+	else
+	{
+		PALLOGF((LOG_DEBUG3, "   > PHASE               > new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+	}
+#endif
+	PAL_POSIX_phase = phase;
+}
+
 
 /* IContainer */
 static STATUS
