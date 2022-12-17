@@ -29,10 +29,9 @@
 /* Internal Executive state data */
 struct Executive executive;
 
-int
+STATUS
 Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platform)
 {
-	struct TaskCreationParameters taskInfo;
 	MDirectoryEntryTarget *meta;
 	IDirectoryEntryTarget *target;
 
@@ -120,6 +119,18 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 		ExAssert(E_SUCCESS == ExAdd("/System/Boot/Environment", &CLSID_PAL_BootEnvironment, (IObject *) (void *) executive.data.bootEnvironment));
 		ExAssert(E_SUCCESS == ExSetFlags("/System/Boot/Environment", DEF_SYSTEM|DEF_IMMUTABLE));
 	}
+	ExPhaseShift(PHASE_STARTUP_CLASSES);
+	{
+		IContainer *container;
+
+		/* Executive::Classes is a singleton which provides an IContainer
+		 * interface, which can be retrieved directly via ExMetaClass()
+		 */
+		ExAssert(E_SUCCESS == ExMetaClass(&CLSID_Executive_Classes, &IID_IContainer, &container));
+		ExAssert(E_SUCCESS == ExAdd("/System/Classes", &CLSID_Executive_Classes, (void *) container));
+		ExAssert(E_SUCCESS == ExSetFlags("/System/Classes", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN));
+		IContainer_release(container);
+	}
 
 	ExPhaseShift(PHASE_STARTUP_USERS);
 	ExAssert(E_SUCCESS == ExCreate("/Users", &CLSID_Executive_Container, NULL, NULL));
@@ -127,6 +138,7 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	ExPhaseShift(PHASE_STARTUP_VOLUMES);
 	ExAssert(E_SUCCESS == ExCreate("/Volumes", &CLSID_Executive_Container, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/Volumes", DEF_IMMUTABLE));
+
 	ExPhaseShift(PHASE_STARTUP_LOCAL);
 	ExAssert(E_SUCCESS == ExCreate("/Local", &CLSID_Executive_Local, NULL, NULL));
 	ExAssert(E_SUCCESS == ExSetFlags("/Local", DEF_IMMUTABLE));
@@ -144,12 +156,15 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	ExAssert(NULL != executive.data.tasker);
 	ExAssert(E_SUCCESS == ExAdd("/System/Tasks", &CLSID_Executive_Tasker, (IObject *) (void *) executive.data.tasker));
 	ExSetFlags("/System/Tasks", DEF_SYSTEM);
-	/* XXX this should be ExAdd() */
 
-	ExPhaseShift(PHASE_STARTUP_CLASSES);
-	ExAssert(E_SUCCESS == ExCreate("/System/Classes", &CLSID_Executive_Container, NULL, NULL));
-	ExSetFlags("/System/Classes", DEF_SYSTEM|DEF_IMMUTABLE|DEF_HIDDEN);
 	EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the object directory completed"));
+	return E_SUCCESS;
+}
+
+STATUS
+Executive_bootstrap(void)
+{
+	struct TaskCreationParameters taskInfo;
 
 	/* Ask the tasker to create a task in the Executive's address space */
 	ExPhaseShift(PHASE_STARTUP_EXECTASK);
@@ -158,15 +173,18 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	taskInfo.mainThread_entrypoint = Executive_BootstrapTask_mainThread;
 	ExAssert(E_SUCCESS == ITasker_createTask(executive.data.tasker, &taskInfo, &IID_ITask, (void **) &executive.data.bootstrapTask));
 	ExAssert(NULL != executive.data.bootstrapTask);
-	/* Ask the task to create the first thread */
-	/* Schedule the task and thread */
-	/* Yield to the scheduler forever */
+
+	return E_SUCCESS;
+}
+
+STATUS
+Executive_run(void)
+{
 	ExPhaseShift(PHASE_RUNNING);
 	for(;;)
 	{
 		ITasker_yield(executive.data.tasker);
 	}
-	return 0;
 }
 
 void

@@ -32,11 +32,11 @@ static PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics = {
 	{ NULL, NULL }, /* WriteChannel */
 	{
 #if EXEC_BUILD_RELEASE
-		LOG_CONDITION
+		LOG_INFO
 #elif EXEC_BUILD_DEBUG
 		LOG_TRACE
 #else
-		LOG_INFO
+		LOG_CONDITION
 #endif
 	}
 };

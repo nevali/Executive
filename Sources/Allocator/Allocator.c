@@ -2,7 +2,9 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "../p_Executive.h"
+#include <Executive/Internal/Allocator.h>
+#include <Executive/Internal/Runtime.h>
+#include <Executive/MFactory.h>
 
 #include "dlmalloc/malloc.h"
 

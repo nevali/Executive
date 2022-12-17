@@ -33,6 +33,8 @@
 # include <Executive/Internal/Executive.h>
 # include <Executive/Internal/Entry.h>
 # include <Executive/Internal/Runtime.h>
+# include <Executive/Internal/Classes.h>
+# include <Executive/Internal/Allocator.h>
 
 # include <Executive/IAllocator.h>
 # include <Executive/IBootEnvironment.h>
@@ -60,7 +62,6 @@
 # include <Executive/MDirectoryEntryTarget.h>
 
 # include <Executive/Classes.h>
-# include <Executive/Internal/Classes.h>
 
 # define EXEC_THREAD_STACK_SIZE        32768
 
@@ -100,41 +101,10 @@
 	} \
 	return self->data.refCount;
 
-typedef struct Executive Executive;
-typedef union Executive_Allocator Executive_Allocator;
 typedef union Executive_BootEnvironment Executive_BootEnvironment;
 typedef struct Executive_CooperativeTasker Executive_CooperativeTasker;
 typedef union Executive_CooperativeTasker_Task Executive_CooperativeTasker_Task;
 typedef union Executive_CooperativeTasker_Thread Executive_CooperativeTasker_Thread;
-
-/* Executive private data */
-struct Executive
-{
-	/* Placeholder for our virtual method table */
-	void *vmt;
-	struct
-	{
-		int (*PAL_metaClass)(REFUUID clsid, REFUUID iid, void **out);
-		/* A reference to the PAL's Platform object */
-		IPlatform *platform;
-		/* A reference to the current memory manager */
-		IMemoryManager *mm;
-		/* A reference to our default allocator */
-		IAllocator *allocator;
-		/* A reference to the boot environment */
-		IBootEnvironment *bootEnvironment;
-		/* A reference to the PAL's diagnostics interface, if provided */
-		IPlatformDiagnostics *diagnostics;
-		/* A pointer to the root of the Object Directory */
-		IMutableContainer *rootDirectory;
-		/* The Object Directory namespace */
-		INamespace *rootNS;
-		/* A reference to the Tasker */
-		ITasker *tasker;
-		/* Our bootstrap task */
-		ITask *bootstrapTask;
-	} data;
-};
 
 # undef ExPanic
 # define ExPanic(str)                  IPlatform_panic(executive.data.platform, str) /*[noreturn]*/
@@ -165,21 +135,11 @@ struct Executive
 extern "C" {
 # endif
 
-extern Executive executive;
-
-extern IAllocator *Executive_Allocator_create(IMemoryManager *mm);
-extern void *Executive_Allocator_map(Executive_Allocator *me, size_t size, RegionFlags flags);
-extern int Executive_Allocator_unmap(Executive_Allocator *me, void *addr, size_t size);
-
-STATUS Executive_Directory_metaClass(REFUUID clsid, REFUUID iid, void **out);
-
 extern IBootEnvironment *Executive_BootEnvironment_create(void);
 
 extern ITasker *Executive_CooperativeTasker_create(void);
 
 extern void Executive_BootstrapTask_mainThread(IThread *self);
-
-const char *Executive_nameOfClass(REFUUID clsid);
 
 # ifdef __cplusplus
 }

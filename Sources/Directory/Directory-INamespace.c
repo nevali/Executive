@@ -127,7 +127,7 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 		save = tail[0];
 		tail[0] = 0;
 
-		EXLOGF((LOG_DEBUG, "*** will attempt to resolve path component '%s' to a container", head));
+		EXLOGF((LOG_DEBUG7, "*** will attempt to resolve path component '%s' to a container", head));
 
 		/* attempt to resolve the path component within the current scope */
 		if(E_SUCCESS != (status = IContainer_resolve(scope, head, &dentry))) break;
@@ -143,7 +143,7 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 				EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: Executive::Directory::ResolveContainer(): '%s' does not support ILink", buffer));
 				break;
 			}
-			EXLOGF((LOG_DEBUG, "attempting to resolve '%s'", ILink_target(link)));
+			EXLOGF((LOG_DEBUG7, "attempting to resolve '%s'", ILink_target(link)));
 			status = Executive_Directory_resolveEntry(me, ILink_target(link), scope, &linkEntry);
 			ILink_release(link);
 			if(E_SUCCESS != status)
@@ -151,7 +151,7 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 				EXLOGF((LOG_DEBUG, "resolveEntry() failed %d", status));
 				break;
 			}
-			EXLOGF((LOG_DEBUG, "have resolved link to a new entry"));
+			EXLOGF((LOG_DEBUG7, "have resolved link to a new entry"));
 			/* replace the entry and fetch the flags again */
 			IDirectoryEntry_release(dentry);
 			dentry = linkEntry;
@@ -198,7 +198,7 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 	}
 	if(E_SUCCESS == status)
 	{
-		EXLOGF((LOG_DEBUG, "%s: successfully resolved to container", buffer));
+		EXLOGF((LOG_DEBUG7, "%s: successfully resolved to container", buffer));
 		if(basename)
 		{
 			/* skip any leftover slashes */
@@ -291,8 +291,8 @@ Executive_Directory_INamespace_create(INamespace *me, const char *path, IContain
 	{
 		return status;
 	}
-	EXLOGF((LOG_DEBUG, "located parent entry for '%s'", path));
-	EXLOGF((LOG_DEBUG, "basename is '%s'", basename));
+	EXLOGF((LOG_DEBUG7, "located parent entry for '%s'", path));
+	EXLOGF((LOG_DEBUG7, "basename is '%s'", basename));
 	if(E_SUCCESS != (status = IContainer_queryInterface(container, &IID_IMutableContainer, (void **) &mutable)))
 	{
 		EXLOGF((LOG_DEBUG, "IDirectoryEntry::queryTargetInterface() failed %d", status));
@@ -307,7 +307,7 @@ Executive_Directory_INamespace_create(INamespace *me, const char *path, IContain
 		return status;
 	}
 	IMutableContainer_release(mutable);
-	EXLOGF((LOG_DEBUG, "new object created successfully"));
+	EXLOGF((LOG_DEBUG3, "new object created successfully"));
 	return status;
 }
 
@@ -325,8 +325,8 @@ Executive_Directory_INamespace_add(INamespace *me, const char *path, IContainer 
 	{
 		return status;
 	}
-	EXLOGF((LOG_DEBUG, "located parent entry for '%s'", path));
-	EXLOGF((LOG_DEBUG, "basename is '%s'", basename));
+	EXLOGF((LOG_DEBUG7, "located parent entry for '%s'", path));
+	EXLOGF((LOG_DEBUG7, "basename is '%s'", basename));
 	if(E_SUCCESS != (status = IContainer_queryInterface(container, &IID_IMutableContainer, (void **) &mutable)))
 	{
 		EXLOGF((LOG_DEBUG, "IDirectoryEntry::queryTargetInterface() failed %d", status));
@@ -341,7 +341,7 @@ Executive_Directory_INamespace_add(INamespace *me, const char *path, IContainer 
 		return status;
 	}
 	IMutableContainer_release(mutable);
-	EXLOGF((LOG_DEBUG, "new object created successfully"));
+	EXLOGF((LOG_DEBUG2, "new object created successfully"));
 	return status;
 }
 
@@ -358,8 +358,8 @@ Executive_Directory_INamespace_createLink(INamespace *me, const char *path, ICon
 	{
 		return status;
 	}
-	EXLOGF((LOG_DEBUG, "located parent entry for '%s'", path));
-	EXLOGF((LOG_DEBUG, "basename is '%s'", basename));
+	EXLOGF((LOG_DEBUG7, "located parent entry for '%s'", path));
+	EXLOGF((LOG_DEBUG7, "basename is '%s'", basename));
 	if(E_SUCCESS != (status = IContainer_queryInterface(container, &IID_IMutableContainer, (void **) &mutable)))
 	{
 		EXLOGF((LOG_DEBUG, "IDirectoryEntry::queryTargetInterface() failed %d", status));
@@ -374,7 +374,7 @@ Executive_Directory_INamespace_createLink(INamespace *me, const char *path, ICon
 		return status;
 	}
 	IMutableContainer_release(mutable);
-	EXLOGF((LOG_DEBUG, "new link created successfully"));
+	EXLOGF((LOG_DEBUG2, "new link created successfully"));
 	return status;
 }
 

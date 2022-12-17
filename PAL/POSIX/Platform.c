@@ -79,14 +79,48 @@ PAL_POSIX_Platform_phaseDidChange(IPlatform *me, PHASE phase)
 	UNUSED__(me);
 
 	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::phaseDidChange(%04x)", phase));
+	if(phase == PAL_POSIX_phase)
+	{
+		return;
+	}
+	if(phase < PAL_POSIX_phase)
+	{
+		PALLOGF((LOG_EMERGENCY, "new phase %04x is less than previous %04x", phase, PAL_POSIX_phase));
+		PAL_panic("attempt to revert to a previous system phase");
+	}
+#if !EXEC_BUILD_RELEASE
+	if(phase / 0x1000 != PAL_POSIX_phase / 0x1000)
+	{
+		PALLOGF((LOG_INFO, ">>>> PHASE TRANSITION >>>> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
 #if EXEC_BUILD_DEBUG
-	fprintf(stderr, "\n\n"
-"***********************************************************************\n"
-"             P H A S E    S H I F T   O C C U R R E D\n"
-"***********************************************************************\n"
-"     previous phase = %04x, new phase = %04x\n"
-"***********************************************************************\n",
-	PAL_POSIX_phase, phase);
+		fprintf(stderr, "\n\n"
+			"++===================================================================++\n"
+			"||            S Y S T E M    P H A S E    T R A N S I T I O N        ||\n"
+			"++===================================================================++\n"
+			"    NEW PHASE:       %04x\n"
+			"    PREVIOUS PHASE:  %04x\n"
+			"=======================================================================\n",
+			phase, PAL_POSIX_phase);
+#endif
+	}
+	else if(phase / 0x100 != PAL_POSIX_phase / 0x100)
+	{
+		PALLOGF((LOG_DEBUG, " >>> PHASE SHIFT       >>> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+#if EXEC_BUILD_DEBUG
+		fprintf(stderr, "\n"
+			"||   P H A S E   S H I F T  > > >  NEW phase: %04x, previous phase = %04x\n"
+			"\n",
+			phase, PAL_POSIX_phase);
+#endif
+	}
+	else if(phase / 0x10 != PAL_POSIX_phase / 0x10)
+	{
+		PALLOGF((LOG_DEBUG2, "  >> PHASE STEP         >> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+	}
+	else
+	{
+		PALLOGF((LOG_DEBUG3, "   > PHASE               > new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+	}
 #endif
 	PAL_POSIX_phase = phase;
 }

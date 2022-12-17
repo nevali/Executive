@@ -104,6 +104,7 @@ Sources/Runtime/snprintf/Makefile
 Sources/Runtime/arm64/Makefile
 Sources/Allocator/Makefile
 Sources/Allocator/dlmalloc/Makefile
+Sources/Classes/Makefile
 Sources/Directory/Makefile
 Sources/Glue/Makefile
 Sources/Glue/posix/Makefile

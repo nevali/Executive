@@ -9,6 +9,8 @@
 
 STATUS Executive_metaClass(REFUUID clsid, REFUUID iid, void **out);
 STATUS Executive_createObject(REFUUID clsid, REFUUID iid, void **out);
+
+/* these should just be /System/Classes lookups */
 STATUS Executive_classIdForName(const char *name, UUID *out);
 STATUS Executive_createObjectByName(const char *name, REFUUID iid, void **out);
 /* XXX this is not a good interface no no no */

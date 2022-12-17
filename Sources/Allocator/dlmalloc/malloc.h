@@ -513,14 +513,15 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 #ifndef MALLOC_280_H
 #define MALLOC_280_H
 
-#include "../../p_Executive.h"
+#include <Executive/Internal/Allocator.h>
+#include <Executive/Internal/Runtime.h>
+#include <PAL/PAL.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <limits.h>
-#include <PAL/PAL.h>
 
 /**** Options begin here ****/
 
