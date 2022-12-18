@@ -7,6 +7,7 @@
 #define INTF_TO_CLASS(i) ((Bootstrap *)(void *)((i)->instptr))
 
 static void Bootstrap_init(Bootstrap *self);
+static void Bootstrap_init_container(Bootstrap *self);
 
 /* IObject */
 STATUS Bootstrap_queryInterface(IObject *me, REFUUID iid, void **out);
@@ -50,7 +51,7 @@ static Bootstrap bootstrap = {
 	{ NULL, NULL },
 	{
 		false,
-		NULL, NULL, NULL, NULL, NULL
+		NULL, NULL, NULL, NULL, NULL, NULL
 	} };
 IObject *bootstrap_IObject = &(bootstrap.Object);
 
@@ -62,7 +63,7 @@ static const char *banner = PRODUCT_FULLNAME " [" HOST_FAMILY "] - " PRODUCT_REL
  * defined by the Executive are okay, other symbols are not.
  */
 
-#define ExUuidEqual(a, b) ((a)->d.d1 == (b)->d.d1 && (a)->d.d2 == (b)->d.d2 && (a)->d.d3 == (b)->d.d3 && (a)->d.d4 == (b)->d.d4)
+#define ExLog(level, str)  if(self->data.diagnostics) IPlatformDiagnostics_log((self->data.diagnostics), level, str)
 
 static size_t
 ExStrLen(const char *str)
@@ -153,7 +154,9 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	Bootstrap *self = INTF_TO_CLASS(me);
 	STATUS status;
 	struct TaskCreationParameters taskInfo;
-	ITasker *tasker;
+	IExecutable *exec;
+	const char *args[4];
+	TASKID tid;
 
 	/* Are we already running? */
 	if(self->data.running)
@@ -172,11 +175,7 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	/* Create our internal container */
 	if(!self->data.container)
 	{
-		if(E_SUCCESS != (status = INamespace_create(root, NULL, NULL, &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &(self->data.container))))
-		{
-			/* PANIC */
-			return status;			
-		}
+		Bootstrap_init_container(self);
 	}
 	/* Open the console if possible */
 	if(E_SUCCESS != INamespace_open(root, "/System/Devices/Console", NULL, &IID_IWriteChannel, (void **) &(self->data.console)))
@@ -196,9 +195,10 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	/* Create the Bootstrap job */
 	/* Release the job coordinator */
 	/* Open /System/Tasks's ITasker interface */
-	if(E_SUCCESS != (status = INamespace_open(root, "/System/Tasks", NULL, &IID_ITasker, (void **) &tasker)))
+	if(E_SUCCESS != (status = INamespace_open(root, "/System/Tasks", NULL, &IID_ITasker, (void **) &(self->data.tasker))))
 	{
 		/* PANIC */
+		ExLog(LOG_CRIT, "Bootstrap: unable to open /System/Tasks<ITasker>");
 		return status;
 	}
 	/* Create the Sentinel task */
@@ -210,31 +210,31 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	taskInfo.namespace = root;
 	taskInfo.mainThread_entrypoint = Bootstrap_Sentinel_mainThread;
 
-	if(E_SUCCESS != (status = ITasker_createTask(tasker, &taskInfo, &IID_ITask, (void **) &self->data.sentinel)))
+	if(E_SUCCESS != (status = ITasker_createTask((self->data.tasker), &taskInfo, &IID_ITask, (void **) &self->data.sentinel)))
 	{
-		ITasker_release(tasker);
+		ExLog(LOG_CRIT, "Bootstrap: unable to open to create Sentinel task");
 		return status;
 	}
+	ExLog(LOG_DEBUG, "Bootstrap: Sentinel task spawned successfully");
 
 	/* Now create the Startup task */
-#if 0
-	if(E_SUCCESS != (status = INamespace_open(root, "/System/Subsystems/Bootstrap/Startup", NULL, &IID_IResidentProgram, (void **) &resident)))
+	if(E_SUCCESS != (status = INamespace_open(root, "/System/Subsystems/Bootstrap/Startup", NULL, &IID_IExecutable, (void **) &exec)))
 	{
 		/* PANIC */
+		ExLog(LOG_CRIT, "Bootstrap: unable to open /System/Subsystems/Bootstrap/Startup<IExecutable>");
 		return status;
 	}
-	taskInfo.flags = TF_EXECUTIVE;
-	taskInfo.name = "Sentinel";
-	taskInfo.namespace = root;
-	taskInfo.mainThread_entrypoint = IResidentProgram_entry(resident);
-	if(E_SUCCESS != (status = ITasker_createTask(tasker, &taskInfo, &IID_ITask, (void **) &self->data.startup)))
+	args[0] = "Startup";
+	args[1] = NULL;
+	tid = IExecutable_spawn(exec, args, NULL, NULL);
+	IExecutable_release(exec);
+	if(tid < 0)
 	{
-		ITasker_release(tasker);
-		return status;
+		/* PANIC */
+		ExLog(LOG_CRIT, "Bootstrap: unable to spawn /System/Subsystems/Bootstrap/Startup");
+		return (STATUS) tid;
 	}
-#endif
-	/* Release the Tasker*/
-	ITasker_release(tasker);
+	ExLog(LOG_DEBUG, "Bootstrap: Startup task spawned successfully");
 	return E_SUCCESS;
 }
 
@@ -272,4 +272,21 @@ Bootstrap_iterator(IContainer *me)
 		return IMutableContainer_iterator((self->data.container));
 	}
 	return NULL;
+}
+
+/* PRIVATE */
+static void
+Bootstrap_init_container(Bootstrap *self)
+{
+	STATUS status;
+
+	if(E_SUCCESS != (status = INamespace_create((self->data.root), NULL, NULL, &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &(self->data.container))))
+	{
+		/* PANIC */
+		ExLog(LOG_CRIT, "Bootstrap: unable to create Executive::Container");
+		return;
+	}
+	ExLog(LOG_DEBUG, "Bootstrap: populating subsystem objects");
+	Bootstrap_ResidentTask_init(&Bootstrap_startupTask, self, Bootstrap_Startup_mainThread);
+	IMutableContainer_add((self->data.container), "Startup", &CLSID_Executive_Executable, (void *) &Bootstrap_startupTask);
 }

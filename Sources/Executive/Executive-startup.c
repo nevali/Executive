@@ -44,6 +44,7 @@ Executive_startup(Executive *self)
 	{
 		ExPanic("Bootstrap subsystem failed to start");
 	}
+	ExLog(LOG_DEBUG, "Bootstrap subsystem started successfully");
 	/* Release the reference */
 	ISubsystem_release(subsystem);
 	return status;

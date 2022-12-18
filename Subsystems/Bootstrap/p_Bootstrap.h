@@ -15,8 +15,12 @@
 # include <Executive/IThread.h>
 # include <Executive/IContainer.h>
 # include <Executive/IMutableContainer.h>
+# include <Executive/IExecutable.h>
+
+#define ExUuidEqual(a, b) ((a)->d.d1 == (b)->d.d1 && (a)->d.d2 == (b)->d.d2 && (a)->d.d3 == (b)->d.d3 && (a)->d.d4 == (b)->d.d4)
 
 typedef struct Bootstrap Bootstrap;
+typedef union Bootstrap_ResidentTask Bootstrap_ResidentTask;
 
 struct Bootstrap
 {
@@ -32,11 +36,29 @@ struct Bootstrap
 		INamespace *root;
 		IPlatformDiagnostics *diagnostics;
 		IWriteChannel *console;
+		ITasker *tasker;
 		ITask *sentinel;
 	} data;
 };
 
+union Bootstrap_ResidentTask
+{
+	IObject Object;
+	IExecutable Executable;
+	struct
+	{
+		const void *vtable;
+		Bootstrap *bootstrap;
+		ThreadEntrypoint entry;
+	} data;
+};
+
 extern IObject *bootstrap_IObject;
+extern Bootstrap_ResidentTask Bootstrap_startupTask;
+
+void Bootstrap_ResidentTask_init(Bootstrap_ResidentTask *self, Bootstrap *bootstrap, ThreadEntrypoint entry);
+
+void Bootstrap_Startup_mainThread(IThread *self);
 
 void Bootstrap_Sentinel_mainThread(IThread *self);
 

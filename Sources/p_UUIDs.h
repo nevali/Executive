@@ -36,6 +36,7 @@
 #include <Executive/IThread.h>
 #include <Executive/IJob.h>
 #include <Executive/IEvent.h>
+#include <Executive/IExecutable.h>
 
 #include <Executive/MDirectoryEntryTarget.h>
 

@@ -272,7 +272,12 @@ static void trampoline(Executive_CooperativeTasker_Task *task)
 		EXLOGF((LOG_DEBUG, "trampoline(): transferring control to entrypoint of thread %u", task->data.mainThread->data.id));
 		task->data.mainThread->data.entrypoint(&task->data.mainThread->Thread);
 		task->data.mainThread->data.flags = THF_COMPLETED;
-		ExTrace("trampoline(): thread has finished");
+		EXLOGF((LOG_DEBUG, "trampoline(): thread %u has finished", task->data.mainThread->data.id));
+		sigsetjmp(task->data.mainThread->data.env, 0);
+	}
+	else
+	{
+		EXLOGF((LOG_DEBUG, "trampoline(): thread %u is a zombie", task->data.mainThread->data.id));
 	}
 }
 
@@ -376,7 +381,9 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 	Executive_CooperativeTasker *self = INTF_TO_CLASS(me);
 	Executive_CooperativeTasker_Task *task;
 
-	ExTrace("Executive::CooperativeTasker::createTask()");
+	/* Validate parameters */
+	ExAssert(params != NULL);
+	EXTRACEF(("Executive::CooperativeTasker::createTask({ .name = '%s' })", params->name));
 	if(out)
 	{
 		/* If the task was created successfully, the caller must test out to
@@ -384,12 +391,11 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 		 */
 		*out = NULL;
 	}
-	/* Validate parameters */
-	ExAssert(params != NULL);
 	/* Create the task itself */
 	task = ExAlloc(sizeof(Executive_CooperativeTasker_Task));
 	if(!task)
 	{
+		EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::createTask(): ExAlloc(%u) failed", sizeof(Executive_CooperativeTasker_Task)));
 		return E_NOMEM;
 	}
 	task->data.vtable = &Executive_CooperativeTasker_Task_vtable;
@@ -413,6 +419,7 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 	/* Are we ready to create a main thread? */
 	if(params->mainThread_entrypoint)
 	{
+		EXTRACEF(("Executive::CooperativeTasker::createTask(): entrypoint provided"));
 		task->data.mainThread = ExAlloc(sizeof(Executive_CooperativeTasker_Thread));
 		if(!task->data.mainThread)
 		{
@@ -428,7 +435,7 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 		task->data.mainThread->data.stackSize = EXEC_THREAD_STACK_SIZE;
 		task->data.mainThread->data.flags = THF_READY;
 		task->data.flags |= TF_READY;
-		ExTrace("new task is READY");
+		EXTRACEF(("Executive::CooperativeTasker::createTask(): new task state is READY"));
 	}
 	if(out)
 	{
