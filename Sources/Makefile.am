@@ -16,7 +16,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = Executive Runtime Allocator Classes Directory .
+SUBDIRS = Executive Runtime Allocator Classes Directory Subsystems .
 
 sbin_PROGRAMS =
 noinst_LTLIBRARIES = libEntrypoint.la libExecutiveServices.la
@@ -43,6 +43,7 @@ libExecutiveServices_la_LIBADD = \
 	Runtime/libRuntime.la \
 	Classes/libClasses.la \
 	Directory/libDirectory.la \
+	Subsystems/libSubsystems.la \
 	Allocator/libAllocator.la
 
 $(top_builddir)/Sources/libExecutiveServices.la: libExecutiveServices.la

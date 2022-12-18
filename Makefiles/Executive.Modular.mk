@@ -1,6 +1,6 @@
 Modular_sources = $(ENTRYPOINT)
 Modular_cppflags = @AM_CPPFLAGS@ @EXEC_GLUE_CPPFLAGS@ -DEXEC_BUILD_MODULAR=1 ${WARNING_CPPFLAGS}
-Modular_libs = @EXEC_GLUE_OBJECT_MODULAR@ $(top_builddir)/Frameworks/PAL/libPAL.la $(top_builddir)/Sources/libExecutiveServices.la
+Modular_libs = @EXEC_GLUE_OBJECT_MODULAR@ $(top_builddir)/Frameworks/PAL/libPAL.la $(top_builddir)/Sources/libExecutiveServices.la $(top_builddir)/Subsystems/Stubs/libResident.Stubs.la
 
 Executive_Modular_CPPFLAGS = $(Modular_cppflags)
 Executive_Modular_SOURCES = $(Modular_sources)

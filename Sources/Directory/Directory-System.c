@@ -31,7 +31,11 @@ Executive_Directory_System_populate(IMutableContainer *me)
 	ExAssert(E_SUCCESS == IMutableContainer_add((&(self->MutableContainer)), "Platform", &CLSID_PAL_Platform, (void *) (executive.data.platform)));
 	self->data.last->data.flags |= DEF_HIDDEN;
 
-	ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Subsystems", &CLSID_Executive_Container, NULL, NULL));
+	ExAssert(E_SUCCESS == ExMetaClass(&CLSID_Executive_Subsystems, &IID_IContainer, &container));
+	ExAssert(E_SUCCESS == IMutableContainer_add((&(self->MutableContainer)), "Subsystems", &CLSID_Executive_Subsystems, (void *) container));
+	self->data.last->data.flags |= DEF_HIDDEN;
+	IContainer_release(container);
+
 	ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Boot", &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &mutableContainer));
 	self->data.last->data.flags |= DEF_HIDDEN;
 	/* XXX we should add via ExMetaClass() and do away with executive.data.bootEnvironment altogether */

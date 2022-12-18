@@ -2,20 +2,18 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Executive.h"
-
-extern void Executive_Directory_dump(IContainer *me);
-
-extern void abort(void);
+#include "p_Bootstrap.h"
 
 void
-Executive_Sentinel_mainThread(IThread *self)
+Bootstrap_Sentinel_mainThread(IThread *self)
 {
 	UNUSED__(self);
 
+#if 0
 	for(;;)
 	{
 		ExTrace("Bootstrap::Sentinel::mainThread(): Ping");
 		ExYield();
 	}
+#endif
 }

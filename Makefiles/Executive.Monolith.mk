@@ -5,8 +5,7 @@ Monolith_sources = $(ENTRYPOINT)
 Monolith_cppflags = @AM_CPPFLAGS@ @EXEC_GLUE_CPPFLAGS@ -DEXEC_BUILD_MONOLITH=1 ${WARNING_CPPFLAGS}
 Monolith_glue = $(top_builddir)/@EXEC_GLUE_OBJECT_MONOLITH@
 
-Monolith_resident = \
-	$(top_builddir)/Subsystems/Bootstrap/libBootstrap.Resident.la
+Monolith_resident = $(top_builddir)/Subsystems/libResident.la
 
 Monolith_POSIX_cppflags = $(Monolith_cppflags) @EXEC_PAL_POSIX_CPPFLAGS@ 
 Monolith_POSIX_sources = $(Monolith_sources)

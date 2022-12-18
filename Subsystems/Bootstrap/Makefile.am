@@ -10,5 +10,5 @@ AM_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
 noinst_LTLIBRARIES = libBootstrap.Resident.la
 
 libBootstrap_Resident_la_SOURCES = p_Bootstrap.h \
-	Bootstrap.c
+	Bootstrap.c Sentinel.c
 

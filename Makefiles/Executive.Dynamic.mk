@@ -1,6 +1,6 @@
 Dynamic_cppflags = @AM_CPPFLAGS@ @EXEC_GLUE_CPPFLAGS@ -DEXEC_BUILD_DYNAMIC=1 ${WARNING_CPPFLAGS}
 Dynamic_sources = $(ENTRYPOINT)
-Dynamic_libs = @EXEC_GLUE_OBJECT_DYNAMIC@ $(top_builddir)/Sources/libExecutiveServices.la 
+Dynamic_libs = @EXEC_GLUE_OBJECT_DYNAMIC@ $(top_builddir)/Sources/libExecutiveServices.la $(top_builddir)/Subsystems/Stubs/libResident.Stubs.la
 Dynamic_ldflags = @AM_LDFLAGS@ @EXEC_GLUE_LDFLAGS@
 
 Executive_Dynamic_CPPFLAGS = $(Dynamic_cppflags)

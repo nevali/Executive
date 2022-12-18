@@ -31,6 +31,8 @@
  * Only some registered classes provide any metaclass interfaces
  */
 
+extern STATUS Executive_Subsystems_metaClass(REFUUID clsid, REFUUID iid, void **out);
+
 struct MetaClassEntry metaClass_entries[] = {
 	{ "Executive", &CLSID_Executive_System, "System Domain", Executive_MetaClass_metaClass, NULL },
 	{ "Executive::Classes", &CLSID_Executive_Classes, "Classes", NULL, &Executive_Classes_IContainer },
@@ -48,6 +50,7 @@ struct MetaClassEntry metaClass_entries[] = {
 	{ "Executive::Network", &CLSID_Executive_Network, "Network Domain", Executive_Directory_metaClass, NULL },
 	{ "Executive::Node", &CLSID_Executive_Node, "Node", NULL, NULL },
 	{ "Executive::Tasker", &CLSID_Executive_Tasker, "Tasker", NULL, NULL },
+	{ "Executive::Subsystems", &CLSID_Executive_Subsystems, "Subsystems", Executive_Subsystems_metaClass, NULL },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 

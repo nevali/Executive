@@ -6,6 +6,7 @@
 
 #define INTF_TO_CLASS(i) ((Bootstrap *)(void *)((i)->instptr))
 
+/* IObject */
 STATUS Bootstrap_queryInterface(IObject *me, REFUUID iid, void **out);
 static REFCOUNT Bootstrap_retain(IObject *me);
 static REFCOUNT Bootstrap_release(IObject *me);
@@ -14,6 +15,18 @@ static struct IObject_vtable_ Bootstrap_IObject_vtable = {
 	Bootstrap_queryInterface,
 	Bootstrap_retain,
 	Bootstrap_release
+};
+
+/* ISubsystem */
+static STATUS Bootstrap_start(ISubsystem *me, INamespace *root);
+static STATUS Bootstrap_stop(ISubsystem *me, INamespace *root);
+
+static struct ISubsystem_vtable_ Bootstrap_ISubsystem_vtable = {
+	(STATUS (*)(ISubsystem *, REFUUID, void **)) &Bootstrap_queryInterface,
+	(REFCOUNT (*)(ISubsystem *)) &Bootstrap_retain,
+	(REFCOUNT (*)(ISubsystem *)) &Bootstrap_release,
+	Bootstrap_start,
+	Bootstrap_stop
 };
 
 /* construct a minimal static object to expose Bootstrap::queryInterface */
@@ -27,12 +40,26 @@ static Bootstrap bootstrap = {
 	} };
 IObject *bootstrap_IObject = &(bootstrap.Object);
 
+static const char *banner = PRODUCT_FULLNAME " [" HOST_FAMILY "] - " PRODUCT_RELEASE "\n"
+	"  " PACKAGE_NAME " version " PACKAGE_VERSION ", build " PRODUCT_BUILD_ID_STR ", built at " PRODUCT_BUILD_DATE " " PRODUCT_BUILD_TIME " by " PRODUCT_BUILD_USER "@" PRODUCT_BUILD_HOST "\n\n";
+
 /* This code must be written as though it runs exclusively in user-space,
  * using only the interfaces provided to it; undefined references to the UUIDs
  * defined by the Executive are okay, other symbols are not.
  */
 
 #define ExUuidEqual(a, b) ((a)->d.d1 == (b)->d.d1 && (a)->d.d2 == (b)->d.d2 && (a)->d.d3 == (b)->d.d3 && (a)->d.d4 == (b)->d.d4)
+
+static size_t
+ExStrLen(const char *str)
+{
+	size_t c;
+
+	for(c = 0; str[c]; c++)
+	{
+	}
+	return c;
+}
 
 /* IObject */
 
@@ -55,16 +82,16 @@ Bootstrap_queryInterface(IObject *me, REFUUID iid, void **out)
 		}
 		return E_SUCCESS;
 	}
-#if 0
 	if(ExUuidEqual(iid, &IID_ISubsystem))
 	{
+		bootstrap.Subsystem.lpVtbl = &Bootstrap_ISubsystem_vtable;
+		bootstrap.Subsystem.instptr = &bootstrap;
 		if(out)
 		{
 			*out = &(bootstrap.Subsystem);
 		}
 		return E_SUCCESS;
 	}
-#endif
 	return E_NOTIMPL;
 }
 
@@ -116,6 +143,10 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 			/* No console at all */
 			self->data.console = NULL;
 		}
+	}
+	if(self->data.console)
+	{
+		IWriteChannel_write((self->data.console), (const uint8_t *) banner, ExStrLen(banner));
 	}
 	/* Open /System/Jobs's ICoordinator interface */
 	/* Create the Bootstrap job */

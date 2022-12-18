@@ -110,6 +110,7 @@ Sources/Allocator/Makefile
 Sources/Allocator/dlmalloc/Makefile
 Sources/Classes/Makefile
 Sources/Directory/Makefile
+Sources/Subsystems/Makefile
 Glue/Makefile
 Glue/posix/Makefile
 Glue/linux/Makefile
@@ -117,6 +118,7 @@ PAL/Makefile
 PAL/Stand-in/Makefile
 PAL/POSIX/Makefile
 Subsystems/Makefile
+Subsystems/Stubs/Makefile
 Subsystems/Bootstrap/Makefile
 ])
 ## Generate output files
