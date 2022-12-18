@@ -196,21 +196,29 @@ Executive_unlinked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
 }
 
 
-/* BOOTSTRAP TASK */
+/* BOOTSTRAP SUBSYSTEM */
 STATUS
 Executive_bootstrap(void)
 {
-	struct TaskCreationParameters taskInfo;
+	ISubsystem *subsystem;
+	STATUS status;
 
-	/* Ask the tasker to create a task in the Executive's address space */
 	ExPhaseShift(PHASE_STARTUP_EXECTASK);
-	taskInfo.flags = TF_EXECUTIVE;
-	taskInfo.name = "System";
-	taskInfo.mainThread_entrypoint = Executive_BootstrapTask_mainThread;
-	ExAssert(E_SUCCESS == ITasker_createTask(executive.data.tasker, &taskInfo, &IID_ITask, (void **) &executive.data.bootstrapTask));
-	ExAssert(NULL != executive.data.bootstrapTask);
 
-	return E_SUCCESS;
+	/* Open the Bootstrap subsystem */
+	if(E_SUCCESS != (status = ExOpen("/System/Subsystems/Bootstrap", &IID_ISubsystem, &subsystem)))
+	{
+		ExPanic("failed to open the ISubsystem interface on /System/Subsystems/Bootstrap");
+		return status;
+	}
+	/* Ask it to start, supplying it with the root namespace interface pointer */
+	if(E_SUCCESS != (status = ISubsystem_start(subsystem, executive.data.rootNS)))
+	{
+		ExPanic("Bootstrap subsystem failed to start");
+	}
+	/* Release the reference */
+	ISubsystem_release(subsystem);
+	return status;
 }
 
 /* RUNTIME */
@@ -332,6 +340,7 @@ Executive_init_directory(void)
 
 	/* Request the MDirectoryEntryTarget metaclass interface from Executive::Directory::Root */
 	ExPhaseShift(PHASE_STARTUP_ROOT);
+	EXLOGF((LOG_DEBUG, "Executive::init_directory(): populating the root directory"));
 	ExAssert(E_SUCCESS == Executive_metaClass(&CLSID_Executive_Root, &IID_MDirectoryEntryTarget, (void **) &meta));
 	/* invoke the constructor on the metaclass interface, MDirectoryEntryTarget::createInstance()
 	 * to create the root instance itself
@@ -354,9 +363,15 @@ Executive_init_directory(void)
 
 	if(!executive.data.system)
 	{
+		/* if nothing triggered the creation of the internal /System container,
+		 * do so now */
 		Executive_init_sysContainer();
 	}
-	EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the object directory completed"));
+	EXLOGF((LOG_DEBUG, "Executive::init_directory(): initial population of the object directory completed"));
+#ifdef EXEC_BUILD_DEBUG
+	EXLOGF((LOG_NOTICE, "Executive::init_directory(): dump of object directory follows:-"));
+	Executive_Directory_dump((IContainer *) (void *) executive.data.rootNS);
+#endif
 }
 
 /*PRIVATE*/

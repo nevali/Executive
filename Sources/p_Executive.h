@@ -79,8 +79,6 @@ extern IBootEnvironment *Executive_BootEnvironment_create(void);
 
 extern ITasker *Executive_CooperativeTasker_create(void);
 
-extern void Executive_BootstrapTask_mainThread(IThread *self);
-
 # ifdef __cplusplus
 }
 # endif

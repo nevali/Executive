@@ -35,7 +35,7 @@ libEntrypointServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
 
 libExecutiveServices_la_SOURCES = p_Executive.h \
 	BootEnvironment.c \
-	CooperativeTasker.c Descriptor.c BootstrapTask.c \
+	CooperativeTasker.c Descriptor.c \
 	UUIDs.c
 libExecutiveServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
 libExecutiveServices_la_LIBADD = \

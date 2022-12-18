@@ -59,7 +59,6 @@ Executive_BootstrapTask_mainThread(IThread *self)
 	taskInfo.mainThread_entrypoint = Executive_StartupTask_mainThread;
 	ITasker_createTask(executive.data.tasker, &taskInfo, &IID_ITask, NULL);
 
-	Executive_Directory_dump((IContainer *) (void *) executive.data.rootNS);
 
 	if(E_SUCCESS == (status = ExOpen("/System/Devices/Console", &IID_IWriteChannel, &console)))
 	{

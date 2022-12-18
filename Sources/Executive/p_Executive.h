@@ -49,6 +49,8 @@
 
 # include <Executive/IWriteChannel.h>
 
+# include <Executive/ISubsystem.h>
+
 # include <Executive/ITasker.h>
 # include <Executive/ITask.h>
 # include <Executive/IThread.h>
