@@ -110,9 +110,13 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	/* Open the console if possible */
 	if(E_SUCCESS != INamespace_open(root, "/System/Devices/Console", NULL, &IID_IWriteChannel, (void **) &(self->data.console)))
 	{
-		self->data.console = NULL;
+		/* If no console, can we open a write channel on the diagnostics interface and use that? */
+		if(E_SUCCESS != INamespace_open(root, "/System/Devices/Diagnostics", NULL, &IID_IWriteChannel, (void **) &(self->data.console)))
+		{
+			/* No console at all */
+			self->data.console = NULL;
+		}
 	}
-	/* If no console, can we open a write channel on the diagnostics interface and use that? */
 	/* Open /System/Jobs's ICoordinator interface */
 	/* Create the Bootstrap job */
 	/* Release the job coordinator */
@@ -123,7 +127,6 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 		return status;
 	}
 	/* Create the Sentinel task */
-	/* Ask the tasker to create a task in the Executive's address space */
 	taskInfo.flags = TF_EXECUTIVE;
 	taskInfo.name = "Sentinel";
 #if 0
@@ -140,4 +143,14 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	/* Release the Tasker*/
 	ITasker_release(tasker);
 	return E_SUCCESS;
+}
+
+STATUS
+Bootstrap_stop(ISubsystem *me, INamespace *root)
+{
+	UNUSED__(me);
+	UNUSED__(root);
+	
+	/* The Bootstrap subsystem cannot be stopped */
+	return E_PERM;
 }

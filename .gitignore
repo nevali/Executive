@@ -20,6 +20,8 @@ Makefile.in
 confdefs.h
 conftest.*
 /BuildProducts
+/Executive.Dynamic.*
+/Executive.Modular.*
 /Executive.Monolith.*
 /Executive.Targeted.*
 /configure

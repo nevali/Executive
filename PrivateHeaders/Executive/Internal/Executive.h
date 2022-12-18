@@ -80,8 +80,8 @@ struct Executive
 extern Executive executive;
 
 STATUS Executive_MetaClass_metaClass(REFUUID clsid, REFUUID iid, void **out);
-STATUS Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platform);
-STATUS Executive_bootstrap(void);
-STATUS Executive_run(void);
+STATUS Executive_init(Executive *self, struct ExecutiveEntryParameters *params, IPlatform *platform);
+STATUS Executive_startup(Executive *self);
+STATUS Executive_runLoop(Executive *self);
 
 #endif /*!EXECUTIVE_INTERNAL_EXECUTIVE_H_*/

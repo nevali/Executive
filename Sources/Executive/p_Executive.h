@@ -74,11 +74,15 @@ typedef union Executive_CooperativeTasker_Thread Executive_CooperativeTasker_Thr
 extern "C" {
 # endif
 
+extern struct IObject_vtable_ Executive_IObject_vtable;
+extern struct IContainer_vtable_ Executive_IContainer_vtable;
+extern struct IDirectoryEntryTarget_vtable_ Executive_IDirectoryEntryTarget_vtable;
+
 extern IBootEnvironment *Executive_BootEnvironment_create(void);
 
 extern ITasker *Executive_CooperativeTasker_create(void);
 
-extern void Executive_BootstrapTask_mainThread(IThread *self);
+extern void Executive_init_sysContainer(void);
 
 # ifdef __cplusplus
 }

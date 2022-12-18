@@ -63,16 +63,16 @@ Executive_start(struct ExecutiveEntryParameters *params)
 	 * implementation of the Executive core logic, built as the
 	 * libExecutiveServices convenience library
 	 */
-	if(E_SUCCESS != Executive_initialise(params, platform))
+	if(E_SUCCESS != Executive_init(&executive, params, platform))
 	{
 		return;
 	}
 	/* Start the bootstrap task */
-	if(E_SUCCESS != Executive_bootstrap())
+	if(E_SUCCESS != Executive_startup(&executive))
 	{
 		return;
 	}
 	/* Actually run the system (should never return) */
-	Executive_run();
+	Executive_runLoop(&executive);
 	return;
 }
