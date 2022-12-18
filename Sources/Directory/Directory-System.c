@@ -17,8 +17,8 @@ Executive_Directory_System_populate(IMutableContainer *me)
 	IContainer *container;
 	IMutableContainer *mutableContainer;
 
-	EXLOGF((LOG_DEBUG, "Executive::Directory: populating the /System domain"));
-/*	ExPhaseShift(PHASE_STARTUP_SYSTEM); */
+	EXLOGF((LOG_DEBUG, "Executive::Directory::System: populating the /System domain"));
+	ExPhaseShift(PHASE_STARTUP_SYSTEM);
 
 	ExAssert(E_SUCCESS == IMutableContainer_add((&(self->MutableContainer)), "Allocator", &CLSID_Executive_Allocator, (void *) (executive.data.allocator)));
 	self->data.last->data.flags |= DEF_HIDDEN;
@@ -57,7 +57,7 @@ Executive_Directory_System_populate(IMutableContainer *me)
 	{
 		entry->data.flags |= DEF_SYSTEM|DEF_IMMUTABLE;
 	}
-	EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the /System domain complete"));
+	EXLOGF((LOG_DEBUG, "Executive::Directory::System: initial population of the /System domain complete"));
 
 	return E_SUCCESS;
 }

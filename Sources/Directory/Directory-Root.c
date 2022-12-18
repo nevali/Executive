@@ -13,7 +13,8 @@ Executive_Directory_Root_populate(IMutableContainer *me)
 	IMutableContainer *mutableContainer;
 
 	EXLOGF((LOG_DEBUG, "Executive::Directory: creating the root directory objects"));
-	ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "System", &CLSID_Executive_System, NULL, NULL));
+/*	ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "System", &CLSID_Executive_System, NULL, NULL)); */
+	ExAssert(E_SUCCESS == IMutableContainer_add((&(self->MutableContainer)), "System", &CLSID_Executive_System, &(executive.Object)));
 	ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Users", &CLSID_Executive_Container, NULL, NULL));
 	ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Volumes", &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &mutableContainer));
 	ExAssert(E_SUCCESS == IMutableContainer_createLink(mutableContainer, "System", "/System/Volumes/System", true));

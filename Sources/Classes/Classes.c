@@ -32,6 +32,7 @@
  */
 
 struct MetaClassEntry metaClass_entries[] = {
+	{ "Executive", &CLSID_Executive_System, "System Domain", Executive_MetaClass_metaClass, NULL },
 	{ "Executive::Classes", &CLSID_Executive_Classes, "Classes", NULL, &Executive_Classes_IContainer },
 	{ "PAL::Platform", &CLSID_PAL_Platform, "Platform", NULL, NULL },
 	{ "PAL::PlatformDiagnostics", &CLSID_PAL_PlatformDiagnostics, "Platform Diagnostics", NULL, NULL },
@@ -42,7 +43,6 @@ struct MetaClassEntry metaClass_entries[] = {
 	{ "Executive::Link", &CLSID_Executive_Link, "Link", NULL, NULL },
 	{ "Executive::Allocator", &CLSID_Executive_Allocator, "Memory Allocator", NULL, &Executive_Allocator_MFactory },
 	{ "Executive::Root", &CLSID_Executive_Root, "Object Directory", Executive_Directory_metaClass, NULL },
-	{ "Executive::System", &CLSID_Executive_System, "System Domain", Executive_Directory_metaClass, NULL },
 	{ "Executive::Local", &CLSID_Executive_Local, "Local Domain", Executive_Directory_metaClass, NULL },
 	{ "Executive::Cluster", &CLSID_Executive_Cluster, "Cluster Domain", Executive_Directory_metaClass, NULL },
 	{ "Executive::Network", &CLSID_Executive_Network, "Network Domain", Executive_Directory_metaClass, NULL },

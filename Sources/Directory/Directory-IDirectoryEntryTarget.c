@@ -7,8 +7,6 @@
 /* for CLSID_PAL_xxx */
 #include <PAL/PAL.h>
 
-#define ExPhaseShift(phase) /* */
-
 /** Executive::Directory<IDirectoryEntryTarget> **/
 
 const struct IDirectoryEntryTarget_vtable_ Executive_Directory_IDirectoryEntryTarget_vtable = {

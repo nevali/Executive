@@ -4,42 +4,7 @@
 # include <Executive/Internal/Directory.h>
 # include <Executive/Internal/Runtime.h>
 # include <Executive/Internal/Classes.h>
-
-# define EXEC_COMMON_SUPPORTS(basename) \
-	if(ExUuidEqual(iid, &IID_I ## basename)) \
-	{ \
-		if(out) \
-		{ \
-			I ## basename ##_retain((&(self->basename))); \
-			*out = &(self->basename); \
-		} \
-		return E_SUCCESS; \
-	}
-# define EXEC_COMMON_SUPPORTS_DEFAULT \
-	EXEC_COMMON_SUPPORTS(Object); \
-	if(out) \
-	{ \
-		*out = NULL; \
-	} \
-	do { \
-		UUIDBUF ibuf; \
-		ExUuidStr(iid, ibuf); \
-		EXLOGF((LOG_CONDITION, "%%E-NOTIMPL: %s(): iid:%s is not supported", __FUNCTION__, ibuf)); \
-	} while(0); \
-	return E_NOTIMPL;
-# define EXEC_COMMON_RETAIN(class) \
-	class *self = INTF_TO_CLASS(me); \
-	self->data.refCount++; \
-	return self->data.refCount;
-# define EXEC_COMMON_RELEASE(class, fini) \
-	class *self = INTF_TO_CLASS(me); \
-	self->data.refCount--; \
-	if(!self->data.refCount) \
-	{ \
-		fini; \
-		return 0; \
-	} \
-	return self->data.refCount;
+# include <Executive/Internal/Executive.h>
 
 /** Executive::Directory metaclass */
 

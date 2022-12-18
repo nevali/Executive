@@ -136,13 +136,13 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 			PALDebug("PAL::POSIX::Platform::queryInterface(): creating platform container");
 			if(E_SUCCESS != (status = Executive_createObjectByName("Executive::Container", &IID_IMutableContainer, (void **) &(PAL_POSIX_platform.data.platformContainer))))
 			{
-				PAL_panic("Executive::createObject(Executive::Container, IMutableContainer) failed");
+				PAL_panic("PAL::POSIX::Platform::queryInterface(): Executive::createObjectByName(Executive::Container, IMutableContainer) failed");
 				return status;
 			}
 			PALDebug("PAL::POSIX::Platform::queryInterface(): created platform container!");
 			if(E_SUCCESS != (status = IMutableContainer_create((PAL_POSIX_platform.data.platformContainer), "Devices", &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &devices)))
 			{
-				PAL_panic("IMutableContainer::create('Devices') failed");
+				PAL_panic("PAL::POSIX::Platform::queryInterface(): IMutableContainer::create('Devices') failed");
 				return status;
 			}
 			IMutableContainer_add(devices, "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
@@ -154,7 +154,7 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 		{
 			*out = &(PAL_POSIX_platform.Container);
 		}
-		PALLOGF((LOG_DEBUG7, "returning PAL::POSIX::Platform<IContainer>"));
+		PALLOGF((LOG_DEBUG7, "PAL::POSIX::Platform::queryInterface(): returning PAL::POSIX::Platform<IContainer>"));
 		return E_SUCCESS;
 	}
 	return E_NOTIMPL;

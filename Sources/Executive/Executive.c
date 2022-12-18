@@ -26,6 +26,8 @@
 
 #include "p_Executive.h"
 
+#define INTF_TO_CLASS(i)               EXEC_COMMON_INTF_TO(i, Executive)
+
 /* Internal Executive state data */
 struct Executive executive;
 
@@ -35,11 +37,60 @@ static void Executive_init_bootEnvironment(void);
 static void Executive_init_diagnostics(void);
 static void Executive_init_directory(void);
 static void Executive_init_tasker(void);
+static void Executive_init_sysContainer(void);
+
+/* IObject */
+static STATUS Executive_queryInterface(IObject *me, REFUUID iid, void **out);
+static REFCOUNT Executive_retain(IObject *me);
+static REFCOUNT Executive_release(IObject *me);
+
+static struct IObject_vtable_ Executive_IObject_vtable = {
+	Executive_queryInterface,
+	Executive_retain,
+	Executive_release
+};
+
+/* IContainer */
+static STATUS Executive_resolve(IContainer *me, const char *name, IDirectoryEntry **entry);
+static IIterator *Executive_iterator(IContainer *me);
+
+static struct IContainer_vtable_ Executive_IContainer_vtable = {
+	EXEC_COMMON_VTABLE_IOBJECT(Executive, IContainer),
+	Executive_resolve,
+	Executive_iterator
+};
+
+/* IDirectoryEntryTarget */
+static void Executive_linked(IDirectoryEntryTarget *me, IDirectoryEntry *entry);
+static void Executive_unlinked(IDirectoryEntryTarget *me, IDirectoryEntry *entry);
+
+static struct IDirectoryEntryTarget_vtable_ Executive_IDirectoryEntryTarget_vtable = {
+	EXEC_COMMON_VTABLE_IOBJECT(Executive, IDirectoryEntryTarget),
+	Executive_linked,
+	Executive_unlinked
+};
+
+/* Callback registered with Executive::Classes */
+STATUS
+Executive_MetaClass_metaClass(REFUUID clsid, REFUUID iid, void **out)
+{
+	UNUSED__(clsid);
+
+	return Executive_queryInterface(&(executive.Object), iid, out);
+}
+
+/* Constructor */
 
 STATUS
 Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platform)
 {
 	IPlatform_phaseDidChange(platform, PHASE_STARTUP_EXECINIT);
+	executive.Object.lpVtbl = &Executive_IObject_vtable;
+	executive.Object.instptr = &executive;
+	executive.Container.lpVtbl = &Executive_IContainer_vtable;
+	executive.Container.instptr = &executive;
+	executive.DirectoryEntryTarget.lpVtbl = &Executive_IDirectoryEntryTarget_vtable;
+	executive.DirectoryEntryTarget.instptr = &executive;
 	executive.data.PAL_metaClass = params->PAL_metaClass;
 	executive.data.platform = platform;
 	
@@ -52,6 +103,100 @@ Executive_initialise(struct ExecutiveEntryParameters *params, IPlatform *platfor
 	return E_SUCCESS;
 }
 
+/* IObject */
+
+static STATUS
+Executive_queryInterface(IObject *me, REFUUID iid, void **out)
+{
+	Executive *self = &executive;
+
+	UNUSED__(me);
+
+	EXEC_COMMON_SUPPORTS(Container);
+	EXEC_COMMON_SUPPORTS(DirectoryEntryTarget);
+	EXEC_COMMON_SUPPORTS_DEFAULT;
+}
+
+static REFCOUNT
+Executive_retain(IObject *me)
+{
+	UNUSED__(me);
+
+	return 2;
+}
+
+static REFCOUNT
+Executive_release(IObject *me)
+{
+	UNUSED__(me);
+
+	return 1;
+}
+
+/* IContainer */
+
+static STATUS
+Executive_resolve(IContainer *me, const char *name, IDirectoryEntry **entry)
+{
+	UNUSED__(me);
+
+	if(!executive.data.system)
+	{
+		Executive_init_sysContainer();
+	}
+	return IContainer_resolve(executive.data.system, name, entry);
+}
+
+static IIterator *
+Executive_iterator(IContainer *me)
+{
+	UNUSED__(me);
+
+	if(!executive.data.system)
+	{
+		Executive_init_sysContainer();
+	}
+	return IContainer_iterator(executive.data.system);
+}
+
+/* IDirectoryEntryTarget */
+
+static void
+Executive_linked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
+{
+	UNUSED__(me);
+
+	if(!executive.data.system)
+	{
+		Executive_init_sysContainer();
+	}
+	me = NULL;
+	if((E_SUCCESS == IMutableContainer_queryInterface(executive.data.system, &IID_IDirectoryEntryTarget, (void **) &me)))
+	{
+		IDirectoryEntryTarget_linked(me, entry);
+		IDirectoryEntryTarget_release(me);
+	}
+}
+
+static void
+Executive_unlinked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
+{
+	UNUSED__(me);
+
+	if(!executive.data.system)
+	{
+		Executive_init_sysContainer();
+	}
+	me = NULL;
+	if((E_SUCCESS == IMutableContainer_queryInterface(executive.data.system, &IID_IDirectoryEntryTarget, (void **) &me)))
+	{
+		IDirectoryEntryTarget_unlinked(me, entry);
+		IDirectoryEntryTarget_release(me);
+	}
+}
+
+
+/* BOOTSTRAP TASK */
 STATUS
 Executive_bootstrap(void)
 {
@@ -68,6 +213,7 @@ Executive_bootstrap(void)
 	return E_SUCCESS;
 }
 
+/* RUNTIME */
 STATUS
 Executive_run(void)
 {
@@ -78,6 +224,7 @@ Executive_run(void)
 	}
 }
 
+/** Executive runtime APIs */
 void
 Executive_panic(const char *str)
 {
@@ -205,6 +352,10 @@ Executive_init_directory(void)
 	IDirectoryEntryTarget_release(target);
 	MDirectoryEntryTarget_release(meta);
 
+	if(!executive.data.system)
+	{
+		Executive_init_sysContainer();
+	}
 	EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the object directory completed"));
 }
 
@@ -217,6 +368,19 @@ Executive_init_tasker(void)
 	/* XXX this should be via a metaclass interface */
 	executive.data.tasker = Executive_CooperativeTasker_create();
 	ExAssert(NULL != executive.data.tasker);
-	ExAssert(E_SUCCESS == ExAdd("/System/Tasks", &CLSID_Executive_Tasker, (IObject *) (void *) executive.data.tasker));
+	ExAssert(E_SUCCESS == IMutableContainer_add(executive.data.system, "Tasks", &CLSID_Executive_Tasker,  (void *) executive.data.tasker));
 	ExSetFlags("/System/Tasks", DEF_SYSTEM);
+}
+
+/*PRIVATE*/
+static void
+Executive_init_sysContainer(void)
+{
+	MObject *meta;
+	
+	/* Ask Executive::Directory for this metaclass directly */
+	ExAssert(E_SUCCESS == Executive_Directory_metaClass(&CLSID_Executive_System, &IID_MObject, (void **) &meta));
+	ExAssert(E_SUCCESS == MObject_create(meta, executive.data.allocator, &IID_IMutableContainer, (void **) &(executive.data.system)));
+	MObject_release(meta);
+
 }

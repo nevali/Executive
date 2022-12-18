@@ -30,7 +30,6 @@
 
 # include <PAL/PAL.h>
 
-# include <Executive/Internal/Executive.h>
 # include <Executive/Internal/Entry.h>
 # include <Executive/Internal/Runtime.h>
 # include <Executive/Internal/Classes.h>
@@ -63,73 +62,14 @@
 
 # include <Executive/Classes.h>
 
-# define EXEC_THREAD_STACK_SIZE        32768
+# include <Executive/Internal/Executive.h>
 
-# define EXEC_COMMON_SUPPORTS(basename) \
-	if(ExUuidEqual(iid, &IID_I ## basename)) \
-	{ \
-		if(out) \
-		{ \
-			I ## basename ##_retain((&(self->basename))); \
-			*out = &(self->basename); \
-		} \
-		return E_SUCCESS; \
-	}
-# define EXEC_COMMON_SUPPORTS_DEFAULT \
-	EXEC_COMMON_SUPPORTS(Object); \
-	if(out) \
-	{ \
-		*out = NULL; \
-	} \
-	do { \
-		UUIDBUF ibuf; \
-		ExUuidStr(iid, ibuf); \
-		EXLOGF((LOG_CONDITION, "%%E-NOTIMPL: %s(): iid:%s is not supported", __FUNCTION__, ibuf)); \
-	} while(0); \
-	return E_NOTIMPL;
-# define EXEC_COMMON_RETAIN(class) \
-	class *self = INTF_TO_CLASS(me); \
-	self->data.refCount++; \
-	return self->data.refCount;
-# define EXEC_COMMON_RELEASE(class, fini) \
-	class *self = INTF_TO_CLASS(me); \
-	self->data.refCount--; \
-	if(!self->data.refCount) \
-	{ \
-		fini; \
-		return 0; \
-	} \
-	return self->data.refCount;
+# define EXEC_THREAD_STACK_SIZE        32768
 
 typedef union Executive_BootEnvironment Executive_BootEnvironment;
 typedef struct Executive_CooperativeTasker Executive_CooperativeTasker;
 typedef union Executive_CooperativeTasker_Task Executive_CooperativeTasker_Task;
 typedef union Executive_CooperativeTasker_Thread Executive_CooperativeTasker_Thread;
-
-# undef ExPanic
-# define ExPanic(str)                  IPlatform_panic(executive.data.platform, str) /*[noreturn]*/
-# undef ExAlloc
-# define ExAlloc(nbytes)               IAllocator_alloc(executive.data.allocator, nbytes)
-# undef ExReAlloc
-# define ExReAlloc(ptr, nbytes)        IAllocator_realloc(executive.data.allocator, ptr, nbytes)
-# undef ExFree
-# define ExFree(ptr)                   IAllocator_free(executive.data.allocator, ptr)
-# undef ExYield
-# define ExYield()                     ITasker_yield(executive.data.tasker)
-# undef ExLog
-# define ExLog(level, str)             if(executive.data.diagnostics) { IPlatformDiagnostics_log(executive.data.diagnostics, level, str); }
-# undef ExOpen
-# define ExOpen(filename, iid, out)    INamespace_open(executive.data.rootNS, filename, NULL, iid, (void **) (out))
-# undef ExCreate
-# define ExCreate(filename, clsid, iid, out) INamespace_create(executive.data.rootNS, filename, NULL, clsid, iid, (void **) (out))
-# undef ExAdd
-# define ExAdd(filename, clsid, obj)   INamespace_add(executive.data.rootNS, filename, NULL, clsid, obj)
-# undef ExCreateLink
-# define ExCreateLink(filename, target, force) INamespace_createLink(executive.data.rootNS, filename, NULL, target, force)
-# undef ExSetFlags
-# define ExSetFlags(filename, flags)   INamespace_setFlags(executive.data.rootNS, filename, NULL, flags)
-# undef ExPhaseShift
-# define ExPhaseShift(phase)           IPlatform_phaseDidChange(executive.data.platform, phase)
 
 # ifdef __cplusplus
 extern "C" {

@@ -51,6 +51,10 @@ Executive_String_equal(const char *a, const char *b)
 			return 0;
 		}
 	}
+	if(*a != *b)
+	{
+		return 0;
+	}
 	return 1;
 }
 
@@ -67,6 +71,14 @@ Executive_String_lequal(const char *a, const char *b, size_t max)
 		{
 			return 0;
 		}
+	}
+	if(!max)
+	{
+		return 1;
+	}
+	if(*a != *b)
+	{
+		return 0;
 	}
 	return 1;
 }

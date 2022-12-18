@@ -40,6 +40,8 @@ Executive_Directory_MObject_create(MObject *me, IAllocator *allocator, REFUUID i
 	dir->Container.instptr = dir;
 	dir->MutableContainer.lpVtbl = &Executive_Directory_IMutableContainer_vtable;
 	dir->MutableContainer.instptr = dir;
+	dir->DirectoryEntryTarget.lpVtbl = &Executive_Directory_IDirectoryEntryTarget_vtable;
+	dir->DirectoryEntryTarget.instptr = dir;
 	if(self->kind == DK_ROOT)
 	{
 		dir->Namespace.lpVtbl = &Executive_Directory_INamespace_vtable;
