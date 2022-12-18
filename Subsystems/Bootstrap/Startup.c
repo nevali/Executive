@@ -9,5 +9,10 @@ Bootstrap_ResidentTask Bootstrap_startupTask;
 void Bootstrap_Startup_mainThread(IThread *self)
 {
 	UNUSED__(self);
+
+	for(;;)
+	{
+		IThread_yield(self);
+	}
 }
 
