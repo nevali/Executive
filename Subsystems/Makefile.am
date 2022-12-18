@@ -1,6 +1,6 @@
 ## Executive Microkernel
 ##   Sources/Subsystems/Makefile.am
-##   External subsystems
+##   Subsystems
 
 ## Subsystems are the programs executed by the Executive directly, and they are
 ## used to provide critical system services
@@ -9,6 +9,7 @@
 ## operating environment for user programs to execute within
 ##
 ## There is not necessarily any technical difference between a "subsystem
-## executable" and a "user program executable"
+## executable" and a "user program executable", but they're also not
+## necessarily the same, either
 
-SUBDIRS = VER
+SUBDIRS = Bootstrap

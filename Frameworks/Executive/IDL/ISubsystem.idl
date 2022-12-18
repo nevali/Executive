@@ -20,7 +20,7 @@ cpp_quote(" */");
 
 import "IObject.idl";
 
-interface INamespace;
+import "INamespace.idl";
 
 [
 	object,

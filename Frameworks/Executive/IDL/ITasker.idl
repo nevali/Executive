@@ -21,6 +21,7 @@ cpp_quote(" */");
 import "IObject.idl";
 import "ITask.idl";
 import "IThread.idl";
+import "INamespace.idl";
 
 [
 	local, object,
@@ -39,6 +40,7 @@ interface ITasker: IObject
 		 */
 		const char *name;
 		TaskFlags flags;
+		INamespace *namespace;
 		ThreadEntrypoint mainThread_entrypoint;
 	} TaskCreationParameters;
 

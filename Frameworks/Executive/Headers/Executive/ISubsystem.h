@@ -28,6 +28,7 @@ typedef struct ISubsystem ISubsystem;
  *  limitations under the License.
  */
 # include <Executive/IObject.h>
+# include <Executive/INamespace.h>
 
 /* ISubsystem version 0.0 */
 

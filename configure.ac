@@ -117,7 +117,7 @@ PAL/Makefile
 PAL/Stand-in/Makefile
 PAL/POSIX/Makefile
 Subsystems/Makefile
-Subsystems/VER/Makefile
+Subsystems/Bootstrap/Makefile
 ])
 ## Generate output files
 AC_OUTPUT
