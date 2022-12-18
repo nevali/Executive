@@ -2,6 +2,8 @@
 # include "BuildConfiguration.h"
 #endif
 
+# define INITGUID_EXTERN       1
+
 #include <Executive/Internal/Allocator.h>
 #include <Executive/Internal/Runtime.h>
 #include <Executive/MFactory.h>

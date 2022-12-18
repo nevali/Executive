@@ -5,6 +5,8 @@
 #ifndef P_RUNTIME_H_
 # define P_RUNTIME_H_                  1
 
+# define INITGUID_EXTERN       1
+
 # include <Executive/UUID.h>
 # include <Executive/Internal/Runtime.h>
 

@@ -1,6 +1,8 @@
 #ifndef P_DIRECTORY_H_
 # define P_DIRECTORY_H_                1
 
+# define INITGUID_EXTERN       1
+
 # include <Executive/Internal/Directory.h>
 # include <Executive/Internal/Runtime.h>
 # include <Executive/Internal/Classes.h>

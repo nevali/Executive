@@ -513,6 +513,8 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 #ifndef MALLOC_280_H
 #define MALLOC_280_H
 
+# define INITGUID_EXTERN       1
+
 #include <Executive/Internal/Allocator.h>
 #include <Executive/Internal/Runtime.h>
 #include <PAL/PAL.h>
