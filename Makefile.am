@@ -17,7 +17,7 @@
 
 ACLOCAL_AMFLAGS = -I M4
 
-SUBDIRS = DeveloperTools Frameworks PrivateHeaders Sources PAL Subsystems .
+SUBDIRS = DeveloperTools Frameworks PrivateHeaders Sources Glue PAL Subsystems .
 
 EXTRA_DIST = README.md LICENSE-2.0 Dockerfile docker-bake.hcl
 
@@ -29,5 +29,24 @@ CLEANFILES =
 
 ENTRYPOINT = Sources/entrypoint.c
 
+# The Executive and PAL can be built in a number of different ways, depending
+# upon the target platform/bootloader/host operating system (as appropriate)
+# capabilities:
+#
+#  Dynamic      Dynamic linking/loading is available; the Executive can search
+#               for an appropriate PAL using the services provided to it
+#
+#  Modular      The bootloader or host operating system arranges for the
+#               Executive and the correct PAL to be loaded, which doesn't need
+#               to specified in advance
+#
+#  Targeted     The Executive and a specific PAL are either statically or
+#               dynamically linked together at build time
+#
+#  Monolith     The Executive, a specific PAL, and other executables are
+#               linked together at build time
+
+include $(top_srcdir)/Makefiles/Executive.Dynamic.mk
+include $(top_srcdir)/Makefiles/Executive.Modular.mk
 include $(top_srcdir)/Makefiles/Executive.Monolith.mk
 include $(top_srcdir)/Makefiles/Executive.Targeted.mk

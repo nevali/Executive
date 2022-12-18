@@ -16,14 +16,18 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = Glue Executive Runtime Allocator Classes Directory .
+SUBDIRS = Executive Runtime Allocator Classes Directory .
 
 sbin_PROGRAMS =
-noinst_LTLIBRARIES = libExecutiveServices.la
+noinst_LTLIBRARIES = libEntrypoint.la libExecutiveServices.la
+noinst_PROGRAMS = Executive.lo
 CLEANFILES =
 EXTRA_DIST = entrypoint.c
 
 ENTRYPOINT = entrypoint.c
+
+libEntrypoint_la_SOURCES = entrypoint.c
+libEntrypointServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
 
 ## the ExecutiveServices convenience library contains most of the logic
 ## of the microkernel itself -- it and the Glue constitute the Executive
@@ -43,25 +47,10 @@ libExecutiveServices_la_LIBADD = \
 
 $(top_builddir)/Sources/libExecutiveServices.la: libExecutiveServices.la
 
-# The Executive and PAL can be built in a number of different ways, depending
-# upon the target platform/bootloader/host operating system (as appropriate)
-# capabilities:
-#
-#  Dynamic      Dynamic linking/loading is available; the Executive can search
-#               for an appropriate PAL using the services provided to it
-#
-#  Modular      The bootloader or host operating system arranges for the
-#               Executive and the correct PAL to be loaded, which doesn't need
-#               to specified in advance
-#
-#  Targeted     The Executive and a specific PAL are either statically or
-#               dynamically linked together at build time
-#
-#  Monolith     The Executive, a specific PAL, and other executables are
-#               linked together at build time
+## Compile the core of the Executive (i.e., the entrypoint and the Executive
+## Services convenience library) into a single combined object
 
-include $(top_srcdir)/Makefiles/Executive.Dynamic.mk
-include $(top_srcdir)/Makefiles/Executive.Modular.mk
-
-# Monolith builds are performed by the Makefile at the root, after everything else
-# has been built
+Executive_lo_SOURCES =
+Executive_lo_LDADD = libEntrypoint.la libExecutiveServices.la
+Executive_lo_LDFLAGS = -r
+Executive_lo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(LD) $(Executive_lo_LDFLAGS) -o $@

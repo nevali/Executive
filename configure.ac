@@ -110,9 +110,9 @@ Sources/Allocator/Makefile
 Sources/Allocator/dlmalloc/Makefile
 Sources/Classes/Makefile
 Sources/Directory/Makefile
-Sources/Glue/Makefile
-Sources/Glue/posix/Makefile
-Sources/Glue/linux/Makefile
+Glue/Makefile
+Glue/posix/Makefile
+Glue/linux/Makefile
 PAL/Makefile
 PAL/Stand-in/Makefile
 PAL/POSIX/Makefile

@@ -75,7 +75,7 @@ AC_DEFUN([EXEC_GLUE_CONFIG],[
 		AS_VAR_SET([EXEC_GLUE_DYNAMIC_LIBS], [""])
 		AS_VAR_SET([EXEC_GLUE_CPPFLAGS], [""])
 		AS_VAR_SET([EXEC_GLUE_LDFLAGS], [""])
-		m4_include([Sources/Glue/]$1[/config.ac])dnl
+		m4_include([Glue/]$1[/config.ac])dnl
 		if test "$exec_glue_enabled" = "yes" ; then
 			AS_VAR_SET([exec_glue],["]$1["])
 		else
