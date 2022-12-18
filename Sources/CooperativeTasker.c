@@ -58,6 +58,8 @@ union Executive_CooperativeTasker_Task
 		TASKID id;
 		/* Task flags */
 		TaskFlags flags;
+		/* pointer to the Tasker that owns us */
+		Executive_CooperativeTasker *tasker;
 		/* pointer to the next task in the list */
 		Executive_CooperativeTasker_Task *nextTask;
 		/* IJob *job */
@@ -155,6 +157,7 @@ static REFCOUNT Executive_CooperativeTasker_Thread_release(IThread *me);
 static THREADID Executive_CooperativeTasker_Thread_id(IThread *me);
 static ThreadFlags Executive_CooperativeTasker_Thread_flags(IThread *me);
 static ITask *Executive_CooperativeTasker_Thread_task(IThread *me);
+static void Executive_CooperativeTasker_Thread_yield(IThread *me);
 
 static const struct IThread_vtable_ Executive_CooperativeTasker_Thread_vtable = {
 	Executive_CooperativeTasker_Thread_queryInterface,
@@ -162,7 +165,8 @@ static const struct IThread_vtable_ Executive_CooperativeTasker_Thread_vtable = 
 	Executive_CooperativeTasker_Thread_release,
 	Executive_CooperativeTasker_Thread_id,
 	Executive_CooperativeTasker_Thread_flags,
-	Executive_CooperativeTasker_Thread_task
+	Executive_CooperativeTasker_Thread_task,
+	Executive_CooperativeTasker_Thread_yield
 };
 
 
@@ -390,6 +394,7 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 	}
 	task->data.vtable = &Executive_CooperativeTasker_Task_vtable;
 	/* Assign the task an ID */
+	task->data.tasker = self;
 	task->data.id = self->data.nextTaskId;
 	self->data.nextTaskId++;
 	/* Apply task flags */
@@ -570,4 +575,15 @@ Executive_CooperativeTasker_Thread_task(IThread *me)
 	ExAssert(self->data.task);
 	ITask_retain((&(self->data.task->Task)));
 	return &(self->data.task->Task);
+}
+
+static void
+Executive_CooperativeTasker_Thread_yield(IThread *me)
+{
+	Executive_CooperativeTasker_Thread *self = INTF_TO_CLASS(me);
+
+	ExAssert(self->data.task);
+	ExAssert(self->data.task->data.tasker);
+
+	Executive_CooperativeTasker_yield(&(self->data.task->data.tasker->Tasker));
 }

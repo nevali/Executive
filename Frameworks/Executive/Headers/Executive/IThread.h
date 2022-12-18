@@ -68,6 +68,7 @@ DECLARE_INTERFACE_(IThread, IObject)
 	STDMETHOD_(THREADID, id)(THIS) PURE;
 	STDMETHOD_(ThreadFlags, flags)(THIS) PURE;
 	STDMETHOD_(ITask*, task)(THIS) PURE;
+	STDMETHOD_(void, yield)(THIS) PURE;
 
 	END_INTERFACE
 };
@@ -79,6 +80,7 @@ DECLARE_INTERFACE_(IThread, IObject)
 #   define IThread_id(__this) __this->lpVtbl->id(__this)
 #   define IThread_flags(__this) __this->lpVtbl->flags(__this)
 #   define IThread_task(__this) __this->lpVtbl->task(__this)
+#   define IThread_yield(__this) __this->lpVtbl->yield(__this)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__IThread_INTERFACE_DEFINED__*/

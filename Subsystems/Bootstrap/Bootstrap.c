@@ -6,6 +6,8 @@
 
 #define INTF_TO_CLASS(i) ((Bootstrap *)(void *)((i)->instptr))
 
+static void Bootstrap_init(Bootstrap *self);
+
 /* IObject */
 STATUS Bootstrap_queryInterface(IObject *me, REFUUID iid, void **out);
 static REFCOUNT Bootstrap_retain(IObject *me);
@@ -29,6 +31,18 @@ static struct ISubsystem_vtable_ Bootstrap_ISubsystem_vtable = {
 	Bootstrap_stop
 };
 
+/* IContainer */
+static STATUS Bootstrap_resolve(IContainer *me, const char *name, IDirectoryEntry **entry);
+static IIterator *Bootstrap_iterator(IContainer *me);
+
+static struct IContainer_vtable_ Bootstrap_IContainer_vtable = {
+		(STATUS (*)(IContainer *, REFUUID, void **)) &Bootstrap_queryInterface,
+	(REFCOUNT (*)(IContainer *)) &Bootstrap_retain,
+	(REFCOUNT (*)(IContainer *)) &Bootstrap_release,
+	Bootstrap_resolve,
+	Bootstrap_iterator
+};
+
 /* construct a minimal static object to expose Bootstrap::queryInterface */
 static Bootstrap bootstrap = {
 	{ &Bootstrap_IObject_vtable, NULL },
@@ -36,7 +50,7 @@ static Bootstrap bootstrap = {
 	{ NULL, NULL },
 	{
 		false,
-		NULL, NULL, NULL, NULL
+		NULL, NULL, NULL, NULL, NULL
 	} };
 IObject *bootstrap_IObject = &(bootstrap.Object);
 
@@ -61,6 +75,19 @@ ExStrLen(const char *str)
 	return c;
 }
 
+/* Constructor */
+
+static void
+Bootstrap_init(Bootstrap *self)
+{
+	self->Object.lpVtbl = &Bootstrap_IObject_vtable;
+	self->Object.instptr = &bootstrap;
+	self->Subsystem.lpVtbl = &Bootstrap_ISubsystem_vtable;
+	self->Subsystem.instptr = &bootstrap;
+	self->Container.lpVtbl = &Bootstrap_IContainer_vtable;
+	self->Container.instptr = &bootstrap;
+}
+
 /* IObject */
 
 STATUS
@@ -72,10 +99,12 @@ Bootstrap_queryInterface(IObject *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
+	if(!bootstrap.Subsystem.lpVtbl)
+	{
+		Bootstrap_init(&bootstrap);
+	}
 	if(ExUuidEqual(iid, &IID_IObject))
 	{
-		bootstrap.Object.lpVtbl = &Bootstrap_IObject_vtable;
-		bootstrap.Object.instptr = &bootstrap;
 		if(out)
 		{
 			*out = &(bootstrap.Object);
@@ -84,11 +113,17 @@ Bootstrap_queryInterface(IObject *me, REFUUID iid, void **out)
 	}
 	if(ExUuidEqual(iid, &IID_ISubsystem))
 	{
-		bootstrap.Subsystem.lpVtbl = &Bootstrap_ISubsystem_vtable;
-		bootstrap.Subsystem.instptr = &bootstrap;
 		if(out)
 		{
 			*out = &(bootstrap.Subsystem);
+		}
+		return E_SUCCESS;
+	}
+	if(ExUuidEqual(iid, &IID_IContainer))
+	{
+		if(out)
+		{
+			*out = &(bootstrap.Container);
 		}
 		return E_SUCCESS;
 	}
@@ -134,6 +169,15 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	{
 		self->data.diagnostics = NULL;
 	}
+	/* Create our internal container */
+	if(!self->data.container)
+	{
+		if(E_SUCCESS != (status = INamespace_create(root, NULL, NULL, &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &(self->data.container))))
+		{
+			/* PANIC */
+			return status;			
+		}
+	}
 	/* Open the console if possible */
 	if(E_SUCCESS != INamespace_open(root, "/System/Devices/Console", NULL, &IID_IWriteChannel, (void **) &(self->data.console)))
 	{
@@ -171,6 +215,24 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 		ITasker_release(tasker);
 		return status;
 	}
+
+	/* Now create the Startup task */
+#if 0
+	if(E_SUCCESS != (status = INamespace_open(root, "/System/Subsystems/Bootstrap/Startup", NULL, &IID_IResidentProgram, (void **) &resident)))
+	{
+		/* PANIC */
+		return status;
+	}
+	taskInfo.flags = TF_EXECUTIVE;
+	taskInfo.name = "Sentinel";
+	taskInfo.namespace = root;
+	taskInfo.mainThread_entrypoint = IResidentProgram_entry(resident);
+	if(E_SUCCESS != (status = ITasker_createTask(tasker, &taskInfo, &IID_ITask, (void **) &self->data.startup)))
+	{
+		ITasker_release(tasker);
+		return status;
+	}
+#endif
 	/* Release the Tasker*/
 	ITasker_release(tasker);
 	return E_SUCCESS;
@@ -184,4 +246,30 @@ Bootstrap_stop(ISubsystem *me, INamespace *root)
 	
 	/* The Bootstrap subsystem cannot be stopped */
 	return E_PERM;
+}
+
+/* IContainer */
+
+static STATUS
+Bootstrap_resolve(IContainer *me, const char *name, IDirectoryEntry **entry)
+{
+	Bootstrap *self = INTF_TO_CLASS(me);
+
+	if(self->data.container)
+	{
+		return IMutableContainer_resolve((self->data.container), name, entry);
+	}
+	return E_NOTIMPL;
+}
+
+static IIterator *
+Bootstrap_iterator(IContainer *me)
+{
+	Bootstrap *self = INTF_TO_CLASS(me);
+
+	if(self->data.container)
+	{
+		return IMutableContainer_iterator((self->data.container));
+	}
+	return NULL;
 }

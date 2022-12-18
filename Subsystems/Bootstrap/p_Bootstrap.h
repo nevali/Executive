@@ -3,6 +3,8 @@
 
 # define INITGUID_EXTERN               1
 
+# include <Executive/Classes.h>
+
 # include <Executive/IObject.h>
 # include <Executive/ISubsystem.h>
 # include <Executive/INamespace.h>
@@ -12,6 +14,7 @@
 # include <Executive/ITask.h>
 # include <Executive/IThread.h>
 # include <Executive/IContainer.h>
+# include <Executive/IMutableContainer.h>
 
 typedef struct Bootstrap Bootstrap;
 
@@ -25,6 +28,7 @@ struct Bootstrap
 	struct
 	{
 		bool running;
+		IMutableContainer *container;
 		INamespace *root;
 		IPlatformDiagnostics *diagnostics;
 		IWriteChannel *console;

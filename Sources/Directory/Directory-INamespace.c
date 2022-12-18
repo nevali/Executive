@@ -287,6 +287,11 @@ Executive_Directory_INamespace_create(INamespace *me, const char *path, IContain
 	{
 		*out = NULL;
 	}
+	if(NULL == path)
+	{
+		/* create an anonymous object */
+		return Executive_createObject(clsid, iid, out);
+	}
 	if(E_SUCCESS != (status = Executive_Directory_resolveContainer(me, path, scope, &container, &basename)))
 	{
 		return status;

@@ -21,6 +21,8 @@
 #ifndef EXECUTIVE_CLASSES_H_
 # define EXECUTIVE_CLASSES_H_ 1
 
+# include <Executive/UUID.h>
+
 #endif /*!EXECUTIVE_CLASSES_H_*/
 
 #if defined(INITGUID) || !defined(EXECUTIVE_CLASSES_H_GUIDS_DEFINED_)

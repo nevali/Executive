@@ -58,5 +58,6 @@ interface IThread: IObject
 
 	THREADID id(void);
 	ThreadFlags flags(void);
-	ITask *task(void);
+	[local] ITask *task(void);
+	[local] void yield(void);
 }

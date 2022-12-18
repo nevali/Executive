@@ -234,7 +234,7 @@ PAL_POSIX_Platform_phaseDidChange(IPlatform *me, PHASE phase)
 #if EXEC_BUILD_DEBUG
 		fprintf(stderr, "\n\n"
 			"++===================================================================++\n"
-			"||            S Y S T E M    P H A S E    T R A N S I T I O N        ||\n"
+			"||           S Y S T E M    P H A S E    T R A N S I T I O N         ||\n"
 			"++===================================================================++\n"
 			"    NEW PHASE:       %04x\n"
 			"    PREVIOUS PHASE:  %04x\n"
