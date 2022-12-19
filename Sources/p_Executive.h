@@ -64,12 +64,7 @@
 
 # include <Executive/Internal/Executive.h>
 
-# define EXEC_THREAD_STACK_SIZE        32768
-
 typedef union Executive_BootEnvironment Executive_BootEnvironment;
-typedef struct Executive_CooperativeTasker Executive_CooperativeTasker;
-typedef union Executive_CooperativeTasker_Task Executive_CooperativeTasker_Task;
-typedef union Executive_CooperativeTasker_Thread Executive_CooperativeTasker_Thread;
 
 # ifdef __cplusplus
 extern "C" {

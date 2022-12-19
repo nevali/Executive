@@ -6,6 +6,7 @@
 # include <Executive/Errors.h>
 # include <Executive/UUID.h>
 # include <Executive/Classes.h>
+# include <Executive/Internal/Runtime.h>
 
 # define EXEC_COMMON_INTF_TO(i, class) ((class *)((IObject *)(void *)(i))->instptr)
 # define EXEC_COMMON_SUPPORTS(basename) \
@@ -23,11 +24,6 @@
 	{ \
 		*out = NULL; \
 	} \
-	do { \
-		UUIDBUF ibuf; \
-		ExUuidStr(iid, ibuf); \
-		EXLOGF((LOG_CONDITION, "%%E-NOTIMPL: %s(): iid:%s is not supported", __FUNCTION__, ibuf)); \
-	} while(0); \
 	return E_NOTIMPL;
 # define EXEC_COMMON_SUPPORTS_DEFAULT \
 	EXEC_COMMON_SUPPORTS(Object); \

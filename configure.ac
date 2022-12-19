@@ -110,6 +110,9 @@ Sources/Allocator/Makefile
 Sources/Allocator/dlmalloc/Makefile
 Sources/Classes/Makefile
 Sources/Directory/Makefile
+Sources/CooperativeTasker/Makefile
+Sources/Coordinator/Makefile
+Sources/Despatch/Makefile
 Sources/Subsystems/Makefile
 Glue/Makefile
 Glue/posix/Makefile

@@ -16,7 +16,8 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = Executive Runtime Allocator Classes Directory Subsystems .
+SUBDIRS = Executive Runtime Allocator Classes Directory CooperativeTasker \
+	Coordinator Despatch Subsystems .
 
 sbin_PROGRAMS =
 noinst_LTLIBRARIES = libEntrypoint.la libExecutiveServices.la
@@ -34,19 +35,16 @@ libEntrypointServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
 ## itself (but requires a PAL to function)
 
 libExecutiveServices_la_SOURCES = p_Executive.h \
-	BootEnvironment.c \
-	CooperativeTasker.c Descriptor.c \
-	UUIDs.c
+	BootEnvironment.c UUIDs.c
 libExecutiveServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
 libExecutiveServices_la_LIBADD = \
 	Executive/libExecutive.la \
 	Runtime/libRuntime.la \
 	Classes/libClasses.la \
 	Directory/libDirectory.la \
+	CooperativeTasker/libCooperativeTasker.la \
 	Subsystems/libSubsystems.la \
 	Allocator/libAllocator.la
-
-$(top_builddir)/Sources/libExecutiveServices.la: libExecutiveServices.la
 
 ## Compile the core of the Executive (i.e., the entrypoint and the Executive
 ## Services convenience library) into a single combined object

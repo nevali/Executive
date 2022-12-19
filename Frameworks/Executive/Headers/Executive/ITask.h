@@ -28,6 +28,7 @@ typedef struct ITask ITask;
  *  limitations under the License.
  */
 # include <Executive/IObject.h>
+# include <Executive/IJob.h>
 
 /* ITask version 0.0 */
 
@@ -47,9 +48,8 @@ typedef enum
 	 	TF_READY = (1<<3),
 	 	TF_RUNNING = (2<<3),
 	 	TF_SUSPENDED = (3<<3),
-	 	TF_WAITING = (4<<3),
-	 	TF_COMPLETED = (5<<3),
-	 	TF_TERMINATED = (6<<3)
+	 	TF_COMPLETED = (4<<3),
+	 	TF_TERMINATED = (5<<3)
 }  TaskFlags;
 #  undef INTEFACE
 #  define INTERFACE ITask

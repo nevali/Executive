@@ -44,10 +44,11 @@ typedef enum
 	 	THF_NEW = 0,
 	 	THF_READY = (1<<3),
 	 	THF_RUNNING = (2<<3),
-	 	THF_SUSPENDED = (3<<3),
-	 	THF_WAITING = (4<<3),
-	 	THF_COMPLETED = (5<<3),
-	 	THF_TERMINATED = (6<<3)
+	 	THF_TRAP = (3<<3),
+	 	THF_SUSPENDED = (4<<3),
+	 	THF_WAITING = (5<<3),
+	 	THF_COMPLETED = (6<<3),
+	 	THF_TERMINATED = (7<<3)
 }  ThreadFlags;
 #  undef INTEFACE
 #  define INTERFACE IThread

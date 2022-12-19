@@ -51,6 +51,7 @@ static struct IBootEnvironment_vtable_ Executive_BootEnvironment_vtable = {
 /* The PAL didn't provide a Boot Environment object, so synthesise a workable
  * fallback version
  */
+ /* XXX should be via MObject */
 IBootEnvironment *
 Executive_BootEnvironment_create(void)
 {
