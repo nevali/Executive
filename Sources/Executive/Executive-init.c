@@ -42,7 +42,7 @@ Executive_init(Executive *self, struct ExecutiveEntryParameters *params, IPlatfo
 {
 	UNUSED__(self);
 	
-	IPlatform_phaseDidChange(platform, PHASE_STARTUP_EXECINIT);
+	IPlatform_phaseTransition(platform, PHASE_STARTUP_EXECINIT);
 	executive.Object.lpVtbl = &Executive_IObject_vtable;
 	executive.Object.instptr = &executive;
 	executive.Container.lpVtbl = &Executive_IContainer_vtable;

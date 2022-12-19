@@ -12,7 +12,8 @@ static REFCOUNT PAL_POSIX_Platform_release(IObject *self);
 static void PAL_POSIX_Platform_panic(IPlatform *self, const char *str);
 static void PAL_POSIX_Platform_setDefaultAllocator(IPlatform *self, IAllocator *allocator);
 static void PAL_POSIX_Platform_nap(IPlatform *self);
-static void PAL_POSIX_Platform_phaseDidChange(IPlatform *self, PHASE phase);
+static void PAL_POSIX_Platform_tick(IPlatform *self);
+static void PAL_POSIX_Platform_phaseTransition(IPlatform *self, PHASE phase);
 static STATUS PAL_POSIX_Platform_resolve(IContainer *self, const char *name, IDirectoryEntry **entry);
 static IIterator *PAL_POSIX_Platform_iterator(IContainer *self);
 
@@ -30,7 +31,8 @@ static struct IPlatform_vtable_ platform_IPlatform_vtable = {
 	PAL_POSIX_Platform_panic,
 	PAL_POSIX_Platform_setDefaultAllocator,
 	PAL_POSIX_Platform_nap,
-	PAL_POSIX_Platform_phaseDidChange
+	PAL_POSIX_Platform_tick,
+	PAL_POSIX_Platform_phaseTransition
 };
 /* IContainer */
 static struct IContainer_vtable_ platform_IContainer_vtable = {
@@ -208,16 +210,24 @@ PAL_POSIX_Platform_nap(IPlatform *self)
 {
 	UNUSED__(self);
 	
-	PALDebug("PAL::POSIX::Platform::nap()");
+	PALTrace("PAL::POSIX::Platform::nap()");
 	sleep(1);
 }
 
 static void
-PAL_POSIX_Platform_phaseDidChange(IPlatform *me, PHASE phase)
+PAL_POSIX_Platform_tick(IPlatform *self)
+{
+	UNUSED__(self);
+	
+	PALTrace("PAL::POSIX::Platform::tick()");
+}
+
+static void
+PAL_POSIX_Platform_phaseTransition(IPlatform *me, PHASE phase)
 {
 	UNUSED__(me);
 
-	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::phaseDidChange(%04x)", phase));
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::phaseTransition(%04x)", phase));
 	if(phase == PAL_POSIX_phase)
 	{
 		return;
@@ -254,11 +264,11 @@ PAL_POSIX_Platform_phaseDidChange(IPlatform *me, PHASE phase)
 	}
 	else if(phase / 0x10 != PAL_POSIX_phase / 0x10)
 	{
-		PALLOGF((LOG_DEBUG2, "  >> PHASE STEP         >> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+		PALLOGF((LOG_DEBUG2, "  >> PHASE JUMP         >> new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
 	}
 	else
 	{
-		PALLOGF((LOG_DEBUG3, "   > PHASE               > new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
+		PALLOGF((LOG_DEBUG3, "   > PHASE STEP          > new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
 	}
 #endif
 	PAL_POSIX_phase = phase;

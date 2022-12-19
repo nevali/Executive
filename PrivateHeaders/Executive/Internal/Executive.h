@@ -38,7 +38,7 @@
 # undef ExSetFlags
 # define ExSetFlags(filename, flags)   INamespace_setFlags(executive.data.rootNS, filename, NULL, flags)
 # undef ExPhaseShift
-# define ExPhaseShift(phase)           IPlatform_phaseDidChange(executive.data.platform, phase)
+# define ExPhaseShift(phase)           IPlatform_phaseTransition(executive.data.platform, phase)
 
 typedef struct Executive Executive;
 

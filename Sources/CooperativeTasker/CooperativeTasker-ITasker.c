@@ -34,6 +34,8 @@
 static void Executive_CooperativeTasker_tick(ITasker *me);
 void Executive_CooperativeTasker_yield(ITasker *me);
 static STATUS Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationParameters *params, REFUUID iid, void **out);
+/* PRIVATE */
+static Executive_CooperativeTasker_Thread *Executive_CooperativeTasker_nextRunnableThread(Executive_CooperativeTasker *self);
 
 const struct ITasker_vtable_ Executive_CooperativeTasker_ITasker_vtable = {
 	EXEC_COMMON_VTABLE_IOBJECT(Executive_CooperativeTasker, ITasker),
@@ -42,20 +44,7 @@ const struct ITasker_vtable_ Executive_CooperativeTasker_ITasker_vtable = {
 	Executive_CooperativeTasker_createTask
 };
 
-/* Executive::CooperativeTasker::<ITasker>yield()
- *
- * Yield to the Tasker
- *
- * This method is invoked to switch control to the next task in turn; if
- * there aren't any (on the current processor), ask the PAL to perform a
- * power-friendly sleep via PAL::nap()
- *
- * This method may be invoked by the Executive where currentTask == NULL
- * to pass control to the Tasker and allow scheduling to begin; the task
- * of the next runnable thread will become the current task
- *
- */
-
+#if 0
 static void trampoline(Executive_CooperativeTasker_Task *task)
 {
 	/* XXX use maacros to update flags */
@@ -75,90 +64,103 @@ static void trampoline(Executive_CooperativeTasker_Task *task)
 		EXLOGF((LOG_DEBUG, "trampoline(): thread %u is a zombie", task->data.mainThread->data.id));
 	}
 }
+#endif
 
+/* Executive::CooperativeTasker::yield()
+ * Voluntarily relinquish CPU time
+ *
+ * yield() is invoked when a thread wishes to voluntarily relinquish its CPU
+ * time allocation, for example because it's waiting on some external event to
+ * occur
+ *
+ * if there are no other runnable threads, IPlatform::nap() is invoked, and
+ * then control is returned to the caller
+ *
+ * otherwise, invoke IPlatform::tick() and switch context to the next
+ * runnable thread
+ *
+ * see also tick(), which performs a similar function, but if there are no
+ * other runnable threads, invokes IPlatform::tick() and then returns to
+ * thew caller
+ */
 void
 Executive_CooperativeTasker_yield(ITasker *me)
 {
 	Executive_CooperativeTasker *self = INTF_TO_CLASS(me);
-	Executive_CooperativeTasker_Task *task;
-	int l;
+	Executive_CooperativeTasker_Thread *thread, *nextThread;
 
-	ExTrace("Executive::CooperativeTasker::yield()");
-/* XXX placeholders */
-#define TASK_CONTEXT_SAVE (self->data.currentTask ? sigsetjmp(self->data.currentTask->data.mainThread->data.env, 0) : 0)
-#define TASK_IS_RUNNABLE(task) (task && Executive_CooperativeTasker_Task_runnable(task))
-#define TASK_CONTEXT_RESTORE(newTask) self->data.currentTask = newTask; \
-	if((!((newTask)->data.mainThread->data.flags & THF_RUNNING))) \
-	{ \
-		trampoline(newTask); \
-		return; \
-	} \
-	else \
-	{ \
-		siglongjmp(self->data.currentTask->data.mainThread->data.env, 1); \
-	}
-
-	if(0 == TASK_CONTEXT_SAVE)
+	EXTRACEF(("Executive::CooperativeTasker::yield()"));
+	EXLOGF((LOG_DEBUG, "currentThread = %p", self->data.currentThread));
+	EXLOGF((LOG_DEBUG, "runnable threads list:-"));
+	for(thread = self->data.firstRunnableThread; thread; thread = thread->data.nextRunnable)
 	{
-		ExTrace("saved context");
-		/* loop through the list of tasks to find the next runnable task
-		 *
-		 * this is an purposefully minimal and simplistic implementation
-		 */
-		task = self->data.currentTask;
-		l = 0;
-		do
+		EXLOGF((LOG_DEBUG, " runnable thread: %p => %u:%u", thread, thread->data.task->data.id, thread->data.id));
+	}
+	/* if there's a current thread, suspend it */
+	if(self->data.currentThread)
+	{
+		if(Executive_CooperativeTasker_Thread_suspend(self->data.currentThread))
 		{
-			/* if there's a current task */
-			if(NULL != task && NULL != task->data.nextTask)
-			{
-				task = task->data.nextTask;
-			}
-			else
-			{
-				task = self->data.firstTask;
-				if(l)
-				{
-					/* prevent looping forever if there's no current task
-					 * and no other tasks are runnable yet 
-					 */
-					break;
-				}
-				l = 1;
-			}
-			if(!task)
-			{
-				ExTrace("no available tasks at all");
-				break;
-			}
-		}
-		while(!TASK_IS_RUNNABLE(task));
-		if(task == self->data.currentTask)
-		{
-			task = NULL;
-		}
-		if(!task || !TASK_IS_RUNNABLE(task))
-		{
-			ExTrace("Executive::CooperativeScheduler::yield(): no [other] runnable tasks");
-			/* no runnable tasks */
-			IPlatform_nap(executive.data.platform);
+			EXTRACEF(("Executive::CooperativeTasker::yield(): resumed"));
 			return;
 		}
-		/* Switch to the new task */
-		ExTrace("will now switch to new task");
-		TASK_CONTEXT_RESTORE(task);
 	}
-	/* This is now the context of the new task */
-	ExTrace("Executive::CooperativeScheduler::yield(): resuming");
+	else
+	{
+		self->data.previousThread = NULL;
+	}
+	nextThread = Executive_CooperativeTasker_nextRunnableThread(self);
+	EXLOGF((LOG_DEBUG, "nextThread = %p", nextThread));
+	if(!nextThread)
+	{
+		EXTRACEF(("Executive::CooperativeTasker::yield(): no runnable threads"));
+		IPlatform_nap(executive.data.platform);
+		return;
+	}
+	if(nextThread == self->data.previousThread)
+	{
+		EXTRACEF(("Executive::CooperativeTasker::yield(): no other runnable threads"));
+		IPlatform_nap(executive.data.platform);
+	}
+	else
+	{
+		IPlatform_tick(executive.data.platform);
+	}
+	Executive_CooperativeTasker_Thread_resume(nextThread);
 }
 
 static void
 Executive_CooperativeTasker_tick(ITasker *me)
 {
+	UNUSED__(me);
+
 	/* XXX is there no current task, or has the current thread exceeded its
 	 * runtime?
 	 */
-	Executive_CooperativeTasker_yield(me);
+	IPlatform_tick(executive.data.platform);
+}
+
+static Executive_CooperativeTasker_Thread *
+Executive_CooperativeTasker_nextRunnableThread(Executive_CooperativeTasker *self)
+{
+	Executive_CooperativeTasker_Thread *thread;
+
+	/* Find the next runnable thread, starting with the previous thread's
+	 * next runnable thread pointer (if it has one)
+	 */
+	 if(self->data.previousThread)
+	 {
+		if(NULL != (thread = self->data.previousThread->data.nextRunnable))
+		{
+			EXLOGF((LOG_DEBUG, "previously-running thread had a next-runnable pointer, using that"));
+			/* XXX assert that it is in fact runnable */
+			return thread;
+		}
+		EXLOGF((LOG_DEBUG, "there WAS a previous thread, but it was the end of the chain"));
+	}
+	/* Otherwise, start at the beginning of the list */
+	EXLOGF((LOG_DEBUG, "next runnable thread is first runnable thread"));
+	return self->data.firstRunnableThread;
 }
 
 /* Executive::CooperativeTasker::<ITasker>createTask()
@@ -174,7 +176,7 @@ static TASKID
 Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationParameters *params, REFUUID iid, void **out)
 {
 	Executive_CooperativeTasker *self = INTF_TO_CLASS(me);
-	Executive_CooperativeTasker_Task *task;
+	Executive_CooperativeTasker_Task *task, *p;
 
 	/* Validate parameters */
 	ExAssert(params != NULL);
@@ -198,19 +200,31 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 	task->data.tasker = self;
 	task->data.id = self->data.nextTaskId;
 	self->data.nextTaskId++;
+	if(params->namespace)
+	{
+		task->data.ns = params->namespace;
+	}
+	else
+	{
+		/* XXX inherit from parent task */
+		task->data.ns = executive.data.rootNS;
+	}
+	INamespace_retain(task->data.ns);
 	/* Apply task flags */
 	/* XXX sanitise flags */
 	task->data.flags = params->flags;
 	/* Add the task to the list of tasks */
-	if(self->data.lastTask)
+	if(self->data.firstTask)
 	{
-		self->data.lastTask->data.nextTask = task;
+		for(p = self->data.firstTask; p->data.nextTask; p = p->data.nextTask)
+		{
+		}
+		p->data.nextTask = task;
 	}
 	else
 	{
 		self->data.firstTask = task;
 	}
-	self->data.lastTask = task;
 	/* Are we ready to create a main thread? */
 	if(params->mainThread_entrypoint)
 	{
@@ -224,11 +238,13 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 		task->data.mainThread->data.vtable = &Executive_CooperativeTasker_Thread_vtable;
 		task->data.mainThread->data.id = self->data.nextThreadId;
 		self->data.nextThreadId++;
+		task->data.mainThread->data.tasker = self;
 		task->data.mainThread->data.task = task;
 		task->data.mainThread->data.entrypoint = params->mainThread_entrypoint;
 		task->data.mainThread->data.stackBase = ExAlloc(EXEC_THREAD_STACK_SIZE);
 		task->data.mainThread->data.stackSize = EXEC_THREAD_STACK_SIZE;
 		task->data.mainThread->data.flags = THF_READY;
+		Executive_CooperativeTasker_Thread_schedule(task->data.mainThread);
 		task->data.flags |= TF_READY;
 		EXTRACEF(("Executive::CooperativeTasker::createTask(): new task state is READY"));
 	}

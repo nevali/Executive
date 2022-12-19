@@ -57,7 +57,8 @@ DECLARE_INTERFACE_(IPlatform, IObject)
 	STDMETHOD_(void, panic)(THIS_ const char *string) PURE;
 	STDMETHOD_(void, setDefaultAllocator)(THIS_ IAllocator *allocator) PURE;
 	STDMETHOD_(void, nap)(THIS) PURE;
-	STDMETHOD_(void, phaseDidChange)(THIS_ PHASE newPhase) PURE;
+	STDMETHOD_(void, tick)(THIS) PURE;
+	STDMETHOD_(void, phaseTransition)(THIS_ PHASE newPhase) PURE;
 
 	END_INTERFACE
 };
@@ -69,7 +70,8 @@ DECLARE_INTERFACE_(IPlatform, IObject)
 #   define IPlatform_panic(__this, string) __this->lpVtbl->panic(__this, string)
 #   define IPlatform_setDefaultAllocator(__this, allocator) __this->lpVtbl->setDefaultAllocator(__this, allocator)
 #   define IPlatform_nap(__this) __this->lpVtbl->nap(__this)
-#   define IPlatform_phaseDidChange(__this, newPhase) __this->lpVtbl->phaseDidChange(__this, newPhase)
+#   define IPlatform_tick(__this) __this->lpVtbl->tick(__this)
+#   define IPlatform_phaseTransition(__this, newPhase) __this->lpVtbl->phaseTransition(__this, newPhase)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__IPlatform_INTERFACE_DEFINED__*/

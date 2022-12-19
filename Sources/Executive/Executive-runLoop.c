@@ -31,6 +31,7 @@ Executive_runLoop(Executive *self)
 	ExPhaseShift(PHASE_RUNNING);
 	for(;;)
 	{
+		EXTRACEF(("Executive::runLoop()"));
 		ITasker_yield(executive.data.tasker);
 	}
 }

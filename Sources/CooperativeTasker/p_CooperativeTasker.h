@@ -26,12 +26,13 @@ struct Executive_CooperativeTasker
 	{
 		REFCOUNT refCount;
 		Executive_CooperativeTasker_Task *firstTask;
-		Executive_CooperativeTasker_Task *lastTask;
 		TASKID nextTaskId;
 		long nextThreadId;
 		/* XXX per-CPU */
 		Executive_CooperativeTasker_Task *currentTask;
+		Executive_CooperativeTasker_Thread *previousThread;
 		Executive_CooperativeTasker_Thread *currentThread;
+		Executive_CooperativeTasker_Thread *firstRunnableThread;
 	} data;
 };
 
@@ -51,8 +52,10 @@ union Executive_CooperativeTasker_Task
 		Executive_CooperativeTasker *tasker;
 		/* pointer to the next task in the list */
 		Executive_CooperativeTasker_Task *nextTask;
+		/* the object namespace this task uses */
+		INamespace *ns;
 		IJob *job;
-	/* IAddressSpace *addressSpace; */
+		/* IAddressSpace *addressSpace; */
 		/* IRegionSet *regions; */
 		Executive_CooperativeTasker_Thread *mainThread;
 	} data;
@@ -69,14 +72,18 @@ union Executive_CooperativeTasker_Thread
 		/* Thread ID */
 		THREADID id;
 		ThreadFlags flags;
+		Executive_CooperativeTasker *tasker;
 		/* which task are we part of */
 		Executive_CooperativeTasker_Task *task;
 		/* pointer to the next thread in the task's list */
 		Executive_CooperativeTasker_Thread *nextThread;
+		/* pointer to the next runnable thread in the global list */
+		Executive_CooperativeTasker_Thread *nextRunnable;
 		/* pointer to the thread's stack */
 		uint8_t *stackBase;
 		size_t stackSize;
 		ThreadEntrypoint entrypoint;
+		/* XXX */
 		sigjmp_buf env; 
 		/* IEvent *eventQueue; */
 	} data;
@@ -98,7 +105,9 @@ REFCOUNT Executive_CooperativeTasker_release(IObject *me);
 
 void Executive_CooperativeTasker_yield(ITasker *me);
 
-/* XXX bad interface */
-int Executive_CooperativeTasker_Task_runnable(Executive_CooperativeTasker_Task *task);
+bool Executive_CooperativeTasker_Thread_suspend(Executive_CooperativeTasker_Thread *self);
+void Executive_CooperativeTasker_Thread_resume(Executive_CooperativeTasker_Thread *self);
+void Executive_CooperativeTasker_Thread_schedule(Executive_CooperativeTasker_Thread *self);
+void Executive_CooperativeTasker_Thread_unschedule(Executive_CooperativeTasker_Thread *self);
 
 #endif /*!P_COOPERATIVETASKER_H_*/

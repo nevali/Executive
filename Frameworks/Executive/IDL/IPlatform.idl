@@ -36,5 +36,6 @@ interface IPlatform: IObject
 	void panic([in] const char *string);
 	void setDefaultAllocator([in] IAllocator *allocator);
 	void nap(void);
-	void phaseDidChange(PHASE newPhase);
+	void tick(void);
+	void phaseTransition(PHASE newPhase);
 }

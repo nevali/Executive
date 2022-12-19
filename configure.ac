@@ -98,6 +98,7 @@ Frameworks/Executive/Headers/Executive/Makefile
 Frameworks/PAL/Makefile
 Frameworks/PAL/Headers/Makefile
 Frameworks/PAL/Headers/PAL/Makefile
+Frameworks/System/Makefile
 PrivateHeaders/Makefile
 PrivateHeaders/Executive/Makefile
 PrivateHeaders/Executive/Internal/Makefile

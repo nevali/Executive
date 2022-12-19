@@ -58,7 +58,7 @@ Executive_start(struct ExecutiveEntryParameters *params)
 	{
 		return;
 	}
-	IPlatform_phaseDidChange(platform, PHASE_STARTUP_ENTRY);
+	IPlatform_phaseTransition(platform, PHASE_STARTUP_ENTRY);
 	/* Pass the entry parameters and the Platform object to the actual
 	 * implementation of the Executive core logic, built as the
 	 * libExecutiveServices convenience library
