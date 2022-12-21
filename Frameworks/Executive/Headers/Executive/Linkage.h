@@ -113,7 +113,7 @@
 # endif
 
 # ifndef EXEC_LINKAGE__
-#  define EXEC_LINKAGE__(name, version) WEAK_IMPORT__ SYM__("EXECUTIVE", name, version)
+#  define EXEC_LINKAGE__(name, version) SYM__("EXECUTIVE", name, version) WEAK_IMPORT__
 # endif
 
 #endif /*!EXECUTIVE_LINKAGE_H_*/
