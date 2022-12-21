@@ -26,6 +26,6 @@ PALSRC = p_POSIX.h \
 	AddressSpace.c Region.c Context.c
 
 PAL_MOD_EXT = ${EXEC_POSIX_PAL_EXT}
-PAL_MOD_LDFLAGS = -shared -module -avoid-version -shrext ${PAL_MOD_EXT} -rpath ${libdir}
+PAL_MOD_ldflags= -shared -module -avoid-version -shrext ${PAL_MOD_EXT} -rpath ${libdir}
 
 include $(top_srcdir)/Makefiles/PAL.mk

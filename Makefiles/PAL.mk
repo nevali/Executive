@@ -72,7 +72,7 @@ libPAL.${PALNAME}@EXEC_BUILD_SUFFIX@.Static.la: libPALx.Static.la
 	$(LIBTOOL) --mode=link $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) -avoid-version -shared -rpath $(libdir) $(LDFLAGS) -o $@ $+
 ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la: libPALx.Module.la
 	@echo "Creating PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la dynamic shared object" >&2
-	$(LIBTOOL) --mode=link $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(PAL_MOD_LDFLAGS) $(LDFLAGS) -o $@ $+
+	$(LIBTOOL) --mode=link $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(PAL_MOD_ldflags) $(LDFLAGS) -o $@ $+
 
 
 # Install the PAL binaries intended to be used at runtime as [lib]PAL.${PALNAME}
