@@ -1,6 +1,6 @@
 cpp_quote("/* Executive Microkernel");
-cpp_quote(" * IMemoryManager.idl");
-cpp_quote(" *");
+cpp_quote(" * IContext.idl");
+cpp_quote(" *   Represents a scheduling context");
 cpp_quote(" */");
 cpp_quote("");
 cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
@@ -22,29 +22,20 @@ cpp_quote(" */");
 import "IObject.idl";
 import "IRegion.idl";
 import "IRegionHolder.idl";
+import "IContext.idl";
 
 [
 	local,
 	object,
-	uuid(f037af3e-a41f-4813-b2dc-69bf96049bf2),
+	uuid(5bd135fc-3380-4b6b-9d6c-86da269897bb),
 	pointer_default(unique),
-	cheader("Executive/IMemoryManager.h")
+	cheader("Executive/IContext.h")
 ]
-interface IMemoryManager: IObject
+interface IContext: IObject
 {
 	cpp_quote("#ifndef W_NO_UNSTABLE_INTERFACES");
-	cpp_quote("# warning The IMemoryManager interface is currently considered unstable; source and binary compatibility is not assured.");
+	cpp_quote("# warning The IContext interface is currently considered unstable; source and binary compatibility is not assured.");
 	cpp_quote("#endif");
-	
-	/* Locate the region which includes the address <ptr> */
-	int regionFromPointer([in] void *ptr, [out] IRegion **region);
-	
-	/* Obtain the default page size, in bytes */
-	int pageSize(void);
-	
-	/* Obtain a region of <count> pages, with the supplied IRegionHolder */
-	int obtainRegion([in] size_t count, [in] RegionFlags flags, [in] IRegionHolder *owner, [out] IRegion **region);
 
-	/* Obtain a transient region of <count> pages, with the supplied IRegionHolder */
-	int obtainTransientRegion([in] size_t count, [in] RegionFlags flags, [in] IRegionHolder *owner, [out] IRegion **region);
+	bool swap(IContext *other);
 }

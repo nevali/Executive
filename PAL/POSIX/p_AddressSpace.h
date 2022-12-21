@@ -1,5 +1,5 @@
-#ifndef P_MEMORYMANAGER_H_
-# define P_MEMORYMANAGER_H_           1
+#ifndef P_ADDRESSSPACE_H_
+# define P_ADDRESSSPACE_H_             1
 
 /* File I/O, host memory management */
 # include <unistd.h>
@@ -9,15 +9,26 @@
 # include <string.h>
 /* calloc(), free() */
 # include <stdlib.h>
+/* sigsetjmp, etc. */
+# include <setjmp.h>
+# include <signal.h>
 
 # include <PAL/PAL.h>
 
-typedef union PAL_POSIX_MemoryManager PAL_POSIX_MemoryManager;
-typedef union PAL_POSIX_Region PAL_POSIX_Region;
+# if !defined(SA_ONSTACK) && defined(SV_ONSTACK)
+#  define SA_ONSTACK                   SV_ONSTACK
+# endif
+# if !defined(SS_DISABLE) && defined(SA_DISABLE)
+#  define SS_DISABLE                   SA_DISABLE
+# endif
 
-union PAL_POSIX_MemoryManager
+typedef union PAL_POSIX_AddressSpace PAL_POSIX_AddressSpace;
+typedef union PAL_POSIX_Region PAL_POSIX_Region;
+typedef union PAL_POSIX_Context PAL_POSIX_Context;
+
+union PAL_POSIX_AddressSpace
 {
-	IMemoryManager MemoryManager;
+	IAddressSpace AddressSpace;
 	IObject Object;
 	struct
 	{
@@ -34,11 +45,28 @@ union PAL_POSIX_Region
 	{
 		void *vtable;
 		uint32_t refcount;
-		PAL_POSIX_MemoryManager *mm;
+		PAL_POSIX_AddressSpace *mm;
 		IRegionHolder *holder;
 		RegionFlags flags;
 		uint8_t *base;
 		size_t count;
+	} data;
+};
+
+union PAL_POSIX_Context
+{
+	IContext Context;
+	IObject Object;
+	struct
+	{
+		const void *vtable;
+		REFCOUNT refCount;
+		PAL_POSIX_AddressSpace *addressSpace;
+		IThread *thread;
+		ThreadEntrypoint entry;
+		char *stackLow;
+		char *stackHigh;
+		jmp_buf jb;
 	} data;
 };
 
@@ -66,9 +94,12 @@ extern void PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str,
 #  define PALCondition(str)             PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_CONDITION, str)
 # endif
 
-extern void PAL_POSIX_Platform_setMemoryManager(IMemoryManager *mm);
+extern void PAL_POSIX_Platform_setAddressSpace(IAddressSpace *mm);
 
-extern void PAL_POSIX_MemoryManager_init(void);
-extern int PAL_POSIX_Region_create(PAL_POSIX_MemoryManager *mm, RegionFlags flags, IRegionHolder *owner, void *ptr, size_t size, PAL_POSIX_Region **out);
+extern void PAL_POSIX_AddressSpace_init(void);
+extern int PAL_POSIX_Region_create(PAL_POSIX_AddressSpace *mm, RegionFlags flags, IRegionHolder *owner, void *ptr, size_t size, PAL_POSIX_Region **out);
 
-#endif /*!P_MEMORYMANAGER_H_*/
+extern PAL_POSIX_Context *PAL_POSIX_Context_create(PAL_POSIX_AddressSpace *addressSpace);
+extern void PAL_POSIX_Context_setup(PAL_POSIX_Context *self);
+
+#endif /*!P_ADDRESSSPACE_H_*/

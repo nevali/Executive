@@ -82,8 +82,9 @@ Executive_init_memoryManager(void)
 	/* Initialise a memory manager first, before we need to allocate any
 	 * heap
 	 */
-	ExAssert(E_SUCCESS == ExMetaClass(&CLSID_PAL_MemoryManager, &IID_IMemoryManager, &(executive.data.mm)));
-	ExAssert(NULL != executive.data.mm);
+	/* This should be a call to IPlatform for the initial address space */
+	ExAssert(E_SUCCESS == ExMetaClass(&CLSID_PAL_MemoryManager, &IID_IAddressSpace, &(executive.data.addressSpace)));
+	ExAssert(NULL != executive.data.addressSpace);
 }
 
 /*PRIVATE*/
@@ -91,11 +92,11 @@ static void
 Executive_init_allocator(void)
 {
 	/* Create an instance of the Executive's built-in allocator, which will
-	 * obtain transient regions from the PAL's memory manager
+	 * obtain transient regions from the kernel address sspace
 	 */
 
 	ExPhaseShift(PHASE_STARTUP_ALLOCATOR);
-	executive.data.allocator = Executive_Allocator_create(executive.data.mm);
+	executive.data.allocator = Executive_Allocator_create(executive.data.addressSpace);
 	if(!executive.data.allocator)
 	{
 		ExPanic("failed to create an allocator using the PAL's memory manager!\n");

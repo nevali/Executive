@@ -204,6 +204,7 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	/* Create the Sentinel task */
 	taskInfo.flags = TF_EXECUTIVE;
 	taskInfo.name = "Sentinel";
+	taskInfo.addressSpace = NULL; 
 #if 0
 	taskInfo.job = self->data.job;
 #endif

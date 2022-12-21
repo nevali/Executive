@@ -10,9 +10,6 @@
 
 # define EXEC_THREAD_STACK_SIZE        32768
 
-/* XXX XXX XXX TEMPORARY */
-# include <setjmp.h>
-
 typedef struct Executive_CooperativeTasker Executive_CooperativeTasker;
 typedef union Executive_CooperativeTasker_Task Executive_CooperativeTasker_Task;
 typedef union Executive_CooperativeTasker_Thread Executive_CooperativeTasker_Thread;
@@ -29,10 +26,10 @@ struct Executive_CooperativeTasker
 		TASKID nextTaskId;
 		long nextThreadId;
 		/* XXX per-CPU */
-		Executive_CooperativeTasker_Task *currentTask;
-		Executive_CooperativeTasker_Thread *previousThread;
-		Executive_CooperativeTasker_Thread *currentThread;
-		Executive_CooperativeTasker_Thread *firstRunnableThread;
+		volatile Executive_CooperativeTasker_Task *currentTask;
+		volatile Executive_CooperativeTasker_Thread *previousThread;
+		volatile Executive_CooperativeTasker_Thread *currentThread;
+		volatile Executive_CooperativeTasker_Thread *firstRunnableThread;
 	} data;
 };
 
@@ -55,7 +52,7 @@ union Executive_CooperativeTasker_Task
 		/* the object namespace this task uses */
 		INamespace *ns;
 		IJob *job;
-		/* IAddressSpace *addressSpace; */
+		IAddressSpace *addressSpace;
 		/* IRegionSet *regions; */
 		Executive_CooperativeTasker_Thread *mainThread;
 	} data;
@@ -72,19 +69,19 @@ union Executive_CooperativeTasker_Thread
 		/* Thread ID */
 		THREADID id;
 		ThreadFlags flags;
-		Executive_CooperativeTasker *tasker;
+		volatile Executive_CooperativeTasker *tasker;
 		/* which task are we part of */
 		Executive_CooperativeTasker_Task *task;
 		/* pointer to the next thread in the task's list */
 		Executive_CooperativeTasker_Thread *nextThread;
 		/* pointer to the next runnable thread in the global list */
-		Executive_CooperativeTasker_Thread *nextRunnable;
+		volatile Executive_CooperativeTasker_Thread *nextRunnable;
+		/* the process context for this thread */
+		IContext *context;
 		/* pointer to the thread's stack */
 		uint8_t *stackBase;
 		size_t stackSize;
 		ThreadEntrypoint entrypoint;
-		/* XXX */
-		sigjmp_buf env; 
 		/* IEvent *eventQueue; */
 	} data;
 };
@@ -105,6 +102,7 @@ REFCOUNT Executive_CooperativeTasker_release(IObject *me);
 
 void Executive_CooperativeTasker_yield(ITasker *me);
 
+Executive_CooperativeTasker_Thread *Executive_CooperativeTasker_Thread_create(Executive_CooperativeTasker_Task *task, ThreadEntrypoint entry);
 bool Executive_CooperativeTasker_Thread_suspend(Executive_CooperativeTasker_Thread *self);
 void Executive_CooperativeTasker_Thread_resume(Executive_CooperativeTasker_Thread *self);
 void Executive_CooperativeTasker_Thread_schedule(Executive_CooperativeTasker_Thread *self);

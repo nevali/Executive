@@ -21,7 +21,7 @@
 #ifndef EXECUTIVE_PAL_MEMORYMANAGER_H_
 # define EXECUTIVE_PAL_MEMORYMANAGER_H_ 1
 
-# include <Executive/IMemoryManager.h>
+# include <Executive/IAddressSpace.h>
 
 #endif /*!EXECUTIVE_PAL_MEMORYMANAGER_H_*/
 

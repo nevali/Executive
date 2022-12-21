@@ -6,7 +6,7 @@
 # define EXECUTIVE_INTERNAL_EXECUTIVE_H_ 1
 
 # include <Executive/IPlatform.h>
-# include <Executive/IMemoryManager.h>
+# include <Executive/IAddressSpace.h>
 # include <Executive/IBootEnvironment.h>
 # include <Executive/IPlatformDiagnostics.h>
 # include <Executive/IMutableContainer.h>
@@ -56,8 +56,8 @@ struct Executive
 		int (*PAL_metaClass)(REFUUID clsid, REFUUID iid, void **out);
 		/* A reference to the PAL's Platform object */
 		IPlatform *platform;
-		/* A reference to the current memory manager */
-		IMemoryManager *mm;
+		/* A reference to the kernel's address space */
+		IAddressSpace *addressSpace;
 		/* A reference to our default allocator */
 		IAllocator *allocator;
 		/* A reference to the boot environment */

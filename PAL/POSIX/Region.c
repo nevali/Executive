@@ -18,7 +18,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_MemoryManager.h"
+#include "p_AddressSpace.h"
 
 #define INTF_TO_CLASS(i)               (PAL_POSIX_Region *)((void *)(i))
 
@@ -63,7 +63,7 @@ static struct IRegion_vtable_ PAL_POSIX_Region_vtable = {
  *   implementation for internal use)
  */
 int
-PAL_POSIX_Region_create(PAL_POSIX_MemoryManager *mm, RegionFlags flags, IRegionHolder *owner, void *ptr, size_t count, PAL_POSIX_Region **region)
+PAL_POSIX_Region_create(PAL_POSIX_AddressSpace *mm, RegionFlags flags, IRegionHolder *owner, void *ptr, size_t count, PAL_POSIX_Region **region)
 {
 	PAL_POSIX_Region *p;
 
@@ -107,19 +107,19 @@ PAL_POSIX_Region_queryInterface(IRegion *self, REFUUID iid, void **out)
 
 	if(0 == memcmp(iid, &IID_IObject, sizeof(UUID)))
 	{
-		IRegion_retain(self);
 		if(out)
 		{
 			*out = &(me->Object);
+			IRegion_retain(self);
 		}
 		return E_SUCCESS;
 	}
 	if(0 == memcmp(iid, &IID_IRegion, sizeof(UUID)))
 	{
-		IRegion_retain(self);
 		if(out)
 		{
 			*out = &(me->Region);
+			IRegion_retain(self);
 		}
 		return E_SUCCESS;
 	}

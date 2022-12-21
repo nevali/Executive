@@ -21,13 +21,13 @@
 idlgenerated = Types.h Errors.h UUID.h \
 	IObject.h IAllocator.h MObject.h MFactory.h \
 	IIterator.h \
-	IPlatform.h IBootEnvironment.h IMemoryManager.h \
+	IPlatform.h IBootEnvironment.h IAddressSpace.h \
 	IRegion.h IRegionHolder.h IPlatformDiagnostics.h \
 	MDirectoryEntryTarget.h \
 	IContainer.h INamespace.h IMutableContainer.h IDirectoryEntry.h \
 	IDirectoryEntryTarget.h ILink.h \
 	IWriteChannel.h \
-	ITasker.h ITask.h IThread.h IJob.h IEvent.h IExecutable.h \
+	ITasker.h ITask.h IThread.h IJob.h IEvent.h IExecutable.h IContext.h \
 	ISubsystem.h
 
 Executivedir = $(includedir)/Executive

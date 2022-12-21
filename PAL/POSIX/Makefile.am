@@ -22,8 +22,8 @@ PALSRC = p_POSIX.h \
 	BuildInformation.c init.c panic.c \
 	metaClass.c Platform.c PlatformDiagnostics.c \
 	BootEnvironment.c \
-	p_MemoryManager.h \
-	MemoryManager.c Region.c
+	p_AddressSpace.h \
+	AddressSpace.c Region.c Context.c
 
 PAL_MOD_EXT = ${EXEC_POSIX_PAL_EXT}
 PAL_MOD_LDFLAGS = -shared -module -avoid-version -shrext ${PAL_MOD_EXT} -rpath ${libdir}

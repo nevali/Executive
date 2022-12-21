@@ -44,11 +44,11 @@ PAL_metaClass(REFUUID clsid, REFUUID iid, void **out)
 	}
 	if(0 == memcmp(clsid, &CLSID_PAL_MemoryManager, sizeof(UUID)))
 	{
-		if(PAL_POSIX->data.memoryManager)
+		if(PAL_POSIX->data.addressSpace)
 		{
-			return IMemoryManager_queryInterface(PAL_POSIX->data.memoryManager, iid, out);
+			return IAddressSpace_queryInterface(PAL_POSIX->data.addressSpace, iid, out);
 		}
-		PALLOGF((LOG_CONDITION, "%%E-NOT-AVAIL: the memory manager object is not available"));
+		PALLOGF((LOG_CONDITION, "%%E-NOT-AVAIL: the address space object is not available"));
 	}
 	if(0 == memcmp(clsid, &CLSID_PAL_PlatformDiagnostics, sizeof(UUID)))
 	{

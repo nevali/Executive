@@ -52,7 +52,7 @@ struct PAL_POSIX_Platform
 		IAllocator *allocator;
 		INamespace *namespace;
 		IMutableContainer *platformContainer;
-		IMemoryManager *memoryManager;
+		IAddressSpace *addressSpace;
 		IBootEnvironment *BootEnvironment;
 		IPlatformDiagnostics *diagnostics;
 	} data;
@@ -86,9 +86,9 @@ extern "C" {
 void PAL_POSIX_panic(const char *string);
 void PAL_POSIX_init(void);
 void PAL_POSIX_Platform_init(void);
-void PAL_POSIX_Platform_setMemoryManager(IMemoryManager *mm);
+void PAL_POSIX_Platform_setAddressSpace(IAddressSpace *mm);
 void PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag);
-void PAL_POSIX_MemoryManager_init(void);
+void PAL_POSIX_AddressSpace_init(void);
 void PAL_POSIX_PlatformDiagnostics_init(void);
 
 extern void PAL_POSIX_PlatformDiagnostics_log(IPlatformDiagnostics *me, LogLevel level, const char *str);

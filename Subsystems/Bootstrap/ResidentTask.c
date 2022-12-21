@@ -74,6 +74,7 @@ Bootstrap_ResidentTask_spawn(IExecutable *me, const char **args, REFUUID iid, vo
 	{
 		taskInfo.name = "(no name)";
 	}
+	taskInfo.addressSpace = NULL;
 /*	IPlatformDiagnostics_log((self->data.bootstrap->data.diagnostics), LOG_DEBUG, taskInfo.name); */
 #if 0
 	taskInfo.job = self->data.job;

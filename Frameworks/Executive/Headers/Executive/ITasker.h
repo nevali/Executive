@@ -31,6 +31,7 @@ typedef struct ITasker ITasker;
 # include <Executive/ITask.h>
 # include <Executive/IThread.h>
 # include <Executive/INamespace.h>
+# include <Executive/IAddressSpace.h>
 
 /* ITasker version 0.0 */
 
@@ -41,6 +42,7 @@ typedef struct TaskCreationParameters
 	const char *name;
 	TaskFlags flags;
 	INamespace *namespace;
+	IAddressSpace *addressSpace;
 	ThreadEntrypoint mainThread_entrypoint;
 }  TaskCreationParameters;
 #  undef INTEFACE

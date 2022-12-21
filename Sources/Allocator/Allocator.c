@@ -25,8 +25,8 @@ union Executive_Allocator {
 	struct {
 		const void *vtable;
 		int32_t refCount;
-		/* the Memory Manager used to obtain regions */
-		IMemoryManager *mm;
+		/* the addres space we obtain regions from */
+		IAddressSpace *addressSpace;
 		/* the page size used by the Memory Manager */
 		size_t pageSize;
 		/* the dlmalloc context */
@@ -86,10 +86,11 @@ Executive_Allocator_MFactory_createInstance(MFactory *me, IObject *outer, REFUUI
 }
 
 IAllocator *
-Executive_Allocator_create(IMemoryManager *mm)
+Executive_Allocator_create(IAddressSpace *addressSpace)
 {
 	Executive_Allocator *alloc, *p;
 
+	ExAssert(NULL != addressSpace);
 	if(systemAllocator.data.refCount)
 	{
 		/* Use the system allocator to allocate a new Executive_Allocator
@@ -112,10 +113,10 @@ Executive_Allocator_create(IMemoryManager *mm)
 		 */
 		alloc = &systemAllocator;
 	}
-	IMemoryManager_retain(mm);
+	IAddressSpace_retain(addressSpace);
 	alloc->data.refCount = 1;
-	alloc->data.mm = mm;
-	alloc->data.pageSize = IMemoryManager_pageSize(mm);
+	alloc->data.addressSpace = addressSpace;
+	alloc->data.pageSize = IAddressSpace_pageSize(addressSpace);
 	alloc->data.msp = create_mspace_MemoryManager(alloc, 0, 0);
 	ExAssert(NULL != alloc->data.msp);
 	/* create the region list */
@@ -145,10 +146,7 @@ Executive_Allocator_map(Executive_Allocator *self, size_t size, RegionFlags flag
 	IRegion *region;
 
 //	fprintf(stderr, "DEBUG: %s: request for %lu bytes (flags %d)\n", __FUNCTION__, (unsigned long) size, flags);
-	if(!self->data.mm)
-	{
-		PAL_panic("Executive::Allocator::map(): attempt to obtain mapping when no Memory Manager is available");
-	}
+	ExAssert(NULL != self->data.addressSpace);
 	/* ASSERT(0 == size % self->data.pageSize); */
 	if(size % self->data.pageSize)
 	{
@@ -156,9 +154,9 @@ Executive_Allocator_map(Executive_Allocator *self, size_t size, RegionFlags flag
 	}
 	pages = size / self->data.pageSize;
 //	fprintf(stderr, "DEBUG: %s: request is for %lu pages\n", __FUNCTION__, pages);
-	if(IMemoryManager_obtainTransientRegion(self->data.mm, pages, flags, &(systemAllocator.RegionHolder), &region) != E_SUCCESS)
+	if(IAddressSpace_obtainTransientRegion(self->data.addressSpace, pages, flags, &(systemAllocator.RegionHolder), &region) != E_SUCCESS)
 	{
-		PAL_panic("Executive::Allocator::map(): IMemoryManager::obtainTransientRegion() failed (out of memory?)");
+		PAL_panic("Executive::Allocator::map(): IAddressSpace::obtainTransientRegion() failed (out of memory?)");
 	}
 	if(!self->data.firstRegion)
 	{
@@ -191,27 +189,27 @@ Executive_Allocator_queryInterface(IAllocator *me, REFUUID iid, void **out)
 
 	if(ExUuidEqual(iid, &IID_IObject))
 	{
-		IAllocator_retain(me);
 		if(out)
 		{
+			IAllocator_retain(me);
 			*out = &(self->Object);
 		}
 		return E_SUCCESS;
 	}
 	if(ExUuidEqual(iid, &IID_IRegionHolder))
 	{
-		IAllocator_retain(me);
 		if(out)
 		{
+			IAllocator_retain(me);
 			*out = &(self->RegionHolder);
 		}
 		return E_SUCCESS;
 	}
 	if(ExUuidEqual(iid, &IID_IAllocator))
 	{
-		IAllocator_retain(me);
 		if(out)
 		{
+			IAllocator_retain(me);
 			*out = &(self->Allocator);
 		}
 		return E_SUCCESS;

@@ -10,7 +10,7 @@
 #include <Executive/MFactory.h>
 
 #include <Executive/IObject.h>
-#include <Executive/IMemoryManager.h>
+#include <Executive/IAddressSpace.h>
 #include <Executive/IRegion.h>
 #include <Executive/IRegionHolder.h>
 #include <Executive/IAllocator.h>

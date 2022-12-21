@@ -22,6 +22,7 @@ import "IObject.idl";
 import "ITask.idl";
 import "IThread.idl";
 import "INamespace.idl";
+import "IAddressSpace.idl";
 
 [
 	local, object,
@@ -41,6 +42,7 @@ interface ITasker: IObject
 		const char *name;
 		TaskFlags flags;
 		INamespace *namespace;
+		IAddressSpace *addressSpace;
 		ThreadEntrypoint mainThread_entrypoint;
 	} TaskCreationParameters;
 

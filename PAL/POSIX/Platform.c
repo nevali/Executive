@@ -67,8 +67,8 @@ PAL_POSIX_Platform_init(void)
 	PAL_POSIX_platform.Container.lpVtbl = &platform_IContainer_vtable;
 	PAL_POSIX_platform.Container.instptr = &PAL_POSIX_platform;
 	PALLOGF((LOG_DEBUG7, "- PAL::POSIX = %p, <IObject> = %p", &(PAL_POSIX_platform), &(PAL_POSIX_platform.Object)));
-	PAL_POSIX_MemoryManager_init();
-	PALLOGF((LOG_DEBUG7, "- PAL::POSIX::memoryManager<IMemoryManager> = %p", PAL_POSIX_platform.data.memoryManager));
+	PAL_POSIX_AddressSpace_init();
+	PALLOGF((LOG_DEBUG7, "- PAL::POSIX::addressSpace<IAddressSpace> = %p", PAL_POSIX_platform.data.addressSpace));
 	PAL_POSIX_PlatformDiagnostics_init();
 	PALLOGF((LOG_DEBUG7, "- PAL::POSIX::diagnostics<IPlatformDiagnostics> = %p", PAL_POSIX_platform.data.diagnostics));
 	PAL_POSIX = &PAL_POSIX_platform;
@@ -77,12 +77,12 @@ PAL_POSIX_Platform_init(void)
 
 /* INTERNAL */
 void
-PAL_POSIX_Platform_setMemoryManager(IMemoryManager *mm)
+PAL_POSIX_Platform_setAddressSpace(IAddressSpace *addressSpace)
 {
-	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setMemoryManager(): MemoryManager object is available"));
-	if(!PAL_POSIX_platform.data.memoryManager)
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setAddressSpace(%p): kernel address space object is available", addressSpace));
+	if(!PAL_POSIX_platform.data.addressSpace)
 	{
-		PAL_POSIX_platform.data.memoryManager = mm;
+		PAL_POSIX_platform.data.addressSpace = addressSpace;
 	}
 }
 
@@ -149,7 +149,7 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 			}
 			IMutableContainer_add(devices, "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
 			IMutableContainer_add(devices, "Console", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
-			IMutableContainer_add(devices, "Memory", &CLSID_PAL_MemoryManager, (IObject *) (void *) PAL_POSIX_platform.data.memoryManager);
+			IMutableContainer_add(devices, "AddressSpace", &CLSID_PAL_MemoryManager, (IObject *) (void *) PAL_POSIX_platform.data.addressSpace);
 			IMutableContainer_release(devices);
 		}
 		if(out)
@@ -220,6 +220,7 @@ PAL_POSIX_Platform_tick(IPlatform *self)
 	UNUSED__(self);
 	
 	PALTrace("PAL::POSIX::Platform::tick()");
+	sleep(1);
 }
 
 static void

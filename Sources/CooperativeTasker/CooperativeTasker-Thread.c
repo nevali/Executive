@@ -23,7 +23,7 @@ static STATUS Executive_CooperativeTasker_Thread_namespace(IThread *me, REFUUID 
 static void Executive_CooperativeTasker_Thread_yield(IThread *me);
 
 /*PRIVATE*/
-static void Executive_CooperativeTasker_Thread_spawn(Executive_CooperativeTasker_Thread *self);
+static void Executive_CooperativeTasker_Thread_destroy(Executive_CooperativeTasker_Thread *self);
 static void Executive_CooperativeTasker_Thread__start(Executive_CooperativeTasker_Thread *self);
 
 const struct IThread_vtable_ Executive_CooperativeTasker_Thread_vtable = {
@@ -37,6 +37,60 @@ const struct IThread_vtable_ Executive_CooperativeTasker_Thread_vtable = {
 	Executive_CooperativeTasker_Thread_namespace,
 	Executive_CooperativeTasker_Thread_yield
 };
+
+/*INTERNAL*/
+Executive_CooperativeTasker_Thread *
+Executive_CooperativeTasker_Thread_create(Executive_CooperativeTasker_Task *task, ThreadEntrypoint entry)
+{
+	Executive_CooperativeTasker_Thread *thread, *p;
+
+	thread = ExAlloc(sizeof(Executive_CooperativeTasker_Thread));
+	if(!thread)
+	{
+		return NULL;
+	}
+	thread->data.refCount = 1;
+	thread->data.vtable = &Executive_CooperativeTasker_Thread_vtable;
+	thread->data.tasker = task->data.tasker;
+	thread->data.task = task;
+	thread->data.entrypoint = entry;
+	thread->data.id = thread->data.tasker->data.nextThreadId;
+	thread->data.tasker->data.nextThreadId++;
+	thread->data.stackBase = ExAlloc(EXEC_THREAD_STACK_SIZE);
+	thread->data.stackSize = EXEC_THREAD_STACK_SIZE;
+	if(E_SUCCESS != IAddressSpace_createContext(task->data.addressSpace, &(thread->Thread), thread->data.stackBase, thread->data.stackSize, (ThreadEntrypoint) Executive_CooperativeTasker_Thread__start, &(thread->data.context)))
+	{
+		EXLOGF((LOG_CONDITION, "Executive::CooperativeTasker::Thread::create(): IAddressSpace::createContext() failed"));
+		Executive_CooperativeTasker_Thread_destroy(thread);
+		return NULL;
+	}
+	thread->data.flags = THF_READY;
+	if(NULL == task->data.mainThread)
+	{
+		task->data.mainThread = thread;
+	}
+	else
+	{
+		for(p = task->data.mainThread; p->data.nextThread; p = p->data.nextThread)
+		{
+		}
+		p->data.nextThread = thread;
+	}
+	Executive_CooperativeTasker_Thread_schedule(thread);
+	return thread;
+}
+
+/*PRIVATE*/
+static void
+Executive_CooperativeTasker_Thread_destroy(Executive_CooperativeTasker_Thread *self)
+{
+	if(self->data.context)
+	{
+		IContext_release(self->data.context);
+	}
+	ExFree(self->data.stackBase);
+	ExFree(self);
+}
 
 static STATUS
 Executive_CooperativeTasker_Thread_queryInterface(IThread *me, REFUUID iid, void **out)
@@ -57,7 +111,7 @@ static REFCOUNT
 Executive_CooperativeTasker_Thread_release(IThread *me)
 {
 	EXEC_COMMON_RELEASE(Executive_CooperativeTasker_Thread, {
-		ExFree(self);
+		Executive_CooperativeTasker_Thread_destroy(self);
 	});
 }
 
@@ -121,94 +175,87 @@ bool
 Executive_CooperativeTasker_Thread_suspend(Executive_CooperativeTasker_Thread *self)
 {
 	ExAssert(self == self->data.tasker->data.currentThread);
-	EXTRACEF(("Executive::CooperativeTasker::Thread::suspend(%u:%u)", self->data.task->data.id, self->data.id));
-	if(sigsetjmp(self->data.env, 1))
+	ExAssert(self->data.context);
+	EXTRACEF(("Executive::CooperativeTasker::Thread::suspend(%p => %u:%u)", self, self->data.task->data.id, self->data.id));	
+#if 0
+	if(false == IContext_suspend(self->data.context))
+#endif
 	{
-		EXTRACEF(("Executive::CooperativeTasker::Thread::suspend(%u:%u) resuming where we left off...", self->data.task->data.id, self->data.id));
-		return true;
+		EXTRACEF(("Executive::CooperativeTasker::Thread::suspend(%p => %u:%u): suspended!", self, self->data.task->data.id, self->data.id));	
+		self->data.flags &= ~THF_STATUSMASK;
+		self->data.flags |= THF_SUSPENDED;
+		self->data.tasker->data.previousThread = self;
+		self->data.tasker->data.currentThread = NULL;
+		self->data.tasker->data.currentTask = NULL;
+		return false;
 	}
-	EXTRACEF(("Executive::CooperativeTasker::Thread::suspend(%u:%u): thread suspended", self->data.task->data.id, self->data.id));
-	self->data.flags &= ~THF_STATUSMASK;
-	self->data.flags |= THF_SUSPENDED;
-	self->data.tasker->data.previousThread = self;
-	self->data.tasker->data.currentThread = NULL;
-	self->data.tasker->data.currentTask = NULL;
-	return false;
-}
-
-void
-Executive_CooperativeTasker_Thread_resume(Executive_CooperativeTasker_Thread *self)
-{
-	ThreadFlags status;
-
-	EXTRACEF(("Executive::CooperativeTasker::Thread::resume(%u:%u)", self->data.task->data.id, self->data.id));
-	status = self->data.flags & THF_STATUSMASK;
+#if 0
+	EXTRACEF(("Executive::CooperativeTasker::Thread::suspend(%p => %u:%u): resumed!", self, self->data.task->data.id, self->data.id));	
 	self->data.flags &= ~THF_STATUSMASK;
 	self->data.flags |= THF_RUNNING;
 	self->data.tasker->data.currentThread = self;
 	self->data.tasker->data.currentTask = self->data.task;
-	if(status == THF_READY)
-	{
-		EXTRACEF(("- thread state was THF_READY (now THF_RUNNING)"));
-		/* actually start the thread */
-		Executive_CooperativeTasker_Thread_spawn(self);
-		EXLOGF((LOG_ALERT, "Executive::CooperativeTasker::Thread::resume(): this should never be reached"));
-	}
-	else if(status == THF_SUSPENDED)
-	{
-		EXTRACEF(("- thread state was THF_SUSPENDED (now THF_RUNNING)"));
-		siglongjmp(self->data.env, 1);
-	}
-	else
-	{
-		EXLOGF((LOG_DEBUG, "Thread::resume(): thread %u:%u state was neither THF_READY nor THF_SUSPENDED", self->data.task->data.id, self->data.id));
-		return;
-	}
+	return true;
+#endif
 }
 
-static void
-Executive_CooperativeTasker_Thread_spawn(Executive_CooperativeTasker_Thread *self)
-{
-	size_t stack;
+/*INTERNAL*/
 
-	EXTRACEF(("Executive::CooperativeTasker::Thread::spawn(%u:%u)", self->data.task->data.id, self->data.id));
-	/* save an initial context */
-	if(sigsetjmp(self->data.env, 1))
+void
+Executive_CooperativeTasker_Thread_resume(Executive_CooperativeTasker_Thread *me)
+{
+	volatile Executive_CooperativeTasker_Thread *self = me;
+
+	EXTRACEF(("Executive::CooperativeTasker::Thread<%p>::resume(%u:%u, context = %p)", self, self->data.task->data.id, self->data.id, self->data.context));
+	if(self->data.context)
 	{
-		/* executing within the thread's context */
-		Executive_CooperativeTasker_Thread__start(self);
+		self->data.flags &= ~THF_STATUSMASK;
+		self->data.flags |= THF_RUNNING;
+		self->data.tasker->data.currentThread = self;
+		self->data.tasker->data.currentTask = self->data.task;
+		if(self->data.tasker->data.previousThread)
+		{
+			EXTRACEF(("WILL SUSPEND old thread %p with context %p", self->data.tasker->data.previousThread, self->data.tasker->data.previousThread->data.context));
+			IContext_swap(((IContext *) self->data.tasker->data.previousThread->data.context), self->data.context);
+		}
+		else
+		{
+			IContext_swap(((IContext *) self->data.context), NULL);
+		}
+		EXLOGF((LOG_ALERT, "Executive::CooperativeTasker::Thread<%p>::resume(): now resuming thread...", self));
+		return;
 	}
-	/* assuming stack grows down */
-	stack = (size_t) (void *) self->data.stackBase + self->data.stackSize;
-#if defined(__arm64__) || defined(__ARM_ARCH_7K__)
-	/* r21 - r29 = 9 * 2 = 0 .. 17 */
-	/* sp        = 1 * 2 = 18 .. 19 */
-	self->data.env[18] = stack >> 32;
-	self->data.env[19] = stack;
-#else
-# error don't know how to create a context on whatever CPU this is
-#endif
-	siglongjmp(self->data.env, 1);
+	EXLOGF((LOG_ALERT, "Executive::CooperativeTasker::Thread::resume(): thread had no context; unscheduling"));
+	Executive_CooperativeTasker_Thread_unschedule((Executive_CooperativeTasker_Thread *) self);
 }
 
 static void
 Executive_CooperativeTasker_Thread__start(Executive_CooperativeTasker_Thread *self)
 {
 	EXTRACEF(("Executive::CooperativeTasker::Thread::__start(%u:%u)", self->data.task->data.id, self->data.id));
+	self->data.flags &= ~THF_STATUSMASK;
+	self->data.flags |= THF_RUNNING;
+	self->data.tasker->data.currentThread = self;
+	self->data.tasker->data.currentTask = self->data.task;
 	self->data.entrypoint(&(self->Thread));
 	EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::Thread::__start(%u:%u) - thread terminated", self->data.task->data.id, self->data.id));
+	IContext_release(self->data.context);
+	self->data.context = NULL;
 	self->data.flags &= ~THF_STATUSMASK;
 	self->data.flags |= THF_COMPLETED;
 	Executive_CooperativeTasker_Thread_unschedule(self);
-	IThread_yield((&(self->Thread)));
-	EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::Thread::__start(%u:%u) - we should not have reached this point", self->data.task->data.id, self->data.id));
+	for(;;)
+	{
+		IThread_yield((&(self->Thread)));
+		EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::Thread::__start(%u:%u) - we should not have reached this point", self->data.task->data.id, self->data.id));
+	}
 }
 
 void
 Executive_CooperativeTasker_Thread_unschedule(Executive_CooperativeTasker_Thread *self)
 {
-	Executive_CooperativeTasker *tasker = self->data.tasker;
-	Executive_CooperativeTasker_Thread *thread;
+	volatile Executive_CooperativeTasker *tasker = self->data.tasker;
+	volatile Executive_CooperativeTasker_Thread *thread;
 
 	EXTRACEF(("Executive::CooperativeTasker::Thread::unschedule(%u:%u)", self->data.task->data.id, self->data.id));
 	/* ensure that this thread does not appear in the tasker's runnable threads list */
@@ -247,7 +294,7 @@ Executive_CooperativeTasker_Thread_unschedule(Executive_CooperativeTasker_Thread
 void
 Executive_CooperativeTasker_Thread_schedule(Executive_CooperativeTasker_Thread *self)
 {
-	Executive_CooperativeTasker *tasker = self->data.tasker;
+	volatile Executive_CooperativeTasker *tasker = self->data.tasker;
 
 	EXTRACEF(("Executive::CooperativeTasker::Thread::schedule(%u:%u)", self->data.task->data.id, self->data.id));
 

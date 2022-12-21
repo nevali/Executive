@@ -35,7 +35,7 @@ static void Executive_CooperativeTasker_tick(ITasker *me);
 void Executive_CooperativeTasker_yield(ITasker *me);
 static STATUS Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationParameters *params, REFUUID iid, void **out);
 /* PRIVATE */
-static Executive_CooperativeTasker_Thread *Executive_CooperativeTasker_nextRunnableThread(Executive_CooperativeTasker *self);
+static volatile Executive_CooperativeTasker_Thread *Executive_CooperativeTasker_nextRunnableThread(Executive_CooperativeTasker *self);
 
 const struct ITasker_vtable_ Executive_CooperativeTasker_ITasker_vtable = {
 	EXEC_COMMON_VTABLE_IOBJECT(Executive_CooperativeTasker, ITasker),
@@ -86,8 +86,8 @@ static void trampoline(Executive_CooperativeTasker_Task *task)
 void
 Executive_CooperativeTasker_yield(ITasker *me)
 {
-	Executive_CooperativeTasker *self = INTF_TO_CLASS(me);
-	Executive_CooperativeTasker_Thread *thread, *nextThread;
+	volatile Executive_CooperativeTasker *self = INTF_TO_CLASS(me);
+	volatile Executive_CooperativeTasker_Thread *thread, *nextThread;
 
 	EXTRACEF(("Executive::CooperativeTasker::yield()"));
 	EXLOGF((LOG_DEBUG, "currentThread = %p", self->data.currentThread));
@@ -97,20 +97,17 @@ Executive_CooperativeTasker_yield(ITasker *me)
 		EXLOGF((LOG_DEBUG, " runnable thread: %p => %u:%u", thread, thread->data.task->data.id, thread->data.id));
 	}
 	/* if there's a current thread, suspend it */
+	self->data.previousThread = NULL;
 	if(self->data.currentThread)
 	{
-		if(Executive_CooperativeTasker_Thread_suspend(self->data.currentThread))
+		if(Executive_CooperativeTasker_Thread_suspend((Executive_CooperativeTasker_Thread *) self->data.currentThread))
 		{
-			EXTRACEF(("Executive::CooperativeTasker::yield(): resumed"));
+			EXTRACEF(("Executive::CooperativeTasker::yield(): resumed (self->data.currentThread = %p)", self->data.currentThread));
 			return;
 		}
 	}
-	else
-	{
-		self->data.previousThread = NULL;
-	}
-	nextThread = Executive_CooperativeTasker_nextRunnableThread(self);
-	EXLOGF((LOG_DEBUG, "nextThread = %p", nextThread));
+	nextThread = Executive_CooperativeTasker_nextRunnableThread((Executive_CooperativeTasker *) self);
+	EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::yield(): nextThread = %p", nextThread));
 	if(!nextThread)
 	{
 		EXTRACEF(("Executive::CooperativeTasker::yield(): no runnable threads"));
@@ -119,14 +116,14 @@ Executive_CooperativeTasker_yield(ITasker *me)
 	}
 	if(nextThread == self->data.previousThread)
 	{
-		EXTRACEF(("Executive::CooperativeTasker::yield(): no other runnable threads"));
+		EXTRACEF(("Executive::CooperativeTasker::yield(): no other runnable threads; napping before resumption"));
 		IPlatform_nap(executive.data.platform);
 	}
 	else
 	{
 		IPlatform_tick(executive.data.platform);
 	}
-	Executive_CooperativeTasker_Thread_resume(nextThread);
+	Executive_CooperativeTasker_Thread_resume((Executive_CooperativeTasker_Thread *) nextThread);
 }
 
 static void
@@ -140,10 +137,10 @@ Executive_CooperativeTasker_tick(ITasker *me)
 	IPlatform_tick(executive.data.platform);
 }
 
-static Executive_CooperativeTasker_Thread *
+static volatile Executive_CooperativeTasker_Thread *
 Executive_CooperativeTasker_nextRunnableThread(Executive_CooperativeTasker *self)
 {
-	Executive_CooperativeTasker_Thread *thread;
+	volatile Executive_CooperativeTasker_Thread *thread;
 
 	/* Find the next runnable thread, starting with the previous thread's
 	 * next runnable thread pointer (if it has one)
@@ -160,7 +157,7 @@ Executive_CooperativeTasker_nextRunnableThread(Executive_CooperativeTasker *self
 	}
 	/* Otherwise, start at the beginning of the list */
 	EXLOGF((LOG_DEBUG, "next runnable thread is first runnable thread"));
-	return self->data.firstRunnableThread;
+	return (Executive_CooperativeTasker_Thread *) self->data.firstRunnableThread;
 }
 
 /* Executive::CooperativeTasker::<ITasker>createTask()
@@ -200,16 +197,26 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 	task->data.tasker = self;
 	task->data.id = self->data.nextTaskId;
 	self->data.nextTaskId++;
-	if(params->namespace)
-	{
-		task->data.ns = params->namespace;
-	}
-	else
+	if(NULL == params->namespace)
 	{
 		/* XXX inherit from parent task */
 		task->data.ns = executive.data.rootNS;
 	}
+	else
+	{
+		task->data.ns = params->namespace;
+	}
 	INamespace_retain(task->data.ns);
+	if(NULL == params->addressSpace)
+	{
+		/* XXX inherit from parent task */
+		task->data.addressSpace = executive.data.addressSpace;
+	}
+	else
+	{
+		task->data.addressSpace = params->addressSpace;
+	}
+	IAddressSpace_retain(task->data.addressSpace);
 	/* Apply task flags */
 	/* XXX sanitise flags */
 	task->data.flags = params->flags;
@@ -229,22 +236,15 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 	if(params->mainThread_entrypoint)
 	{
 		EXTRACEF(("Executive::CooperativeTasker::createTask(): entrypoint provided"));
-		task->data.mainThread = ExAlloc(sizeof(Executive_CooperativeTasker_Thread));
+		Executive_CooperativeTasker_Thread_create(task, params->mainThread_entrypoint);
 		if(!task->data.mainThread)
 		{
+			/* ew */
+			task->data.refCount = 1;
 			ITask_release((&(task->Task)));
+			EXLOGF((LOG_CONDITION, "Executive::CooperativeTasker::createTask(): failed to create main thread"));
 			return E_NOMEM;
 		}
-		task->data.mainThread->data.vtable = &Executive_CooperativeTasker_Thread_vtable;
-		task->data.mainThread->data.id = self->data.nextThreadId;
-		self->data.nextThreadId++;
-		task->data.mainThread->data.tasker = self;
-		task->data.mainThread->data.task = task;
-		task->data.mainThread->data.entrypoint = params->mainThread_entrypoint;
-		task->data.mainThread->data.stackBase = ExAlloc(EXEC_THREAD_STACK_SIZE);
-		task->data.mainThread->data.stackSize = EXEC_THREAD_STACK_SIZE;
-		task->data.mainThread->data.flags = THF_READY;
-		Executive_CooperativeTasker_Thread_schedule(task->data.mainThread);
 		task->data.flags |= TF_READY;
 		EXTRACEF(("Executive::CooperativeTasker::createTask(): new task state is READY"));
 	}
