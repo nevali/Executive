@@ -105,7 +105,7 @@
 # endif
 
 # ifndef SYMNAME__
-#  define SYMNAME__(module, symname, version) module "$" symname "!" version
+#  define SYMNAME__(module, symname, version) module "$" symname "$" version
 # endif
 
 # ifndef SYM__

@@ -53,9 +53,7 @@ typedef enum
 	 	RF_EXEC = 16384,
 	 	RF_MASK_HINTS = 983040,
 	 	RF_MASK_LEVEL = 15728640,
-	 	RF_LVL_0 = 0,
-	 	RF_LVL_1 = (1<<40),
-	 	RF_LVL_2 = (2<<40)
+	 	RF_LVL_0 = 0
 }  RegionFlags;
 #  undef INTEFACE
 #  define INTERFACE IRegion

@@ -29,7 +29,7 @@ fi
 
 AC_ARG_ENABLE([errors-as-warnings],[AS_HELP_STRING([--disable-errors-as-warnings],[don't treat compiler warnings as errors])],,[enable_errors_as_warnings=yes])
 if test x"$GCC" = x"yes" ; then
-	AS_VAR_APPEND([AM_CPPFLAGS],[" -W -Wall -Wno-null-pointer-arithmetic"])
+	AS_VAR_APPEND([AM_CPPFLAGS],[" -W -Wall -Wno-null-pointer-arithmetic -Wno-address"])
 	if test $enable_errors_as_warnings = yes ; then
 		AS_VAR_SET([WARNING_CPPFLAGS],["-Werror"])
 	fi

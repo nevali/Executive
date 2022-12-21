@@ -5,7 +5,7 @@
 #include <Executive/Linkage.h>
 
 #undef EXEC_LINKAGE__
-#define EXEC_LINKAGE__(name, version) WEAK_IMPORT__ WEAK_STUB__ SYM__("EXECUTIVE", name, version)
+#define EXEC_LINKAGE__(name, version) SYM__("EXECUTIVE", name, version) WEAK_IMPORT__ WEAK_STUB__
 
 #include <Executive/Internal/Entry.h>
 #include <Executive/SystemCall.h>

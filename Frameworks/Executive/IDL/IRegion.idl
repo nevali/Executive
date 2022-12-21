@@ -60,10 +60,7 @@ interface IRegion: IObject
 		RF_MASK_HINTS = 0x0f0000,
 		
 		RF_MASK_LEVEL = 0xf00000,
-		RF_LVL_0 = 0,
-		RF_LVL_1 = (1 << 40),
-		RF_LVL_2 = (2 << 40)
-		
+		RF_LVL_0 = 0
 		
 	} RegionFlags;
 

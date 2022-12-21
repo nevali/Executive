@@ -5,7 +5,7 @@
 #include <Executive/Linkage.h>
 
 #undef PAL_LINKAGE__
-#define PAL_LINKAGE__(name, version)    WEAK_IMPORT__ WEAK_STUB__ SYM__("PAL", name, version)
+#define PAL_LINKAGE__(name, version)    SYM__("PAL", name, version) WEAK_IMPORT__ WEAK_STUB__
 
 #include <PAL/PAL.h>
 
