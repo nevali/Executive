@@ -17,7 +17,7 @@
 
 ACLOCAL_AMFLAGS = -I M4
 
-SUBDIRS = DeveloperTools Frameworks PrivateHeaders Sources Glue PAL Subsystems .
+SUBDIRS = DeveloperTools Frameworks PrivateHeaders Sources Simulator Glue PAL Subsystems .
 
 EXTRA_DIST = README.md LICENSE-2.0 Dockerfile docker-bake.hcl
 

@@ -28,7 +28,7 @@ EXTRA_DIST = entrypoint.c
 ENTRYPOINT = entrypoint.c
 
 libEntrypoint_la_SOURCES = entrypoint.c
-libEntrypointServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
+libEntrypointServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
 
 ## the ExecutiveServices convenience library contains most of the logic
 ## of the microkernel itself -- it and the Glue constitute the Executive
@@ -36,7 +36,7 @@ libEntrypointServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
 
 libExecutiveServices_la_SOURCES = p_Executive.h \
 	BootEnvironment.c UUIDs.c
-libExecutiveServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
+libExecutiveServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
 libExecutiveServices_la_LIBADD = \
 	Executive/libExecutive.la \
 	Classes/libClasses.la \
@@ -44,6 +44,7 @@ libExecutiveServices_la_LIBADD = \
 	CooperativeTasker/libCooperativeTasker.la \
 	Subsystems/libSubsystems.la \
 	${top_builddir}/Frameworks/Runtime/libExecRuntime.la
+libExecutiveServices_la_LDFLAGS = -export-symbols-regex '^[_]EXECUTIVE\$.*'
 
 ## Compile the core of the Executive (i.e., the entrypoint and the Executive
 ## Services convenience library) into a single combined object

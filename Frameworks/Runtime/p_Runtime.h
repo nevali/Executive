@@ -38,7 +38,7 @@
 
 typedef union RtAllocator RtAllocator;
 
-#if RUNTIME_BUILD_USER
+#if RUNTIME_BUILD_USER || RUNTIME_BUILD_SIMULATOR
 typedef struct RuntimePrivateData RuntimePrivateData;
 
 struct RuntimePrivateData
@@ -79,7 +79,9 @@ extern RuntimePrivateData Rt__private__;
 # define RTASSERT(cond)               RtAssert__(cond, __FILE__, STR__(__LINE__))
 
 /*INTERNAL*/
-EXTERN_C void *Rt_AllocatorMap(RtAllocator *self, size_t size, RegionFlags flags);
-EXTERN_C STATUS Rt_AllocatorUnmap(RtAllocator *self, void *addr, size_t size);
+EXTERN_C void *Rt_AllocatorMap(RtAllocator *self, size_t size, RegionFlags flags) RUNTIME_PRIVATE__(AllocatorMap);
+EXTERN_C STATUS Rt_AllocatorUnmap(RtAllocator *self, void *addr, size_t size) RUNTIME_PRIVATE__(AllocatorUnmap);
+EXTERN_C STATUS RtAllocator_MFactory_createInstance(MFactory *me, IObject *outer, REFUUID iid, void **out) RUNTIME_PRIVATE__(RtAllocator_MFactory_createInstance);
+EXTERN_C IAllocator *RtAllocator_create(IAddressSpace *addressSpace) RUNTIME_PRIVATE__(RtAllocator_create);
 
 #endif /*!P_RUNTIME_H_*/

@@ -33,4 +33,4 @@ libDirectory_la_SOURCES = p_Directory.h \
 	Directory-Root.c Directory-System.c Directory-Local.c Directory-Cluster.c \
 	Directory-Network.c
 
-libDirectory_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
+libDirectory_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1

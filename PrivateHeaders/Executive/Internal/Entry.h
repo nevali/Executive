@@ -12,7 +12,8 @@ typedef enum
 	EEF_HAVE_ENVIRON = (1<<1),
 	EEF_HAVE_PAL_METACLASS = (1<<2),
 	EEF_HAVE_HOSTID = (1<<3),
-	EEF_HAVE_HOSTUUID = (1<<4)
+	EEF_HAVE_HOSTUUID = (1<<4),
+	EEF_SIMULATOR = (1<<5)
 } ExecutiveEntryFlags;
 
 struct ExecutiveEntryParameters

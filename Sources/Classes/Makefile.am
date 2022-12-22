@@ -22,4 +22,4 @@ libClasses_la_SOURCES = p_Classes.h \
 	Classes.c Classes-IContainer.c Classes-GenericFactory.c \
 	Classes-Object.c Classes-Iterator.c Classes-DirectoryEntry.c
 
-libClasses_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
+libClasses_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1

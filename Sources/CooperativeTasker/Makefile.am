@@ -23,4 +23,4 @@ libCooperativeTasker_la_SOURCES = p_CooperativeTasker.h \
 	CooperativeTasker-IContainer.c CooperativeTasker-Task.c \
 	CooperativeTasker-Thread.c 
 
-libCooperativeTasker_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
+libCooperativeTasker_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1

@@ -24,4 +24,6 @@
 #define INITGUID                       1
 #include <Executive/initguid.h>
 
-#include <Runtime/IRegionHolder.h>
+#if !RUNTIME_BUILD_SIMULATOR
+# include <Runtime/IRegionHolder.h>
+#endif

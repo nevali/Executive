@@ -21,11 +21,17 @@ DIST_SUBDIRS = c99-snprintf dlmalloc
 
 SUBDIRS =
 
-noinst_LTLIBRARIES = libRuntimeThirdParty.la
+noinst_LTLIBRARIES = libRuntimeThirdParty.la libExecRuntimeThirdParty.la libSimRuntimeThirdParty.la
 
 libRuntimeThirdParty_la_SOURCES = config.h \
 	c99-snprintf/snprintf.c \
 	dlmalloc/malloc.h dlmalloc/malloc.c
 
 # XXX GCC/clang-only
-libRuntimeThirdParty_la_CPPFLAGS = @AM_CPPFLAGS@ -Wno-empty-body
+libRuntimeThirdParty_la_CPPFLAGS = @AM_CPPFLAGS@ -Wno-empty-body -DRUNTIME_BUILD_USER=1
+
+libExecRuntimeThirdParty_la_SOURCES = $(libRuntimeThirdParty_la_SOURCES)
+libExecRuntimeThirdParty_la_CPPFLAGS = @AM_CPPFLAGS@ -Wno-empty-body -DRUNTIME_BUILD_EXEC=1
+
+libSimRuntimeThirdParty_la_SOURCES = $(libRuntimeThirdParty_la_SOURCES)
+libSimRuntimeThirdParty_la_CPPFLAGS = @AM_CPPFLAGS@ -Wno-empty-body -DRUNTIME_BUILD_SIMULATOR=1

@@ -1,7 +1,5 @@
 /* Executive Microkernel
- * Runtime Framework
- *   This framework provides low-level user-space APIs to applications, via
- *   the Executive's system call mechanism
+ * Runtime framework
  */
 
 /* Copyright 2015-2022 Mo McRoberts.
@@ -19,12 +17,12 @@
  *  limitations under the License.
  */
 
-#ifndef RUNTIME_STATUS_H_
-# define RUNTIME_STATUS_H_             1
+#ifndef RUNTIME_TASK_H_
+# define RUNTIME_TASK_H_               1
 
-# include <Executive/Errors.h>
+# include <Runtime/IThread.h>
 
-EXTERN_C const char *RtStatusName(STATUS s) RUNTIME_LINKAGE__(RtStatusName);
-const char *RtStatusMessage(STATUS s) RUNTIME_LINKAGE__(RtStatusMessage);
+/* Program main routine */
+EXTERN_C STATUS mainThread(IThread *self);
 
-#endif /*!RUNTIME_STATUS_H_*/
+#endif /*!RUNTIME_TASK_H_*/

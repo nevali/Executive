@@ -29,10 +29,10 @@
 typedef char UUIDBUF[42];
 
 /* return true if a and b are equal */
-EXTERN_C bool RtUuidEqual(REFUUID a, REFUUID b);
+EXTERN_C bool RtUuidEqual(REFUUID a, REFUUID b) RUNTIME_LINKAGE__(RtUuidEqual);
 /* write a UUID as a formatted string */
-EXTERN_C size_t RtUuidStr(REFUUID uuid, UUIDBUF buf);
+EXTERN_C size_t RtUuidStr(REFUUID uuid, UUIDBUF buf) RUNTIME_LINKAGE__(RtUuidStr);
 /* assign one UUID to another */
-EXTERN_C void RtUuidCopy(UUID *restrict dest, REFUUID restrict src);
+EXTERN_C void RtUuidCopy(UUID *restrict dest, REFUUID restrict src) RUNTIME_LINKAGE__(RtUuidCopy);
 
 #endif /*!RUNTIME_UUID_H_*/

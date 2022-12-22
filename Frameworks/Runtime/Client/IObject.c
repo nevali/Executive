@@ -24,4 +24,6 @@
 #define INITGUID                       1
 #include <Executive/initguid.h>
 
-#include <Runtime/IObject.h>
+#if !RUNTIME_BUILD_SIMULATOR
+# include <Runtime/IObject.h>
+#endif

@@ -29,5 +29,6 @@
 # include <Runtime/UUID.h>
 # include <Runtime/Log.h>
 # include <Runtime/Status.h>
+# include <Runtime/Task.h>
 
 #endif /*!RUNTIME_RUNTIME_H_*/

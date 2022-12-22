@@ -1077,7 +1077,7 @@ void  dlmalloc_stats(void);
   p = malloc(n);
   assert(malloc_usable_size(p) >= 256);
 */
-size_t dlmalloc_usable_size(const void*);
+size_t dlmalloc_usable_size(const void*) RUNTIME_PRIVATE__(dlmalloc_usable_size);
 
 #if MSPACES
 
@@ -1098,8 +1098,8 @@ typedef void* mspace;
   compiling with a different DEFAULT_GRANULARITY or dynamically
   setting with mallopt(M_GRANULARITY, value).
 */
-mspace create_mspace(size_t capacity, int locked);
-mspace create_mspace_MemoryManager(RtAllocator *mm, size_t capacity, int locked);
+mspace create_mspace(size_t capacity, int locked) RUNTIME_PRIVATE__(create_space);
+mspace create_mspace_MemoryManager(RtAllocator *mm, size_t capacity, int locked) RUNTIME_PRIVATE__(create_mspace_MemoryManager);
 
 /*
   destroy_mspace destroys the given space, and attempts to return all
@@ -1107,7 +1107,7 @@ mspace create_mspace_MemoryManager(RtAllocator *mm, size_t capacity, int locked)
   bytes freed. After destruction, the results of access to all memory
   used by the space become undefined.
 */
-size_t destroy_mspace(mspace msp);
+size_t destroy_mspace(mspace msp) RUNTIME_PRIVATE__(destroy_mspace);
 
 /*
   create_mspace_with_base uses the memory supplied as the initial base
@@ -1118,7 +1118,7 @@ size_t destroy_mspace(mspace msp);
   Destroying this space will deallocate all additionally allocated
   space (if possible) but not the initial base.
 */
-mspace create_mspace_with_base(void* base, size_t capacity, int locked);
+mspace create_mspace_with_base(void* base, size_t capacity, int locked) RUNTIME_PRIVATE__(create_mspace_with_base);
 
 /*
   mspace_track_large_chunks controls whether requests for large chunks
@@ -1131,46 +1131,46 @@ mspace create_mspace_with_base(void* base, size_t capacity, int locked);
   allocated using this space.  The function returns the previous
   setting.
 */
-int mspace_track_large_chunks(mspace msp, int enable);
+int mspace_track_large_chunks(mspace msp, int enable) RUNTIME_PRIVATE__(mspace_track_large_chunks);
 
 #if !NO_MALLINFO
 /*
   mspace_mallinfo behaves as mallinfo, but reports properties of
   the given space.
 */
-struct mallinfo mspace_mallinfo(mspace msp);
+struct mallinfo mspace_mallinfo(mspace msp) RUNTIME_PRIVATE__(mspace_mallinfo);
 #endif /* NO_MALLINFO */
 
 /*
   An alias for mallopt.
 */
-int mspace_mallopt(int, int);
+int mspace_mallopt(int, int) RUNTIME_PRIVATE__(mspace_mallopt);
 
 /*
   The following operate identically to their malloc counterparts
   but operate only for the given mspace argument
 */
-void* mspace_malloc(mspace msp, size_t bytes);
-void mspace_free(mspace msp, void* mem);
-void* mspace_calloc(mspace msp, size_t n_elements, size_t elem_size);
-void* mspace_realloc(mspace msp, void* mem, size_t newsize);
-void* mspace_realloc_in_place(mspace msp, void* mem, size_t newsize);
-void* mspace_memalign(mspace msp, size_t alignment, size_t bytes);
+void* mspace_malloc(mspace msp, size_t bytes) RUNTIME_PRIVATE__(mspace_malloc);
+void mspace_free(mspace msp, void* mem) RUNTIME_PRIVATE__(mspace_free);
+void* mspace_calloc(mspace msp, size_t n_elements, size_t elem_size) RUNTIME_PRIVATE__(mspace_calloc);
+void* mspace_realloc(mspace msp, void* mem, size_t newsize) RUNTIME_PRIVATE__(mspace_realloc);
+void* mspace_realloc_in_place(mspace msp, void* mem, size_t newsize) RUNTIME_PRIVATE__(mspace_realloc_in_place);
+void* mspace_memalign(mspace msp, size_t alignment, size_t bytes) RUNTIME_PRIVATE__(mspace_memalign);
 void** mspace_independent_calloc(mspace msp, size_t n_elements,
-                                 size_t elem_size, void* chunks[]);
+                                 size_t elem_size, void* chunks[]) RUNTIME_PRIVATE__(mspace_independent_calloc);
 void** mspace_independent_comalloc(mspace msp, size_t n_elements,
-                                   size_t sizes[], void* chunks[]);
-size_t mspace_bulk_free(mspace msp, void**, size_t n_elements);
-size_t mspace_usable_size(const void* mem);
-void mspace_malloc_stats(mspace msp);
-int mspace_trim(mspace msp, size_t pad);
-size_t mspace_footprint(mspace msp);
-size_t mspace_max_footprint(mspace msp);
-size_t mspace_footprint_limit(mspace msp);
-size_t mspace_set_footprint_limit(mspace msp, size_t bytes);
+                                   size_t sizes[], void* chunks[]) RUNTIME_PRIVATE__(mspace_independent_comalloc);
+size_t mspace_bulk_free(mspace msp, void**, size_t n_elements) RUNTIME_PRIVATE__(mspace_bulk_free);
+size_t mspace_usable_size(const void* mem) RUNTIME_PRIVATE__(mspace_usable_size);
+void mspace_malloc_stats(mspace msp) RUNTIME_PRIVATE__(mspace_malloc_stats);
+int mspace_trim(mspace msp, size_t pad) RUNTIME_PRIVATE__(mspace_trim);
+size_t mspace_footprint(mspace msp) RUNTIME_PRIVATE__(mspace_footprint);
+size_t mspace_max_footprint(mspace msp) RUNTIME_PRIVATE__(mspace_max_footprint);
+size_t mspace_footprint_limit(mspace msp) RUNTIME_PRIVATE__(mspace_footprint_limit);
+size_t mspace_set_footprint_limit(mspace msp, size_t bytes) RUNTIME_PRIVATE__(mspace_set_footprint_limit);
 void mspace_inspect_all(mspace msp, 
                         void(*handler)(void *, void *, size_t, void*),
-                        void* arg);
+                        void* arg) RUNTIME_PRIVATE__(mspace_inspect_all);
 #endif  /* MSPACES */
 
 #ifdef __cplusplus

@@ -71,6 +71,8 @@ EX_CHECK_GLUE
 EX_CHECK_PALS
 ## Now know which PALs are being built, we can confirm the build dispositions
 EX_CHECK_DISPOSITIONS
+## Should Simulator versions be built?
+EX_CHECK_SIMULATOR
 ## Checks for the Executive runtime library 
 AC_CHECK_HEADERS([stdarg.h stddef.h stdint.h stdlib.h float.h inttypes.h])
 if test $ac_cv_sizeof_long_long -gt 0 ; then
@@ -117,6 +119,8 @@ Sources/CooperativeTasker/Makefile
 Sources/Coordinator/Makefile
 Sources/Despatch/Makefile
 Sources/Subsystems/Makefile
+Simulator/Makefile
+Simulator/PAL/Makefile
 Glue/Makefile
 Glue/posix/Makefile
 Glue/linux/Makefile

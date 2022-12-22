@@ -1,6 +1,10 @@
 #ifndef EXECUTIVE_INTERNAL_RUNTIME_H_
 # define EXECUTIVE_INTERNAL_RUNTIME_H_ 1
 
+# ifndef RUNTIME_BUILD_EXEC
+#  define RUNTIME_BUILD_EXEC           1
+# endif
+
 # include <Executive/UUID.h>
 # include <Executive/IPlatformDiagnostics.h>
 # include <Runtime/Runtime.h>
@@ -8,7 +12,7 @@
 # include <Executive/IAllocator.h>
 # include <Executive/IAddressSpace.h>
 
-extern IAllocator *RtAllocator_create(IAddressSpace *addressSpace);
+EXTERN_C IAllocator *RtAllocator_create(IAddressSpace *addressSpace) RUNTIME_PRIVATE__(RtAllocator_create);
 
 # define ExPanic(str)                  Executive_panic(str)
 # define ExAlloc(nbytes)               RtMemAlloc(nbytes)

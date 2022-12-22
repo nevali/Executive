@@ -24,10 +24,13 @@
 
 # include <Executive/IPlatformDiagnostics.h>
 
-EXTERN_C void RtDebugFormat(LogLevel level, const char *format, ...);
-EXTERN_C void RtTraceFormat(const char *format, ...);
-EXTERN_C void RtLogFormat(LogLevel level, const char *format, ...);
-EXTERN_C void RtLogFormatArgs(LogLevel level, const char *format, va_list args);
-EXTERN_C void RtLog(LogLevel level, const char *string);
+EXTERN_C void RtDebugFormat(LogLevel level, const char *format, ...) RUNTIME_LINKAGE__(RtDebugFormat);
+
+EXTERN_C void RtTraceFormat(const char *format, ...) RUNTIME_LINKAGE__(RtTraceFormat);
+
+EXTERN_C void RtLogFormat(LogLevel level, const char *format, ...) RUNTIME_LINKAGE__(RtLogFormat);
+EXTERN_C void RtLogFormatArgs(LogLevel level, const char *format, va_list args) RUNTIME_LINKAGE__(RtLogFormatArgs);
+
+EXTERN_C void RtLog(LogLevel level, const char *string) RUNTIME_LINKAGE__(RtLlog);
 
 #endif /*!RUNTIME_LOG_H_*/

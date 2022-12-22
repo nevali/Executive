@@ -5,6 +5,7 @@
 #define INITGUID_EXTERN                1
 
 #include <Runtime/Memory.h>
+#include <Runtime/Strings.h>
 
 #define malloc(x) RtMemAlloc(x)
 

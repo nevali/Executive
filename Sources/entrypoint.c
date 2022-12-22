@@ -30,13 +30,15 @@ void
 Executive_start(struct ExecutiveEntryParameters *params)
 {
 	IPlatform *platform;
+	bool simulator;
 
 	if(!params)
 	{
 		return;
 	}
+	simulator = (params->flags & EEF_SIMULATOR);
 	/* Obtain an interface pointer to the PAL's Platform object */
-	if(!params->PAL_metaClass)
+	if(!(params->flags & EEF_HAVE_PAL_METACLASS))
 	{
 		params->PAL_metaClass = PAL_metaClass;
 		if(!PAL_metaClass)
@@ -64,6 +66,10 @@ Executive_start(struct ExecutiveEntryParameters *params)
 	 * libExecutiveServices convenience library
 	 */
 	if(E_SUCCESS != Executive_init(&executive, params, platform))
+	{
+		return;
+	}
+	if(simulator)
 	{
 		return;
 	}

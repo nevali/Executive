@@ -22,8 +22,8 @@ Runtimedir = $(includedir)/Headers
 idlgenerated = 
 
 Runtime_HEADERS = Runtime.h Strings.h Memory.h UUID.h \
-	Log.h Status.h \
-	IObject.h IAllocator.h IRegionHolder.h \
+	Log.h Status.h Task.h \
+	IObject.h IAllocator.h IRegionHolder.h IThread.h \
 	$(idlgenerated)
 
 if WITH_IDL

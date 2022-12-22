@@ -25,7 +25,13 @@
 # include <Executive/Linkage.h>
 
 # ifndef RUNTIME_LINKAGE__
-#  define RUNTIME_LINKAGE__(name, version) SYM__("RUNTIME", name, version) WEAK_IMPORT__
+#  if RUNTIME_BUILD_EXEC
+#   define RUNTIME_LINKAGE__(name) SYM__("EXECUTIVE", name, "0.0") WEAK_IMPORT__
+#   define RUNTIME_PRIVATE__(name) SYM__("__EXECUTIVE__", name, "PRIVATE") WEAK_IMPORT__
+#  else
+#   define RUNTIME_LINKAGE__(name) SYM__("RUNTIME", name, "0.0") WEAK_IMPORT__
+#   define RUNTIME_PRIVATE__(name) SYM__("__RUNTIME__", name, "PRIVATE") WEAK_IMPORT__
+#  endif
 # endif
 
 #endif /*!RUNTIME_LINKAGE_H_*/

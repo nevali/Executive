@@ -25,17 +25,17 @@
 # include <Runtime/Linkage.h>
 # include <Runtime/Types.h>
 
-EXTERN_C size_t RtStrLen(const char *str);
-EXTERN_C const char *RtStrPos(const char *str, int ch);
-EXTERN_C size_t RtStrCopy(char *dest, size_t dsize, const char *src);
-EXTERN_C size_t RtStrLCopy(char *dest, size_t dsize, const char *src, size_t srclen);
-EXTERN_C int RtStrEqual(const char *a, const char *b);
-EXTERN_C int RtStrLEqual(const char *a, const char *b, size_t max);
-EXTERN_C char *RtStrDup(const char *str);
-EXTERN_C char *RtStrLDup(const char *str, size_t max);
-EXTERN_C char *RtStrFormat(const char *format, ...);
-EXTERN_C char *RtStrFormatArgs(const char *format, va_list args);
-EXTERN_C int RtStrBufFormat(char *restrict buf, size_t bufsize, const char *restrict format, ...);
-EXTERN_C int RtStrBufFormatArgs(char *restrict buf, size_t bufsize, const char *restrict format, va_list args);
+EXTERN_C size_t RtStrLen(const char *str) RUNTIME_LINKAGE__(RtStrLen);
+EXTERN_C const char *RtStrPos(const char *str, int ch) RUNTIME_LINKAGE__(RtStrPos);
+EXTERN_C size_t RtStrCopy(char *dest, size_t dsize, const char *src) RUNTIME_LINKAGE__(RtStrCopy);
+EXTERN_C size_t RtStrLCopy(char *dest, size_t dsize, const char *src, size_t srclen) RUNTIME_LINKAGE__(RtStrLCopy);
+EXTERN_C int RtStrEqual(const char *a, const char *b) RUNTIME_LINKAGE__(RtStrEqual);
+EXTERN_C int RtStrLEqual(const char *a, const char *b, size_t max) RUNTIME_LINKAGE__(RtStrLEqual);
+EXTERN_C char *RtStrDup(const char *str) RUNTIME_LINKAGE__(RtStrDup);
+EXTERN_C char *RtStrLDup(const char *str, size_t max) RUNTIME_LINKAGE__(RtStrLDup);
+EXTERN_C int RtStrFormat(char **out, const char *format, ...) RUNTIME_LINKAGE__(RtStrFormat);
+EXTERN_C int RtStrFormatArgs(char **out, const char *format, va_list args) RUNTIME_LINKAGE__(RtStrFormatArgs);
+EXTERN_C int RtStrBufFormat(char *restrict buf, size_t bufsize, const char *restrict format, ...) RUNTIME_LINKAGE__(RtStrBufFormat);
+EXTERN_C int RtStrBufFormatArgs(char *restrict buf, size_t bufsize, const char *restrict format, va_list args) RUNTIME_LINKAGE__(RtStrBufFormatArgs);
 
 #endif /*!RUNTIME_STRINGS_H_*/

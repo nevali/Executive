@@ -17,11 +17,20 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-noinst_LTLIBRARIES = libRuntimeClientExec.la libRuntimeClient.la
+noinst_LTLIBRARIES = libExecRuntimeClient.la libRuntimeClient.la
 
-libRuntimeClientExec_la_SOURCES = p_Client.h \
+if BUILD_SIMULATOR
+
+noinst_LTLIBRARIES += libSimRuntimeClient.la
+
+endif
+
+libExecRuntimeClient_la_SOURCES = p_Client.h \
 	IObject.c IAllocator.c IRegionHolder.c
-libRuntimeClientExec_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
+libExecRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
 
-libRuntimeClient_la_SOURCES = $(libRuntimeClientExec_la_SOURCES)
+libSimRuntimeClient_la_SOURCES = $(libExecRuntimeClient_la_SOURCES)
+libSimRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_SIMULATOR=1
+
+libRuntimeClient_la_SOURCES = $(libExecRuntimeClient_la_SOURCES)
 libRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_USER=1
