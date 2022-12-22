@@ -30,5 +30,9 @@ typedef char UUIDBUF[42];
 
 /* return true if a and b are equal */
 EXTERN_C bool RtUuidEqual(REFUUID a, REFUUID b);
+/* write a UUID as a formatted string */
+EXTERN_C size_t RtUuidStr(REFUUID uuid, UUIDBUF buf);
+/* assign one UUID to another */
+EXTERN_C void RtUuidCopy(UUID *restrict dest, REFUUID restrict src);
 
 #endif /*!RUNTIME_UUID_H_*/

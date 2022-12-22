@@ -29,13 +29,13 @@ static REFCOUNT Executive_MFactory_retain(MFactory *me);
 static REFCOUNT Executive_MFactory_release(MFactory *me);
 static STATUS Executive_MFactory_lock(MFactory *me, bool dolock);
 
-extern STATUS Executive_Allocator_MFactory_createInstance(MFactory *me, IObject *outer, REFUUID iid, void **out);
+extern STATUS RtAllocator_MFactory_createInstance(MFactory *me, IObject *outer, REFUUID iid, void **out);
 
 static struct MFactory_vtable_ Executive_Allocator_MFactory_vtable = {
 	Executive_MFactory_queryInterface,
 	Executive_MFactory_retain,
 	Executive_MFactory_release,
-	Executive_Allocator_MFactory_createInstance,
+	RtAllocator_MFactory_createInstance,
 	Executive_MFactory_lock
 };
 

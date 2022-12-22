@@ -19,15 +19,12 @@
  *  limitations under the License.
  */
 
-#ifndef RUNTIME_RUNTIME_H_
-# define RUNTIME_RUNTIME_H_            1
+#ifndef RUNTIME_STATUS_H_
+# define RUNTIME_STATUS_H_             1
 
-# include <Runtime/Linkage.h>
-# include <Runtime/Types.h>
-# include <Runtime/Strings.h>
-# include <Runtime/Memory.h>
-# include <Runtime/UUID.h>
-# include <Runtime/Log.h>
-# include <Runtime/Status.h>
+# include <Executive/Errors.h>
 
-#endif /*!RUNTIME_RUNTIME_H_*/
+EXTERN_C const char *RtStatusName(STATUS s);
+const char *RtStatusMessage(STATUS s);
+
+#endif /*!RUNTIME_STATUS_H_*/

@@ -19,15 +19,15 @@
  *  limitations under the License.
  */
 
-#ifndef RUNTIME_RUNTIME_H_
-# define RUNTIME_RUNTIME_H_            1
+#ifndef RUNTIME_LOG_H_
+# define RUNTIME_LOG_H_                1
 
-# include <Runtime/Linkage.h>
-# include <Runtime/Types.h>
-# include <Runtime/Strings.h>
-# include <Runtime/Memory.h>
-# include <Runtime/UUID.h>
-# include <Runtime/Log.h>
-# include <Runtime/Status.h>
+# include <Executive/IPlatformDiagnostics.h>
 
-#endif /*!RUNTIME_RUNTIME_H_*/
+EXTERN_C void RtDebugFormat(LogLevel level, const char *format, ...);
+EXTERN_C void RtTraceFormat(const char *format, ...);
+EXTERN_C void RtLogFormat(LogLevel level, const char *format, ...);
+EXTERN_C void RtLogFormatArgs(LogLevel level, const char *format, va_list args);
+EXTERN_C void RtLog(LogLevel level, const char *string);
+
+#endif /*!RUNTIME_LOG_H_*/

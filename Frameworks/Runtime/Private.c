@@ -34,5 +34,7 @@
  * data area instead, and this file isn't used
  */
 
- SystemPrivateData System__private__;
+ RuntimePrivateData Rt__private__ = {
+	NULL, NULL, NULL, NULL, NULL, NULL
+ };
  

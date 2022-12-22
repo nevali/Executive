@@ -1,14 +1,9 @@
 dnl EX_CHECK_ARCHITECTURE
 dnl - Check that the source tree contains support for the host architecture
 AC_DEFUN([EX_CHECK_ARCHITECTURE],[
-dnl There must to be a subdirectory of Sources/Runtime matching the host CPU
-dnl family, containing a Makefile.in, and a subdirectory of Headers/Executive
-dnl containing a Types.h
 
 AC_MSG_CHECKING([if architecture $host_family is supported])
-if test -d "$srcdir/Sources/Runtime/${host_family}" && \
-	test -r "$srcdir/Sources/Runtime/${host_family}/Makefile.am" && \
-	test -d "$srcdir/Frameworks/Executive/Headers/Executive/${host_family}" && \
+if test -d "$srcdir/Frameworks/Executive/Headers/Executive/${host_family}" && \
 	test -r "$srcdir/Frameworks/Executive/Headers/Executive/${host_family}/Types.h" ; then
 	AC_MSG_RESULT([yes])
 else

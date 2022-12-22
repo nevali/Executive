@@ -96,7 +96,7 @@ Executive_init_allocator(void)
 	 */
 
 	ExPhaseShift(PHASE_STARTUP_ALLOCATOR);
-	executive.data.allocator = Executive_Allocator_create(executive.data.addressSpace);
+	executive.data.allocator = RtAllocator_create(executive.data.addressSpace);
 	if(!executive.data.allocator)
 	{
 		ExPanic("failed to create an allocator using the PAL's memory manager!\n");

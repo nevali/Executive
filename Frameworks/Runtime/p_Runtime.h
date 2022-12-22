@@ -39,9 +39,9 @@
 typedef union RtAllocator RtAllocator;
 
 #if RUNTIME_BUILD_USER
-typedef struct SystemPrivateData SystemPrivateData;
+typedef struct RuntimePrivateData RuntimePrivateData;
 
-struct SystemPrivateData
+struct RuntimePrivateData
 {
 	IThread *mainThread;
 	ITask *task;
@@ -53,6 +53,9 @@ struct SystemPrivateData
 	IWriteChannel *stdout;
 	IWriteChannel *stderr;
 };
+
+extern RuntimePrivateData Rt__private__;
+
 #endif /*!RUNTIME_BUILD_USER*/
 
 

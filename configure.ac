@@ -110,13 +110,7 @@ Frameworks/Runtime/Client/Makefile
 PrivateHeaders/Makefile
 PrivateHeaders/Executive/Makefile
 PrivateHeaders/Executive/Internal/Makefile
-Sources/Makefile
-Sources/Runtime/Makefile
-Sources/Runtime/snprintf/Makefile
-Sources/Runtime/arm64/Makefile
 Sources/Executive/Makefile
-Sources/Allocator/Makefile
-Sources/Allocator/dlmalloc/Makefile
 Sources/Classes/Makefile
 Sources/Directory/Makefile
 Sources/CooperativeTasker/Makefile
