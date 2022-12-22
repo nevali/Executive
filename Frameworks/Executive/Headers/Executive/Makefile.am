@@ -38,7 +38,7 @@ if WITH_IDL
 
 CLEANFILES = $(idlgenerated)
 
-%.h: $(top_srcdir)/Frameworks/Executive/IDL/%.idl
+%.h: $(top_srcdir)/Frameworks/Executive/IDL/Executive/%.idl
 	$(IDL) -I$(top_srcdir)/Frameworks/Executive/IDL -H $@ $<
 
 endif

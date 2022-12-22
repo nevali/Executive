@@ -1,0 +1,77 @@
+cpp_quote("/* Executive Microkernel");
+cpp_quote(" * Errors.idl");
+cpp_quote(" *   Defines error codes used by the Executive");
+cpp_quote(" */")
+cpp_quote("");
+cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
+cpp_quote(" *");
+cpp_quote(" *  Licensed under the Apache License, Version 2.0 (the \"License\");");
+cpp_quote(" *  you may not use this file except in compliance with the License.");
+cpp_quote(" *  You may obtain a copy of the License at");
+cpp_quote(" *");
+cpp_quote(" *      http://www.apache.org/licenses/LICENSE-2.0");
+cpp_quote(" *");
+cpp_quote(" *  Unless required by applicable law or agreed to in writing, software");
+cpp_quote(" *  distributed under the License is distributed on an \"AS IS\" BASIS,");
+cpp_quote(" *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
+cpp_quote(" *  See the License for the specific language governing permissions and");
+cpp_quote(" *  limitations under the License.");
+cpp_quote(" */");
+cpp_quote("");
+
+import "Executive/Types.idl";
+
+[
+	cheader("Executive/Errors.h")
+]
+interface Errors
+{
+	typedef int STATUS;
+
+	/* the IDL compiler cannot currently process typedef constants */
+
+	/* Error conditions are always negative */
+	const int E_SUCCESS = 0;
+	
+	/* Request/parameter conditions */
+
+	/* Invalid object descriptor */
+	const int E_BADOBJ = -6;
+	/* Interface is not implemented */
+	const int E_NOTIMPL = -7;
+	/* Request parameter is invalid */
+	const int E_INVAL = -8;
+
+	/* Security conditions */
+
+	/* Operation not permitted */
+	const int E_PERM = -1;
+	/* Access denied */
+	const int E_ACCESS = -2;
+
+	/* Resource conditions */
+
+	/* Object does not exist */
+	const int E_NOENT = -5;
+	/* Object already exists */
+	const int E_EXISTS = -9;
+	/* End of file/end of list */
+	const int E_EOF = -10;
+	/* Object is not a container */
+	const int E_NOT_CONTAINER = -11;
+	const int E_NOTDIR = E_NOT_CONTAINER;
+
+	/* Out of memory */
+	const int E_NOMEM = -3;
+
+	/* Device/communications conditions */
+
+	/* I/O error */
+	const int E_IO = -4;
+	
+	/* User errors must be below this value */
+	const int E_USER = -1024;
+	
+	/* User error codes must not exceed this value */
+	const int E_MAX = -4095;
+}

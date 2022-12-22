@@ -41,6 +41,8 @@ AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_builddir}/Frameworks/Executive/Headers"]
 AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_srcdir}/Frameworks/Executive/Headers"])
 AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_builddir}/Frameworks/PAL/Headers"])
 AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_srcdir}/Frameworks/PAL/Headers"])
+AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_builddir}/Frameworks/Runtime/Headers"])
+AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_srcdir}/Frameworks/Runtime/Headers"])
 
 AC_SUBST([WARNING_CPPFLAGS])
 ])

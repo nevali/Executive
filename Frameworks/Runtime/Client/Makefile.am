@@ -1,6 +1,7 @@
 ## Executive Microkernel
-## Frameworks
-##  
+## Runtime Framework
+##   This framework provides low-level user-space APIs to applications, via
+##   the Executive's system call mechanism
 
 ## Copyright 2015-2022 Mo McRoberts.
 ##
@@ -16,4 +17,11 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = Executive PAL Runtime
+noinst_LTLIBRARIES = libRuntimeClientExec.la libRuntimeClient.la
+
+libRuntimeClientExec_la_SOURCES = p_Client.h \
+	IObject.c IAllocator.c IRegionHolder.c
+libRuntimeClientExec_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
+
+libRuntimeClient_la_SOURCES = $(libRuntimeClientExec_la_SOURCES)
+libRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_USER=1

@@ -1,6 +1,7 @@
 ## Executive Microkernel
-## Frameworks
-##  
+## Runtime Framework
+##   This framework provides low-level user-space APIs to applications, via
+##   the Executive's system call mechanism
 
 ## Copyright 2015-2022 Mo McRoberts.
 ##
@@ -16,4 +17,19 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = Executive PAL Runtime
+Runtimedir = $(includedir)/Headers
+
+idlgenerated = 
+
+Runtime_HEADERS = Runtime.h Strings.h Memory.h UUID.h \
+	IObject.h IAllocator.h IRegionHolder.h \
+	$(idlgenerated)
+
+if WITH_IDL
+
+CLEANFILES = $(idlgenerated)
+
+%.h: $(top_srcdir)/Frameworks/Runtime/IDL/Runtime/%.idl
+	$(IDL)  -I$(top_srcdir)/Frameworks/Runtime/IDL -I$(top_srcdir)/Frameworks/Executive/IDL  -H $@ $<
+
+endif

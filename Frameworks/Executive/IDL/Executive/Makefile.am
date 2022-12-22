@@ -1,6 +1,3 @@
-## Executive Microkernel
-## Frameworks
-##  
 
 ## Copyright 2015-2022 Mo McRoberts.
 ##
@@ -16,4 +13,4 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = Executive PAL Runtime
+dist_noinst_DATA = *.idl

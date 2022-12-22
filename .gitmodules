@@ -1,3 +1,6 @@
 [submodule "Sources/Runtime/snprintf"]
 	path = Sources/Runtime/snprintf
 	url = https://github.com/weiss/c99-snprintf.git
+[submodule "Frameworks/Runtime/ThirdParty/c99-snprintf"]
+	path = Frameworks/Runtime/ThirdParty/c99-snprintf
+	url = https://github.com/weiss/c99-snprintf.git

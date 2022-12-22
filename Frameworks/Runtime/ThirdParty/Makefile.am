@@ -1,6 +1,7 @@
 ## Executive Microkernel
-## Frameworks
-##  
+## System Framework
+##   This framework provides low-level user-space APIs to applications, via
+##   the Executive's system call mechanism
 
 ## Copyright 2015-2022 Mo McRoberts.
 ##
@@ -16,4 +17,15 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = Executive PAL Runtime
+DIST_SUBDIRS = c99-snprintf dlmalloc
+
+SUBDIRS =
+
+noinst_LTLIBRARIES = libRuntimeThirdParty.la
+
+libRuntimeThirdParty_la_SOURCES = config.h \
+	c99-snprintf/snprintf.c \
+	dlmalloc/malloc.h dlmalloc/malloc.c
+
+# XXX GCC/clang-only
+libRuntimeThirdParty_la_CPPFLAGS = @AM_CPPFLAGS@ -Wno-empty-body
