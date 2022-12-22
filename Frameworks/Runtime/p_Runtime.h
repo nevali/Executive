@@ -32,31 +32,13 @@
 # include <Executive/IAddressSpace.h>
 # include <Executive/IWriteChannel.h>
 # include <Executive/MFactory.h>
+# include <Runtime/Internal/Private.h>
+
 # if RUNTIME_BUILD_EXEC
 #  include <Executive/Internal/Executive.h>
 # endif /*RUNTIME_BUILD_EXEC*/
 
 typedef union RtAllocator RtAllocator;
-
-#if RUNTIME_BUILD_USER || RUNTIME_BUILD_SIMULATOR
-typedef struct RuntimePrivateData RuntimePrivateData;
-
-struct RuntimePrivateData
-{
-	IThread *mainThread;
-	ITask *task;
-	INamespace *ns;
-	IAddressSpace *addressSpace;
-#if 0
-	IReadChannel *stdin;
-#endif
-	IWriteChannel *stdout;
-	IWriteChannel *stderr;
-};
-
-extern RuntimePrivateData Rt__private__;
-
-#endif /*!RUNTIME_BUILD_USER*/
 
 
 # if RUNTIME_BUILD_EXEC

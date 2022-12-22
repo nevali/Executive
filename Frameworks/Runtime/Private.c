@@ -38,3 +38,14 @@
 	NULL, NULL, NULL, NULL, NULL, NULL
  };
  
+ #if RUNTIME_BUILD_SIMULATOR
+
+ void
+ Rt__Initialise(IThread *mainThread)
+ {
+	/* XXX marshal this first, then we can use it as normal */
+	Rt__private__.mainThread = mainThread;
+	IThread_task(mainThread, &IID_ITask, (void **) &(Rt__private__.mainThread));
+ }
+
+ #endif /*RUNTIME_BUILD_SIMULATOR*/

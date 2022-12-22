@@ -211,7 +211,6 @@ PAL_POSIX_Platform_nap(IPlatform *self)
 	UNUSED__(self);
 	
 	PALTrace("PAL::POSIX::Platform::nap()");
-	sleep(1);
 }
 
 static void
@@ -220,7 +219,6 @@ PAL_POSIX_Platform_tick(IPlatform *self)
 	UNUSED__(self);
 	
 	PALTrace("PAL::POSIX::Platform::tick()");
-	sleep(1);
 }
 
 static void
