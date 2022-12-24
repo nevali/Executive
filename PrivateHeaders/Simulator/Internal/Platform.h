@@ -21,6 +21,7 @@ namespace PAL
 			PHASE phase_;
 			IAllocator *allocator_;
 			IMutableContainer *platformContainer_;
+			INamespace *ns_;
 		public:
 			/* Constructor */
 			Platform();
@@ -47,7 +48,8 @@ namespace PAL
 		public:
 			/* IPlatform */
 			virtual void panic(const char *str);
-			virtual void setDefaultAllocator(IAllocator *allocator);
+			virtual void allocatorActivated(IAllocator *allocator);
+			virtual void namespaceActivated(INamespace *ns);
 			virtual void nap(void);
 			virtual void tick(void);
 			virtual void phaseTransition(PHASE phase);
@@ -55,6 +57,8 @@ namespace PAL
 			/* IContainer */
 			virtual STATUS resolve(const char *name, IDirectoryEntry **entry);
 			virtual IIterator *iterator(void);
+		private:
+			bool createPlatformContainer(void);
 		};
 	}
 }

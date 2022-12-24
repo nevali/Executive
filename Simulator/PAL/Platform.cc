@@ -90,6 +90,32 @@ Platform::tracef(const char *format, ...)
 	va_end(args);
 }
 
+/*PRIVATE*/
+bool
+Platform::createPlatformContainer(void)
+{
+	IMutableContainer *devices;
+
+	/* XXX wait until we have a namespace */
+	Platform::trace("PAL::Simulator::Platform::createPlatformContainer(): creating platform container");
+	if(E_SUCCESS != Executive_createObjectByName("Executive::Container", IID_IMutableContainer, (void **) &(platformContainer_)))
+	{
+		Platform::panic("PAL::Simulator::Platform::createPlatformContainer(): Executive::createObjectByName(Executive::Container, IMutableContainer) failed");
+		return false;
+	}
+	if(E_SUCCESS != platformContainer_->create("Devices", CLSID_Executive_Container, IID_IMutableContainer, (void **) &devices))
+	{
+		Platform::panic("PAL::Simulator::Platform::createPlatformContainer(): IMutableContainer::create('Devices') failed");
+		return false;
+	}
+	devices->add("Diagnostics", CLSID_PAL_PlatformDiagnostics, static_cast<IPlatformDiagnostics *>(&diagnostics));
+	devices->add("Console", CLSID_PAL_PlatformDiagnostics, static_cast<IPlatformDiagnostics *>(&diagnostics));
+	devices->add("AddressSpace", CLSID_PAL_MemoryManager, static_cast<IAddressSpace *>(&addressSpace));
+	devices->release();
+	Platform::logf(LOG_DEBUG, "PAL::Simulator::Platform::createPlatformContainer(): platform container successfully created");
+	return true;
+}
+
 /* IObject */
 
 STATUS
@@ -115,6 +141,21 @@ Platform::queryInterface(REFUUID iid, void **out)
 		}
 		return E_SUCCESS;
 	}
+	if(!memcmp(&iid, &IID_IContainer, sizeof(UUID)))
+	{
+		if(!platformContainer_)
+		{
+			if(!createPlatformContainer())
+			{
+				return E_NOTIMPL;
+			}
+		}
+		if(out)
+		{
+			*out = static_cast<IContainer *>(this);
+		}
+		return E_SUCCESS;
+	}
 	logf(LOG_DEBUG7, "PAL::Simulator::Platform::queryInterface(iid:" UUID_PRINTF_FORMAT ") not supported", UUID_PRINTF_ARGS(iid));
 	return E_NOENT;
 }
@@ -129,15 +170,27 @@ Platform::panic(const char *string)
 }
 
 void
-Platform::setDefaultAllocator(IAllocator *allocator)
+Platform::allocatorActivated(IAllocator *allocator)
 {
-	tracef("PAL::Simulator::Platform::setDefaultAllocator(%p)", allocator);
+	tracef("PAL::Simulator::Platform::allocatorActivated(%p)", allocator);
 	allocator->retain();
 	if(allocator_)
 	{
 		allocator_->release();
 	}
 	allocator_ = allocator;
+}
+
+void
+Platform::namespaceActivated(INamespace *ns)
+{
+	tracef("PAL::Simulator::Platform::namespaceActivated(%p)", ns);
+	ns->retain();
+	if(ns_)
+	{
+		ns_->release();
+	}
+	ns_ = ns;
 }
 
 void

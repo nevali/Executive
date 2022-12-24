@@ -21,6 +21,7 @@ cpp_quote(" */");
 import "Executive/IObject.idl";
 import "Executive/IAllocator.idl";
 import "Executive/IPlatformDiagnostics.idl";
+import "Executive/INamespace.idl";
 
 [
 	object,
@@ -33,9 +34,25 @@ interface IPlatform: IObject
 	cpp_quote("# warning The IPlatform interface is currently considered unstable; source and binary compatibility are not assured.");
 	cpp_quote("#endif");
 
+	/** Kernel-facing APIs **/
+
+	/* Invoked by the panic to immediately halt the system, displaying the
+	 * supplied string
+	 */
 	void panic([in] const char *string);
-	void setDefaultAllocator([in] IAllocator *allocator);
+	/* Invoked by the scheduler when there are no threads available to switch
+	 * to
+	 */
 	void nap(void);
+	/* Invoked by the scheduler on a frequent basis */
 	void tick(void);
+
+	/** Notifications **/
+
+	/* The kernel has activated a new allocator */
+	void allocatorActivated([in] IAllocator *allocator);
+	/* The kernel has activated a root namespace */
+	void namespaceActivated([in] INamespace *ns);
+	/* The kernel's phase state was has transitioned */
 	void phaseTransition(PHASE newPhase);
 }

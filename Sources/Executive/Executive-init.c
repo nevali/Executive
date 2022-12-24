@@ -102,7 +102,7 @@ Executive_init_allocator(void)
 		ExPanic("failed to create an allocator using the PAL's memory manager!\n");
 	}
 	/* Inform the Platform of the new allocator's availability */
-	IPlatform_setDefaultAllocator(executive.data.platform, executive.data.allocator);
+	IPlatform_allocatorActivated(executive.data.platform, executive.data.allocator);
 }
 
 /*PRIVATE*/
@@ -164,6 +164,8 @@ Executive_init_directory(void)
 	/* Release the temporary resources */
 	IDirectoryEntryTarget_release(target);
 	MDirectoryEntryTarget_release(meta);
+	/* Inform the Platform object that there's a namespace */
+	IPlatform_namespaceActivated(executive.data.platform, executive.data.rootNS);
 
 	if(!executive.data.system)
 	{

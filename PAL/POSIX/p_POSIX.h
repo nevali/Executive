@@ -50,7 +50,7 @@ struct PAL_POSIX_Platform
 	struct
 	{
 		IAllocator *allocator;
-		INamespace *namespace;
+		INamespace *rootNS;
 		IMutableContainer *platformContainer;
 		IAddressSpace *addressSpace;
 		IBootEnvironment *BootEnvironment;

@@ -10,7 +10,8 @@ static STATUS PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void
 static REFCOUNT PAL_POSIX_Platform_retain(IObject *self);
 static REFCOUNT PAL_POSIX_Platform_release(IObject *self);
 static void PAL_POSIX_Platform_panic(IPlatform *self, const char *str);
-static void PAL_POSIX_Platform_setDefaultAllocator(IPlatform *self, IAllocator *allocator);
+static void PAL_POSIX_Platform_allocatorActivated(IPlatform *self, IAllocator *allocator);
+static void PAL_POSIX_Platform_namespaceActivated(IPlatform *self, INamespace *ns);
 static void PAL_POSIX_Platform_nap(IPlatform *self);
 static void PAL_POSIX_Platform_tick(IPlatform *self);
 static void PAL_POSIX_Platform_phaseTransition(IPlatform *self, PHASE phase);
@@ -29,9 +30,10 @@ static struct IPlatform_vtable_ platform_IPlatform_vtable = {
 	(REFCOUNT (*)(IPlatform *)) &PAL_POSIX_Platform_retain,
 	(REFCOUNT (*)(IPlatform *)) &PAL_POSIX_Platform_release,
 	PAL_POSIX_Platform_panic,
-	PAL_POSIX_Platform_setDefaultAllocator,
 	PAL_POSIX_Platform_nap,
 	PAL_POSIX_Platform_tick,
+	PAL_POSIX_Platform_allocatorActivated,
+	PAL_POSIX_Platform_namespaceActivated,
 	PAL_POSIX_Platform_phaseTransition
 };
 /* IContainer */
@@ -102,7 +104,6 @@ PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag)
 static STATUS
 PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 {
-	STATUS status;
 	UNUSED__(self);
 
 	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::queryInterface(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(iid)));
@@ -130,28 +131,6 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 	}
 	if(0 == memcmp(iid, &IID_IContainer, sizeof(UUID)))
 	{
-		if(!PAL_POSIX_platform.data.platformContainer)
-		{
-			IMutableContainer *devices;
-
-			/* XXX wait until we have a namespace */
-			PALDebug("PAL::POSIX::Platform::queryInterface(): creating platform container");
-			if(E_SUCCESS != (status = Executive_createObjectByName("Executive::Container", &IID_IMutableContainer, (void **) &(PAL_POSIX_platform.data.platformContainer))))
-			{
-				PAL_panic("PAL::POSIX::Platform::queryInterface(): Executive::createObjectByName(Executive::Container, IMutableContainer) failed");
-				return status;
-			}
-			PALDebug("PAL::POSIX::Platform::queryInterface(): created platform container!");
-			if(E_SUCCESS != (status = IMutableContainer_create((PAL_POSIX_platform.data.platformContainer), "Devices", &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &devices)))
-			{
-				PAL_panic("PAL::POSIX::Platform::queryInterface(): IMutableContainer::create('Devices') failed");
-				return status;
-			}
-			IMutableContainer_add(devices, "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
-			IMutableContainer_add(devices, "Console", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
-			IMutableContainer_add(devices, "AddressSpace", &CLSID_PAL_MemoryManager, (IObject *) (void *) PAL_POSIX_platform.data.addressSpace);
-			IMutableContainer_release(devices);
-		}
 		if(out)
 		{
 			*out = &(PAL_POSIX_platform.Container);
@@ -192,7 +171,7 @@ PAL_POSIX_Platform_panic(IPlatform *self, const char *string)
 }
 
 static void
-PAL_POSIX_Platform_setDefaultAllocator(IPlatform *self, IAllocator *allocator)
+PAL_POSIX_Platform_allocatorActivated(IPlatform *self, IAllocator *allocator)
 {
 	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
 
@@ -202,7 +181,41 @@ PAL_POSIX_Platform_setDefaultAllocator(IPlatform *self, IAllocator *allocator)
 		IAllocator_release(me->data.allocator);
 	}
 	me->data.allocator = allocator;
-	PALDebug("PAL::POSIX::Platform::setDefaultAllocator(): new default allocator installed");
+	PALDebug("PAL::POSIX::Platform::allocatorActivated(): new default allocator activated");
+}
+
+static void
+PAL_POSIX_Platform_namespaceActivated(IPlatform *self, INamespace *ns)
+{
+	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
+	IMutableContainer *devices;
+	STATUS status;
+
+	INamespace_retain(ns);
+	if(me->data.rootNS)
+	{
+		INamespace_release(me->data.rootNS);
+	}
+	me->data.rootNS = ns;
+	PALDebug("PAL::POSIX::Platform::namespaceActivated(): new root namespace activated");
+	if(me->data.platformContainer)
+	{
+		IMutableContainer_release(me->data.platformContainer);
+	}
+	PALDebug("PAL::POSIX::Platform::namespaceActivated(): creating platform container");
+	if(E_SUCCESS != (status = Executive_createObject(&CLSID_Executive_Container, &IID_IMutableContainer, (void **) &(PAL_POSIX_platform.data.platformContainer))))
+	{
+		PAL_panic("PAL::POSIX::Platform::namespaceActivated(): Executive::createObjectByName(Executive::Container, IMutableContainer) failed");
+	}
+	if(E_SUCCESS != (status = IMutableContainer_create((PAL_POSIX_platform.data.platformContainer), "Devices", &CLSID_Executive_Container, &IID_IMutableContainer, (void **) &devices)))
+	{
+		PAL_panic("PAL::POSIX::Platform::namespaceActivated(): IMutableContainer::create('Devices') failed");
+	}
+	IMutableContainer_add(devices, "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
+	IMutableContainer_add(devices, "Console", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
+	IMutableContainer_add(devices, "AddressSpace", &CLSID_PAL_MemoryManager, (IObject *) (void *) PAL_POSIX_platform.data.addressSpace);
+	IMutableContainer_release(devices);
+	PALDebug("PAL::POSIX::Platform::namespaceActivated(): population of Platfom container complete");
 }
 
 static void
@@ -282,7 +295,6 @@ PAL_POSIX_Platform_resolve(IContainer *self, const char *name, IDirectoryEntry *
 {
 	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
 
-/*	fprintf(stderr, "PAL::POSIX::Platform<IContainer>::resolve('%s')\n", name); */
 	if(entry)
 	{
 		*entry = NULL;
@@ -299,7 +311,6 @@ PAL_POSIX_Platform_iterator(IContainer *self)
 {
 	PAL_POSIX_Platform *me = INTF_TO_CLASS(self);
 
-/*	fprintf(stderr, "PAL::POSIX::Platform<IContainer>::iterator()\n"); */
 	if(!me->data.platformContainer)
 	{
 		return NULL;
