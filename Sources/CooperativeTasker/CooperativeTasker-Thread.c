@@ -155,7 +155,7 @@ Executive_CooperativeTasker_Thread_namespace(IThread *me, REFUUID iid, void **ou
 	Executive_CooperativeTasker_Thread *self = INTF_TO_CLASS(me);
 
 	ExAssert(self->data.task);
-	return ITask_namespace((&(self->data.task->Task)), iid, out);
+	return ITask_ns((&(self->data.task->Task)), iid, out);
 }
 
 static void

@@ -1,5 +1,7 @@
 /* Executive Microkernel
- * Runtime framework
+ * Runtime Framework
+ *   This framework provides low-level user-space APIs to applications, via
+ *   the Executive's system call mechanism
  */
 
 /* Copyright 2015-2022 Mo McRoberts.
@@ -17,15 +19,20 @@
  *  limitations under the License.
  */
 
-#ifndef RUNTIME_TASK_H_
-# define RUNTIME_TASK_H_               1
+#include "p_Client.h"
 
+IThread *
+IThread_Client_create(int descriptor)
+{
+	UNUSED__(descriptor);
+
+	return NULL;
+}
+
+#define INITGUID                       1
+#include <Executive/initguid.h>
+
+#if !RUNTIME_BUILD_SIMULATOR
 # include <Runtime/IThread.h>
-# include <Executive/ITask.h>
-# include <Executive/IJob.h>
-# include <Executive/INamespace.h>
+#endif
 
-/* Program main routine */
-EXTERN_C STATUS mainThread(IThread *self);
-
-#endif /*!RUNTIME_TASK_H_*/

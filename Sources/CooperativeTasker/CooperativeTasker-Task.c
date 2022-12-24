@@ -17,6 +17,7 @@ static TASKID Executive_CooperativeTasker_Task_id(ITask *me);
 static TaskFlags Executive_CooperativeTasker_Task_flags(ITask *me);
 static STATUS Executive_CooperativeTasker_Task_namespace(ITask *me, REFUUID iid, void **out);
 static STATUS Executive_CooperativeTasker_Task_job(ITask *me, REFUUID iid, void **out);
+static STATUS Executive_CooperativeTasker_Task_addressSpace(ITask *me, REFUUID iid, void **out);
 
 /* INTERNAL */
 int Executive_CooperativeTasker_Task_runnable(Executive_CooperativeTasker_Task *task);
@@ -29,6 +30,7 @@ const struct ITask_vtable_ Executive_CooperativeTasker_Task_vtable = {
 	Executive_CooperativeTasker_Task_flags,
 	Executive_CooperativeTasker_Task_namespace,
 	Executive_CooperativeTasker_Task_job,
+	Executive_CooperativeTasker_Task_addressSpace
 };
 
 /** Executive::CooperativeTasker::Task **/
@@ -100,6 +102,14 @@ Executive_CooperativeTasker_Task_job(ITask *me, REFUUID iid, void **out)
 		*out = NULL;
 	}
 	return E_NOENT;
+}
+
+static STATUS
+Executive_CooperativeTasker_Task_addressSpace(ITask *me, REFUUID iid, void **out)
+{
+	Executive_CooperativeTasker_Task *self = INTF_TO_CLASS(me);
+
+	return IAddressSpace_queryInterface(self->data.addressSpace, iid, out);
 }
 
 /* INTERNAL: Executive::CooperativeTasker::Task::runnable()

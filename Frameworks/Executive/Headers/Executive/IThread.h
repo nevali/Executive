@@ -70,7 +70,7 @@ DECLARE_INTERFACE_(IThread, IObject)
 	STDMETHOD_(ThreadFlags, flags)(THIS) PURE;
 	STDMETHOD_(STATUS, task)(THIS_ REFUUID iid, void **out) PURE;
 	STDMETHOD_(STATUS, job)(THIS_ REFUUID iid, void **out) PURE;
-	STDMETHOD_(STATUS, namespace)(THIS_ REFUUID iid, void **out) PURE;
+	STDMETHOD_(STATUS, ns)(THIS_ REFUUID iid, void **out) PURE;
 	STDMETHOD_(void, yield)(THIS) PURE;
 
 	END_INTERFACE
@@ -84,7 +84,7 @@ DECLARE_INTERFACE_(IThread, IObject)
 #   define IThread_flags(__this) __this->lpVtbl->flags(__this)
 #   define IThread_task(__this, iid, out) __this->lpVtbl->task(__this, iid, out)
 #   define IThread_job(__this, iid, out) __this->lpVtbl->job(__this, iid, out)
-#   define IThread_namespace(__this, iid, out) __this->lpVtbl->namespace(__this, iid, out)
+#   define IThread_ns(__this, iid, out) __this->lpVtbl->ns(__this, iid, out)
 #   define IThread_yield(__this) __this->lpVtbl->yield(__this)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE

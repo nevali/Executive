@@ -62,17 +62,17 @@ endif
 
 libPAL.${PALNAME}@EXEC_BUILD_SUFFIX@.Static.la: libPALx.Static.la
 	@echo "Creating libPAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la static library" >&2
-	$(LIBTOOL) --mode=link $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) -avoid-version -all-static -rpath $(libdir) $(LDFLAGS) -o $@ $+
+	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) -avoid-version -all-static -rpath $(libdir) $(LDFLAGS) -o $@ $+
 
 ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.lo: libPALx.Static.la
 	@echo "Creating relocatable PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.lo" >&2
-	$(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link ld -r -o $@ $+
+	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link ld -r -o $@ $+
 ../libPAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la: libPALx.DLL.la
 	@echo "Creating libPAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la shared library" >&2
-	$(LIBTOOL) --mode=link $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) -avoid-version -shared -rpath $(libdir) $(LDFLAGS) -o $@ $+
+	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) -avoid-version -shared -rpath $(libdir) $(LDFLAGS) -o $@ $+
 ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la: libPALx.Module.la
 	@echo "Creating PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la dynamic shared object" >&2
-	$(LIBTOOL) --mode=link $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(PAL_MOD_ldflags) $(LDFLAGS) -o $@ $+
+	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(PAL_MOD_ldflags) $(LDFLAGS) -o $@ $+
 
 
 # Install the PAL binaries intended to be used at runtime as [lib]PAL.${PALNAME}

@@ -33,4 +33,6 @@ EXTERN_C void RtLogFormatArgs(LogLevel level, const char *format, va_list args) 
 
 EXTERN_C void RtLog(LogLevel level, const char *string) RUNTIME_LINKAGE__(RtLlog);
 
+EXTERN_C void RtPanic(const char *) RUNTIME_LINKAGE__(RtPanic);
+
 #endif /*!RUNTIME_LOG_H_*/

@@ -35,7 +35,7 @@ RtDebugFormat(LogLevel level, const char *format, ...)
 	va_list args;
 
 	va_start(args, format);
-	RtLogFormat(level, format, args);
+	RtLogFormatArgs(level, format, args);
 	va_end(args);
 #else /*EXEC_BUILD_DEBUG*/
 	UNUSED__(level);
@@ -50,7 +50,7 @@ RtTraceFormat(const char *format, ...)
 	va_list args;
 
 	va_start(args, format);
-	RtLogFormat(LOG_TRACE, format, args);
+	RtLogFormatArgs(LOG_TRACE, format, args);
 	va_end(args);
 #else /*EXEC_BUILD_DEBUG*/
 	UNUSED__(level);
@@ -76,6 +76,10 @@ RtLogFormatArgs(LogLevel level, const char *format, va_list args)
 	RtLog(level, logbuf);
 }
 
+#if 0
+extern int printf(const char *, ...);
+#endif
+
 void
 RtLog(LogLevel level, const char *string)
 {
@@ -84,6 +88,12 @@ RtLog(LogLevel level, const char *string)
 	{
 		IPlatformDiagnostics_log(executive.data.diagnostics, level, string);
 	}
+#if 0
+	else
+	{
+		printf("<<< %d  %s >>>\n", level, string);
+	}
+#endif
 #else /*RUNTIME_BUILD_EXEC*/
 	UNUSED__(level);
 
@@ -92,4 +102,14 @@ RtLog(LogLevel level, const char *string)
 		IWriteChannel_write(Rt__private__.stderr, (const uint8_t *) string, RtStrLen(string));
 	}
 #endif /*!RUNTIME_BUILD_EXEC*/
+}
+
+void
+RtPanic(const char *str)
+{
+#if RUNTIME_BUILD_EXEC
+	IPlatform_panic(executive.data.platform, str);
+#else
+	RtLog(LOG_EMERGENCY, str);
+#endif
 }

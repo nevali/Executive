@@ -25,6 +25,7 @@
 # define INITGUID_EXTERN               1
 
 # include <Runtime/Runtime.h>
+# include <Executive/SystemCall.h>
 # include <Executive/IAllocator.h>
 # include <Executive/IThread.h>
 # include <Executive/ITask.h>
@@ -33,6 +34,7 @@
 # include <Executive/IWriteChannel.h>
 # include <Executive/MFactory.h>
 # include <Runtime/Internal/Private.h>
+# include <Runtime/Internal/Client.h>
 
 # if RUNTIME_BUILD_EXEC
 #  include <Executive/Internal/Executive.h>
@@ -40,14 +42,8 @@
 
 typedef union RtAllocator RtAllocator;
 
-
-# if RUNTIME_BUILD_EXEC
-#  define RTLOGF(P)                    /* RtLogFormat() */
-#  define RTPANIC(P)                   /* RtPanic() */
-# else /*RUNTIME_BUILD_EXEC*/
-#  define RTLOGF(P) /**/
-#  define RTPANIC(X) /* RtPanic */
-# endif /*!RUNTIME_BUILD_EXEC*/
+# define RTLOGF(P)                    RtLogFormat P
+# define RTPANIC(P)                   RtPanic(P)
 
 # define STR__(x)                      STR2__(x)
 # define STR2__(x)                     #x

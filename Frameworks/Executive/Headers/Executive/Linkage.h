@@ -13,6 +13,9 @@
 #  endif
 # endif
 
+# ifdef __cplusplus
+#  define restrict
+# endif
 
 /* Define Microsoft IDL-compatible macros because that allows the use of any
  * of the several available IDL compiler implementations which generate headers
@@ -23,7 +26,7 @@
 #  define DECLARE_INTERFACE(name) \
 	struct name
 #  define DECLARE_INTERFACE_(name, parent) \
-	struct name: virtual public parent
+	struct name: public parent
 #  define BEGIN_INTERFACE
 #  define END_INTERFACE
 #  define THIS

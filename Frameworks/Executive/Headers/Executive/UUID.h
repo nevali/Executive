@@ -69,7 +69,11 @@ typedef union UUID uuid_t;
 #define REFUUID const union UUID * const
 #endif
 #define UUID_PRINTF_FORMAT "{ %08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x }"
+#if defined(__cplusplus)
+#define UUID_PRINTF_ARGS(uu) (uu).uuid.time_low, (uu).uuid.time_mid, (uu).uuid.time_hi_and_version, (uu).uuid.clock_seq_hi_and_reserved, (uu).uuid.clock_seq_low, (uu).uuid.node[0], (uu).uuid.node[1], (uu).uuid.node[2], (uu).uuid.node[3], (uu).uuid.node[4], (uu).uuid.node[5]
+#else
 #define UUID_PRINTF_ARGS(uu) (uu)->uuid.time_low, (uu)->uuid.time_mid, (uu)->uuid.time_hi_and_version, (uu)->uuid.clock_seq_hi_and_reserved, (uu)->uuid.clock_seq_low, (uu)->uuid.node[0], (uu)->uuid.node[1], (uu)->uuid.node[2], (uu)->uuid.node[3], (uu)->uuid.node[4], (uu)->uuid.node[5]
+#endif
 #  undef INTERFACE
 # endif /*!__UUID_INTERFACE_DEFINED__*/
 

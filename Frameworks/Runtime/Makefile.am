@@ -44,8 +44,7 @@ libExecRuntime_la_LDFLAGS = -export-symbols-regex '^[_]EXECUTIVE\$.*'
 libRuntime_la_SOURCES = $(libExecRuntime_la_SOURCES) Private.c
 libRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_USER=1
 libRuntime_la_LIBADD = ThirdParty/libRuntimeThirdParty.la Client/libRuntimeClient.la ../Executive/libExecutive.la
-libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir)
-libRuntime_la_LDFLAGS = -export-symbols-regex '^[_]RUNTIME\$.*'
+libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir) -export-symbols-regex '^[_]RUNTIME\$.*'
 
 ## The Simulator variant replaces the Executive system call mechanism with a
 ## simulated implementation, primarily to aid in low-level development and

@@ -17,14 +17,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef EXECUTIVE_SYSTEMCALL_H_
+# define EXECUTIVE_SYSTEMCALL_H_       1
+
 #include <Executive/Linkage.h>
+#include <Executive/Types.h>
+#include <Executive/Errors.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C STATUS ExSystemCall(int descriptor, int method, ...) EXEC_LINKAGE__(__syscall, "0.0");
 
-extern int ExSystemCall(int descriptor, int method, ...) EXEC_LINKAGE__(__syscall, "0.0");
-
-#ifdef __cplusplus
-}
-#endif
+#endif /*!EXECUTIVE_SYSTEMCALL_H_*/

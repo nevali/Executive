@@ -61,6 +61,6 @@ interface IThread: IObject
 	ThreadFlags flags(void);
 	STATUS task([in] REFUUID iid, [out, iid_is(iid)] void **out);
 	STATUS job([in] REFUUID iid, [out, iid_is(iid)] void **out);
-	STATUS namespace([in] REFUUID iid, [out, iid_is(iid)] void **out);
+	STATUS ns([in] REFUUID iid, [out, iid_is(iid)] void **out);
 	[local] void yield(void);
 }

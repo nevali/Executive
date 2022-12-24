@@ -38,14 +38,33 @@
 	NULL, NULL, NULL, NULL, NULL, NULL
  };
  
- #if RUNTIME_BUILD_SIMULATOR
+#if !RUNTIME_BUILD_EXEC
 
- void
- Rt__Initialise(IThread *mainThread)
- {
-	/* XXX marshal this first, then we can use it as normal */
-	Rt__private__.mainThread = mainThread;
-	IThread_task(mainThread, &IID_ITask, (void **) &(Rt__private__.mainThread));
- }
+/* During early initialisation we don't have access to an address space from
+ * which to obtain regions, which means we don't have an allocator, which
+ * means the proxy objects must be statically-allocated
+ */
 
- #endif /*RUNTIME_BUILD_SIMULATOR*/
+static IAddressSpace_Client IAddressSpace_client;
+
+void
+Rt__Initialise()
+{
+	int task, addressSpace;
+
+	task = -1;
+	/* object 0, method 5 = IThread::task() */
+	ExSystemCall(0, 5, &IID_ITask, &task);
+	/* task, method 7 = ITask::addressSpace() */
+	addressSpace = -1;
+	ExSystemCall(task, 7, &IID_IAddressSpace, &addressSpace);
+	IAddressSpace_Client_init_(&IAddressSpace_client, addressSpace);
+	Rt__private__.addressSpace = &(IAddressSpace_client.AddressSpace);
+	Rt__private__.mainThread = IThread_Client_create(0);
+	Rt__private__.task = ITask_Client_create(task);
+	ITask_ns((Rt__private__.task), &IID_INamespace, (void **) &(Rt__private__.ns));
+	/* XXX inherited descriptors */
+	/* XXX stdin/stdout/stderr */
+}
+
+#endif /*!RUNTIME_BUILD_EXEC*/

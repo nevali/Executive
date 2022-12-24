@@ -29,8 +29,9 @@ libExecRuntimeClient_la_SOURCES = p_Client.h \
 	IObject.c IAllocator.c IRegionHolder.c
 libExecRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
 
-libSimRuntimeClient_la_SOURCES = $(libExecRuntimeClient_la_SOURCES)
-libSimRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_SIMULATOR=1
-
-libRuntimeClient_la_SOURCES = $(libExecRuntimeClient_la_SOURCES)
+libRuntimeClient_la_SOURCES = $(libExecRuntimeClient_la_SOURCES) \
+	INamespace.c ITask.c IThread.c IAddressSpace.c IContext.c
 libRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_USER=1
+
+libSimRuntimeClient_la_SOURCES = $(libRuntimeClient_la_SOURCES)
+libSimRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_SIMULATOR=1

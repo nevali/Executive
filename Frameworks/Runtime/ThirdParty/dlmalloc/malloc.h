@@ -1098,8 +1098,8 @@ typedef void* mspace;
   compiling with a different DEFAULT_GRANULARITY or dynamically
   setting with mallopt(M_GRANULARITY, value).
 */
-mspace create_mspace(size_t capacity, int locked) RUNTIME_PRIVATE__(create_space);
-mspace create_mspace_MemoryManager(RtAllocator *mm, size_t capacity, int locked) RUNTIME_PRIVATE__(create_mspace_MemoryManager);
+mspace create_mspace(size_t capacity, int locked) RUNTIME_PRIVATE__(create_mspace);
+mspace create_mspace_MemoryManager(RtAllocator *allocator, size_t capacity, int locked) RUNTIME_PRIVATE__(create_mspace_MemoryManager);
 
 /*
   destroy_mspace destroys the given space, and attempts to return all

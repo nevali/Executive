@@ -69,8 +69,9 @@ DECLARE_INTERFACE_(ITask, IObject)
 	/* ITask */
 	STDMETHOD_(TASKID, id)(THIS) PURE;
 	STDMETHOD_(TaskFlags, flags)(THIS) PURE;
-	STDMETHOD_(STATUS, namespace)(THIS_ REFUUID iid, void **out) PURE;
+	STDMETHOD_(STATUS, ns)(THIS_ REFUUID iid, void **out) PURE;
 	STDMETHOD_(STATUS, job)(THIS_ REFUUID iid, void **out) PURE;
+	STDMETHOD_(STATUS, addressSpace)(THIS_ REFUUID iid, void **out) PURE;
 
 	END_INTERFACE
 };
@@ -81,8 +82,9 @@ DECLARE_INTERFACE_(ITask, IObject)
 #   define ITask_release(__this) __this->lpVtbl->release(__this)
 #   define ITask_id(__this) __this->lpVtbl->id(__this)
 #   define ITask_flags(__this) __this->lpVtbl->flags(__this)
-#   define ITask_namespace(__this, iid, out) __this->lpVtbl->namespace(__this, iid, out)
+#   define ITask_ns(__this, iid, out) __this->lpVtbl->ns(__this, iid, out)
 #   define ITask_job(__this, iid, out) __this->lpVtbl->job(__this, iid, out)
+#   define ITask_addressSpace(__this, iid, out) __this->lpVtbl->addressSpace(__this, iid, out)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__ITask_INTERFACE_DEFINED__*/

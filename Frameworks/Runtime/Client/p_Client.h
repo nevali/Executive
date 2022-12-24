@@ -24,10 +24,6 @@
 
 # define INITGUID_EXTERN               1
 
-# include <Runtime/UUID.h>
-
-# include <Runtime/IObject.h>
-# include <Runtime/IAllocator.h>
-# include <Runtime/IRegionHolder.h>
+# include <Runtime/Internal/Client.h>
 
 #endif /*!P_CLIENT_H_*/
