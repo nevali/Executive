@@ -221,7 +221,7 @@ talisker_cxxinc_consts(idl_module_t *module, FILE *f, idl_interface_t *container
 		{
 			if(!started)
 			{
-				fprintf(f, "#  ifdef (__cplusplus)\n");
+				fprintf(f, "#  ifdef __cplusplus\n");
 				started = 1;
 			}
 			idl_emit_cxx_write_indent(module, f);
