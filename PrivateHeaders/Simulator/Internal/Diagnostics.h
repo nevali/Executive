@@ -37,7 +37,9 @@ namespace PAL
 			virtual void log(LogLevel level, const char *str);
 		public:
 			/* IWriteChannel */
-			virtual size_t write(const uint8_t *buf, size_t nbytes);
+			virtual size_t send(const uint8_t *buf, size_t nbytes);
+			virtual size_t write(const char *str);
+			virtual size_t writeLn(const char *str);
 		private:
 			void setEnvironmentLogLevel(void);
 			const char *logPrefix(LogLevel level);

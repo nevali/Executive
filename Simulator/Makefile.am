@@ -15,8 +15,6 @@ SUBDIRS = PAL .
 
 lib_LTLIBRARIES += libRuntime.Simulator.la
 
-noinst_PROGRAMS = SysDump
-
 endif
 
 libRuntime_Simulator_la_SOURCES = p_Simulator.h \
@@ -26,7 +24,3 @@ libRuntime_Simulator_la_LIBADD = \
 	$(top_builddir)/Sources/libExecutiveServices.la \
 	PAL/libPAL.la
 libRuntime_Simulator_la_LDFLAGS = -avoid-version
-
-SysDump_SOURCES = SysDump.c
-SysDump_LDADD = libRuntime.Simulator.la
-SysDump_LDFLAGS = -no-undefined -static

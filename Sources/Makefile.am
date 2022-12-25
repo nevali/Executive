@@ -45,7 +45,7 @@ libExecutiveServices_la_LIBADD = \
 	CooperativeTasker/libCooperativeTasker.la \
 	Subsystems/libSubsystems.la \
 	${top_builddir}/Frameworks/Runtime/libExecRuntime.la
-libExecutiveServices_la_LDFLAGS = -export-symbols-regex '^[_]EXECUTIVE\$.*'
+libExecutiveServices_la_LDFLAGS = -export-symbols-regex '^_?EXECUTIVE__'
 
 ## Compile the core of the Executive (i.e., the entrypoint and the Executive
 ## Services convenience library) into a single combined object

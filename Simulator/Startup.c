@@ -27,6 +27,8 @@ Executive_Resident_objects(void)
 void
 Simulator_mainThread(IThread *self)
 {
+	STATUS status;
+
 	UNUSED__(self);
 
 	fprintf(stderr, "Simulator: main thread %p started!\n", self);
@@ -35,11 +37,14 @@ Simulator_mainThread(IThread *self)
 		fprintf(stderr, "Simulator: embedded Runtime failed to initialise\n");
 		abort();
 	}
-	fprintf(stderr, "Simulator: transferring control to main thread of user program...\n");
-	/* XXX should not be "self" here!! */
-	mainThread(self);
-	fprintf(stderr, "Simulator: main thread ended, exiting\n");
-	exit(0);
+	fprintf(stderr, "Simulator: transferring control to main thread %p of user program...\n", Rt__private__.mainThread);
+	status = mainThread(Rt__private__.mainThread);
+	fprintf(stderr, "Simulator: main thread ended, exiting with status %d\n", status);
+	if(status < 0)
+	{
+		exit(1);
+	}
+	exit(status);
 }
 
 int

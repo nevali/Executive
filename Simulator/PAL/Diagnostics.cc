@@ -185,10 +185,24 @@ Diagnostics::log(LogLevel level, const char *str)
 /* IWriteChannel */
 
 size_t
-Diagnostics::write(const uint8_t *buf, size_t nbytes)
+Diagnostics::send(const uint8_t *buf, size_t nbytes)
 {
 	fprintf(stderr, "\033[0;33m");
 	fwrite((void *) buf, nbytes, 1, stderr);
 	fprintf(stderr, "\033[0m");
 	return nbytes;
+}
+
+size_t
+Diagnostics::write(const char *str)
+{
+	fprintf(stderr, "\033[0;33m%s\033[0m", str);
+	return strlen(str);
+}
+
+size_t
+Diagnostics::writeLn(const char *str)
+{
+	fprintf(stderr, "\033[0;33m%s\033[0m\n", str);
+	return strlen(str);
 }

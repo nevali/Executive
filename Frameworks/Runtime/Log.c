@@ -88,21 +88,12 @@ RtLog(LogLevel level, const char *string)
 	{
 		IPlatformDiagnostics_log(executive.data.diagnostics, level, string);
 	}
-#if 0
-	else
-	{
-		printf("<<< %d  %s >>>\n", level, string);
-	}
-#endif
 #else /*RUNTIME_BUILD_EXEC*/
 	UNUSED__(level);
 
 	if(Rt__private__.stderr)
 	{
-		const char *newline = "\n";
-		
-		IWriteChannel_write(Rt__private__.stderr, (const uint8_t *) string, RtStrLen(string));
-		IWriteChannel_write(Rt__private__.stderr, (const uint8_t *) newline, RtStrLen(newline));
+		IWriteChannel_writeLn(Rt__private__.stderr, string);
 	}
 #endif /*!RUNTIME_BUILD_EXEC*/
 }

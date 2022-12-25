@@ -1,5 +1,6 @@
 /* Executive Microkernel
- * SysDump -- Dump the object directory
+ * SYSINFO
+ *  Report information about the system
  */
 
 #ifdef HAVE_CONFIG_H
@@ -16,9 +17,9 @@ mainThread(IThread *self)
 	UNUSED__(self);
 
 #ifdef EXEC_BUILD_CONFIG
-	RtLog(LOG_NOTICE, PRODUCT_FULLNAME " " PACKAGE_NAME " [" EXEC_BUILD_CONFIG " build " PRODUCT_BUILD_ID_STR "]");
+	RtLog(LOG_NOTICE, PRODUCT_FULLNAME " SYSINFO [" EXEC_BUILD_CONFIG " build " PRODUCT_BUILD_ID_STR "]");
 #else
-	RtLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " [build " PRODUCT_BUILD_ID_STR "]");
+	RtLog(LOG_DEBUG, PRODUCT_FULLNAME " SYSINFO [build " PRODUCT_BUILD_ID_STR "]");
 #endif
 	return E_SUCCESS;
 }

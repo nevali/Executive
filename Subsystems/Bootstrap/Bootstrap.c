@@ -65,17 +65,6 @@ static const char *banner = PRODUCT_FULLNAME " [" HOST_FAMILY "] - " PRODUCT_REL
 
 #define ExLog(level, str)  if(self->data.diagnostics) IPlatformDiagnostics_log((self->data.diagnostics), level, str)
 
-static size_t
-ExStrLen(const char *str)
-{
-	size_t c;
-
-	for(c = 0; str[c]; c++)
-	{
-	}
-	return c;
-}
-
 /* Constructor */
 
 static void
@@ -189,7 +178,7 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	}
 	if(self->data.console)
 	{
-		IWriteChannel_write((self->data.console), (const uint8_t *) banner, ExStrLen(banner));
+		IWriteChannel_writeLn((self->data.console), banner);
 	}
 	/* Open /System/Jobs's ICoordinator interface */
 	/* Create the Bootstrap job */

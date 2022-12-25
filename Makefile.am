@@ -17,7 +17,33 @@
 
 ACLOCAL_AMFLAGS = -I M4
 
-SUBDIRS = DeveloperTools Frameworks PrivateHeaders Sources Simulator Glue PAL Subsystems .
+## Build order is important:
+##
+## First, build DeveloperTools, so that anything required for the rest of the
+## build is available
+##
+## Next, Frameworks, see Frameworks/Makefile.am for further details
+##
+## The Executive "core" is built within the Sources subdirectory. It depends
+## upon the Executive and PAL frameworks
+##
+## The Simulator is built next, depending upon the Executive, PAL, and Runtime
+## frameworks, as well as the Executive core
+##
+## Next, the selected Glue module for the platform
+##
+## Each of the Platform Adaptation Layers (PALs) configured for this platform
+## are built in turn
+##
+## Sample programs are built next, in "Samples"
+##
+## Then the available Subsystems are built
+##
+## Finally, the Executive executables are generated
+
+DIST_SUBDIRS = PrivateHeaders DeveloperTools Frameworks Sources Simulator Glue PAL Samples Subsystems
+
+SUBDIRS = DeveloperTools Frameworks Sources Simulator Glue PAL Samples Subsystems .
 
 EXTRA_DIST = README.md LICENSE-2.0 Dockerfile docker-bake.hcl
 
@@ -43,7 +69,7 @@ ENTRYPOINT = Sources/entrypoint.c
 #  Targeted     The Executive and a specific PAL are either statically or
 #               dynamically linked together at build time
 #
-#  Monolith     The Executive, a specific PAL, and other executables are
+#  Monolith     The Executive, a specific PAL, and other programs are
 #               linked together at build time
 
 include $(top_srcdir)/Makefiles/Executive.Dynamic.mk

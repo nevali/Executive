@@ -128,6 +128,8 @@ Glue/linux/Makefile
 PAL/Makefile
 PAL/Stand-in/Makefile
 PAL/POSIX/Makefile
+Samples/Makefile
+Samples/SYSINFO/Makefile
 Subsystems/Makefile
 Subsystems/Stubs/Makefile
 Subsystems/Bootstrap/Makefile

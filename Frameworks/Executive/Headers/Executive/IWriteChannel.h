@@ -43,11 +43,15 @@ DECLARE_INTERFACE_(IWriteChannel, IObject)
 	BEGIN_INTERFACE
 
 #  ifdef __cplusplus
-	static const int32_t IWriteChannel_ID_write = 3;
+	static const int32_t IWriteChannel_ID_send = 3;
+	static const int32_t IWriteChannel_ID_write = 4;
+	static const int32_t IWriteChannel_ID_writeLn = 5;
 
 #  else /*__cplusplus*/
 
-#  define IWriteChannel_ID_write 3
+#  define IWriteChannel_ID_send 3
+#  define IWriteChannel_ID_write 4
+#  define IWriteChannel_ID_writeLn 5
 #  endif /*__cplusplus*/
 
 # if !defined(__cplusplus)
@@ -58,7 +62,9 @@ DECLARE_INTERFACE_(IWriteChannel, IObject)
 # endif /*!__cplusplus*/
 
 	/* IWriteChannel */
-	STDMETHOD_(size_t, write)(THIS_ const uint8_t *buf, size_t nbytes) PURE;
+	STDMETHOD_(size_t, send)(THIS_ const uint8_t *buf, size_t nbytes) PURE;
+	STDMETHOD_(size_t, write)(THIS_ const char *str) PURE;
+	STDMETHOD_(size_t, writeLn)(THIS_ const char *str) PURE;
 
 	END_INTERFACE
 };
@@ -67,11 +73,15 @@ DECLARE_INTERFACE_(IWriteChannel, IObject)
 #   define IWriteChannel_queryInterface(__this, riid, object) __this->lpVtbl->queryInterface(__this, riid, object)
 #   define IWriteChannel_retain(__this) __this->lpVtbl->retain(__this)
 #   define IWriteChannel_release(__this) __this->lpVtbl->release(__this)
-#   define IWriteChannel_write(__this, buf, nbytes) __this->lpVtbl->write(__this, buf, nbytes)
+#   define IWriteChannel_send(__this, buf, nbytes) __this->lpVtbl->send(__this, buf, nbytes)
+#   define IWriteChannel_write(__this, str) __this->lpVtbl->write(__this, str)
+#   define IWriteChannel_writeLn(__this, str) __this->lpVtbl->writeLn(__this, str)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__IWriteChannel_INTERFACE_DEFINED__*/
 
+#  define IWriteChannel_ID_write 4
+#  define IWriteChannel_ID_writeLn 5
 
 #endif /*!IWRITECHANNEL_H_IDL_*/
 

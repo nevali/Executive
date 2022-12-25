@@ -38,15 +38,15 @@ PRODUCT_BUILD_HOST=${PRODUCT_BUILD_HOST:-$(hostname | cut -f1 -d.)}
 AC_DEFINE_UNQUOTED([PRODUCT_BUILD_HOST],["${PRODUCT_BUILD_HOST}"],[The name of the host this build was performed on])
 AC_SUBST([PRODUCT_BUILD_HOST])
 
-PRODUCT_BUILD_DATE=${PRODUCT_BUILD_DATE:-$(TZ=UTC date -jf %s $now "+%Y-%m-%d" 2>/dev/null)}
+PRODUCT_BUILD_DATE=${PRODUCT_BUILD_DATE:-$(TZ=UTC date -jf %s $now "+%Y-%m-%d" || date "+%Y-%m-%d" 2>/dev/null)}
 AC_DEFINE_UNQUOTED([PRODUCT_BUILD_DATE],["${PRODUCT_BUILD_DATE}"],[The date of this build in YYYY-MM-DD format])
 AC_SUBST([PRODUCT_BUILD_DATE])
 
-PRODUCT_BUILD_YEAR=${PRODUCT_BUILD_YEAR:-$(TZ=UTC date -jf %s $now "+%Y"  2>/dev/null)}
+PRODUCT_BUILD_YEAR=${PRODUCT_BUILD_YEAR:-$(TZ=UTC date -jf %s $now "+%Y" || date "+%Y"  2>/dev/null)}
 AC_DEFINE_UNQUOTED([PRODUCT_BUILD_YEAR],[${PRODUCT_BUILD_YEAR}],[The year of this build])
 AC_SUBST([PRODUCT_BUILD_YEAR])
 
-PRODUCT_BUILD_MONTH=${PRODUCT_BUILD_MONTH:-$(TZ=UTC date -jf %s $now "+%m"  2>/dev/null)}
+PRODUCT_BUILD_MONTH=${PRODUCT_BUILD_MONTH:-$(TZ=UTC date -jf %s $now "+%m" || date "+%m" 2>/dev/null)}
 case "$PRODUCT_BUILD_MONTH" in
 	0*)
 		PRODUCT_BUILD_MONTH=$(echo $PRODUCT_BUILD_MONTH | cut -c2-)
@@ -55,7 +55,7 @@ esac
 AC_DEFINE_UNQUOTED([PRODUCT_BUILD_MONTH],[${PRODUCT_BUILD_MONTH}],[The month of this build])
 AC_SUBST([PRODUCT_BUILD_MONTH])
 
-PRODUCT_BUILD_DAY=${PRODUCT_BUILD_DAY:-$(TZ=UTC date -jf %s $now "+%d"  2>/dev/null)}
+PRODUCT_BUILD_DAY=${PRODUCT_BUILD_DAY:-$(TZ=UTC date -jf %s $now "+%d" || date "+%d" 2>/dev/null)}
 case "$PRODUCT_BUILD_DAY" in
 	0*)
 		PRODUCT_BUILD_DAY=$(echo $PRODUCT_BUILD_DAY | cut -c2-)
@@ -64,7 +64,7 @@ esac
 AC_DEFINE_UNQUOTED([PRODUCT_BUILD_DAY],[${PRODUCT_BUILD_DAY}],[The day of the month of this build])
 AC_SUBST([PRODUCT_BUILD_DAY])
 
-PRODUCT_BUILD_TIME=${PRODUCT_BUILD_TIME:-$(TZ=UTC date -jf %s $now "+%H:%M:%S" 2>/dev/null)}
+PRODUCT_BUILD_TIME=${PRODUCT_BUILD_TIME:-$(TZ=UTC date -jf %s $now "+%H:%M:%S" || date "+%H:%M:%S" 2>/dev/null)}
 AC_DEFINE_UNQUOTED([PRODUCT_BUILD_TIME],["${PRODUCT_BUILD_TIME}"],[The timestamp of this build in HH:MM:SS format])
 AC_SUBST([PRODUCT_BUILD_TIME])
 

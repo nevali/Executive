@@ -39,12 +39,12 @@ endif
 libExecRuntime_la_SOURCES = Memory.c Allocator.c Strings.c UUID.c Status.c Log.c
 libExecRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
 libExecRuntime_la_LIBADD = ThirdParty/libExecRuntimeThirdParty.la Client/libExecRuntimeClient.la
-libExecRuntime_la_LDFLAGS = -export-symbols-regex '^[_]EXECUTIVE\$.*'
+libExecRuntime_la_LDFLAGS = -export-symbols-regex '^_?EXECUTIVE__'
 
 libRuntime_la_SOURCES = $(libExecRuntime_la_SOURCES) Private.c
 libRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_USER=1
 libRuntime_la_LIBADD = ThirdParty/libRuntimeThirdParty.la Client/libRuntimeClient.la ../Executive/libExecutive.la
-libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir) -export-symbols-regex '^[_]RUNTIME\$.*'
+libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir) -export-symbols-regex '^_?RUNTIME__'
 
 ## The Simulator variant replaces the Executive system call mechanism with a
 ## simulated implementation, primarily to aid in low-level development and
@@ -53,4 +53,4 @@ libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir) -export-sy
 libSimRuntime_la_SOURCES = $(libRuntime_la_SOURCES)
 libSimRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_SIMULATOR=1
 libSimRuntime_la_LIBADD = ThirdParty/libSimRuntimeThirdParty.la Client/libSimRuntimeClient.la
-libSimRuntime_la_LDFLAGS = -export-symbols-regex '^[_]SIMULATOR\$.*'
+libSimRuntime_la_LDFLAGS = -export-symbols-regex '^_?SIMULATOR__'

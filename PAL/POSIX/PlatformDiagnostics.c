@@ -10,7 +10,9 @@ static STATUS PAL_POSIX_PlatformDiagnostics_queryInterface(struct IPlatformDiagn
 static REFCOUNT PAL_POSIX_PlatformDiagnostics_retain(struct IPlatformDiagnostics *self);
 static REFCOUNT PAL_POSIX_PlatformDiagnostics_release(struct IPlatformDiagnostics *self);
 
-static size_t PAL_POSIX_PlatformDiagnostics_write(struct IWriteChannel *self, const uint8_t *buf, size_t nbytes);
+static size_t PAL_POSIX_PlatformDiagnostics_send(struct IWriteChannel *self, const uint8_t *buf, size_t nbytes);
+static size_t PAL_POSIX_PlatformDiagnostics_write(struct IWriteChannel *self, const char *str);
+static size_t PAL_POSIX_PlatformDiagnostics_writeLn(struct IWriteChannel *self, const char *str);
 
 static struct IPlatformDiagnostics_vtable_ PAL_POSIX_PlatformDiagnostics_vtable = {
 	PAL_POSIX_PlatformDiagnostics_queryInterface,
@@ -23,7 +25,9 @@ static struct IWriteChannel_vtable_ PAL_POSIX_PlatformDiagnostics_IWriteChannel_
 	(STATUS (*)(IWriteChannel *, REFUUID, void **)) &PAL_POSIX_PlatformDiagnostics_queryInterface,
 	(REFCOUNT (*)(IWriteChannel *)) &PAL_POSIX_PlatformDiagnostics_retain,
 	(REFCOUNT (*)(IWriteChannel *))PAL_POSIX_PlatformDiagnostics_release,
-	PAL_POSIX_PlatformDiagnostics_write
+	PAL_POSIX_PlatformDiagnostics_send,
+	PAL_POSIX_PlatformDiagnostics_write,
+	PAL_POSIX_PlatformDiagnostics_writeLn
 };
 
 static PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics = {
@@ -140,7 +144,7 @@ PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str, ...)
 
 
 size_t
-PAL_POSIX_PlatformDiagnostics_write(IWriteChannel *self, const uint8_t *buf, size_t nbytes)
+PAL_POSIX_PlatformDiagnostics_send(IWriteChannel *self, const uint8_t *buf, size_t nbytes)
 {
 	UNUSED__(self);
 
@@ -148,6 +152,24 @@ PAL_POSIX_PlatformDiagnostics_write(IWriteChannel *self, const uint8_t *buf, siz
 	fwrite((void *) buf, nbytes, 1, stderr);
 	fprintf(stderr, "\033[0m");
 	return nbytes;
+}
+
+size_t
+PAL_POSIX_PlatformDiagnostics_write(IWriteChannel *self, const char *str)
+{
+	UNUSED__(self);
+
+	fprintf(stderr, "\033[0;33m%s\033[0m", str);
+	return strlen(str);
+}
+
+size_t
+PAL_POSIX_PlatformDiagnostics_writeLn(IWriteChannel *self, const char *str)
+{
+	UNUSED__(self);
+
+	fprintf(stderr, "\033[0;33m%s\033[0m\n", str);
+	return strlen(str);
 }
 
 #ifndef EXEC_BUILD_RELEASE
