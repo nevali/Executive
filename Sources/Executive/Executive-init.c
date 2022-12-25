@@ -190,6 +190,11 @@ Executive_init_tasker(void)
 	ExPhaseShift(PHASE_STARTUP_TASKER);
 	/* XXX this should be via a metaclass interface */
 	executive.data.tasker = Executive_CooperativeTasker_create();
+	if(NULL == executive.data.tasker)
+	{
+		EXLOGF((LOG_NOTICE, "no Tasker is available, starting in single-tasking mode"));
+		return;
+	}
 	ExAssert(NULL != executive.data.tasker);
 	ExAssert(E_SUCCESS == IMutableContainer_add(executive.data.system, "Tasks", &CLSID_Executive_Tasker,  (void *) executive.data.tasker));
 	ExSetFlags("/System/Tasks", DEF_SYSTEM);
