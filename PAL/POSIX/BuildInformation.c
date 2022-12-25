@@ -1,5 +1,6 @@
 #ifdef HAVE_CONFIG_H
 # include "BuildConfiguration.h"
+# include "BuildInformation.h"
 #endif
 
 #include "p_POSIX.h"
