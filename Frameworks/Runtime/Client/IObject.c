@@ -50,33 +50,39 @@ Runtime_Client_createFor(int descriptor, REFUUID iid, void **out)
 	/* XXX check if descriptor is already in our object table, if so,
 	 * just retain the existing object
 	 */
+	*out = NULL;
 	if(RtUuidEqual(iid, &IID_IObject))
 	{
 		*out = Runtime_Client_create(descriptor);
-		return E_SUCCESS;
 	}
-	if(RtUuidEqual(iid, &IID_IThread))
+	else if(RtUuidEqual(iid, &IID_IThread))
 	{
 		*out = IThread_Client_create(descriptor);
-		return E_SUCCESS;
 	}
-	if(RtUuidEqual(iid, &IID_INamespace))
+	else if(RtUuidEqual(iid, &IID_INamespace))
 	{
 		*out = INamespace_Client_create(descriptor);
-		return E_SUCCESS;
 	}
-	if(RtUuidEqual(iid, &IID_IAddressSpace))
+	else if(RtUuidEqual(iid, &IID_IAddressSpace))
 	{
 		*out = IAddressSpace_Client_create(descriptor);
-		return E_SUCCESS;
 	}
-	if(RtUuidEqual(iid, &IID_IRegion))
+	else if(RtUuidEqual(iid, &IID_IRegion))
 	{
 		*out = IRegion_Client_create(descriptor);
+	}
+	else if(RtUuidEqual(iid, &IID_IContainer))
+	{
+		*out = IContainer_Client_create(descriptor);
+	}
+	else if(RtUuidEqual(iid, &IID_IWriteChannel))
+	{
+		*out = IWriteChannel_Client_create(descriptor);
+	}
+	if(*out)
+	{
 		return E_SUCCESS;
 	}
-	/* XXX */
-	*out = NULL;
 	return E_NOTIMPL;
 }
 
@@ -91,7 +97,7 @@ Runtime_Client_queryInterface(IObject *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 0, iid, &outd)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IObject_ID_queryInterface, iid, &outd)))
 	{
 		return status;
 	}
@@ -115,7 +121,7 @@ REFCOUNT
 Runtime_Client_release(IObject *me)
 {
 	RUNTIME_RELEASE(Runtime_Client, {
-		ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 2);
+		ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IObject_ID_release);
 		RtMemFree(me);
 	});
 }

@@ -45,6 +45,26 @@ DECLARE_INTERFACE_(INamespace, IContainer)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t INamespace_ID_resolveEntry = 5;
+	static const int32_t INamespace_ID_resolveContainer = 6;
+	static const int32_t INamespace_ID_open = 7;
+	static const int32_t INamespace_ID_create = 8;
+	static const int32_t INamespace_ID_add = 9;
+	static const int32_t INamespace_ID_createLink = 10;
+	static const int32_t INamespace_ID_setFlags = 11;
+
+#  else /*__cplusplus*/
+
+#  define INamespace_ID_resolveEntry 5
+#  define INamespace_ID_resolveContainer 6
+#  define INamespace_ID_open 7
+#  define INamespace_ID_create 8
+#  define INamespace_ID_add 9
+#  define INamespace_ID_createLink 10
+#  define INamespace_ID_setFlags 11
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 # if !defined(__cplusplus)
 	/* IObject */
@@ -87,6 +107,12 @@ DECLARE_INTERFACE_(INamespace, IContainer)
 #  undef INTERFACE
 # endif /*!__INamespace_INTERFACE_DEFINED__*/
 
+#  define INamespace_ID_resolveContainer 6
+#  define INamespace_ID_open 7
+#  define INamespace_ID_create 8
+#  define INamespace_ID_add 9
+#  define INamespace_ID_createLink 10
+#  define INamespace_ID_setFlags 11
 
 #endif /*!INAMESPACE_H_IDL_*/
 

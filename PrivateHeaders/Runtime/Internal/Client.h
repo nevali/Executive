@@ -9,6 +9,7 @@
 # include <Runtime/Task.h>
 # include <Executive/IAddressSpace.h>
 # include <Executive/INamespace.h>
+# include <Executive/IWriteChannel.h>
 
 typedef union Runtime_Client Runtime_Client;
 
@@ -37,6 +38,8 @@ DECLARE_CLIENT(Thread);
 DECLARE_CLIENT(Namespace);
 DECLARE_CLIENT(AddressSpace);
 DECLARE_CLIENT(Region);
+DECLARE_CLIENT(Container);
+DECLARE_CLIENT(WriteChannel);
 
 EXTERN_C void IAddressSpace_Client_init_(IAddressSpace_Client *self, int descriptor) RUNTIME_PRIVATE__(IAddressSpace_Client_init_);
 

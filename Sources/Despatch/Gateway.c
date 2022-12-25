@@ -263,6 +263,10 @@ Executive_Despatch_handler(Executive_Despatch *context, REFUUID iid)
 	{
 		return Executive_Despatch_Handlers_IRegion;
 	}
+	if(RtUuidEqual(iid, &IID_IWriteChannel))
+	{
+		return Executive_Despatch_Handlers_IWriteChannel;
+	}
 	return NULL;
 }
 

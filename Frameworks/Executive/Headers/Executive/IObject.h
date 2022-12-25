@@ -35,6 +35,7 @@ typedef struct IObject IObject;
 
 # ifndef __IObject_INTERFACE_DEFINED__
 #  define __IObject_INTERFACE_DEFINED__
+typedef int DESPATCHID;
 #  undef INTEFACE
 #  define INTERFACE IObject
 
@@ -42,6 +43,18 @@ typedef struct IObject IObject;
 DECLARE_INTERFACE(IObject)
 {
 	BEGIN_INTERFACE
+
+#  ifdef __cplusplus
+	static const int32_t IObject_ID_queryInterface = 0;
+	static const int32_t IObject_ID_retain = 1;
+	static const int32_t IObject_ID_release = 2;
+
+#  else /*__cplusplus*/
+
+#  define IObject_ID_queryInterface 0
+#  define IObject_ID_retain 1
+#  define IObject_ID_release 2
+#  endif /*__cplusplus*/
 
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;
@@ -59,6 +72,8 @@ DECLARE_INTERFACE(IObject)
 #  undef INTERFACE
 # endif /*!__IObject_INTERFACE_DEFINED__*/
 
+#  define IObject_ID_retain 1
+#  define IObject_ID_release 2
 
 #endif /*!IOBJECT_H_IDL_*/
 

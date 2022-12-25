@@ -34,22 +34,29 @@ interface INamespace: IContainer
 	cpp_quote("#endif");
 
 	/* resolve path to a directory entry */
+	const int INamespace_ID_resolveEntry = 5;
 	STATUS resolveEntry([in] const char *path, [in] IContainer *scope, [out] IDirectoryEntry **dentry);
 	/* resolve path to the container which would be scanned to match the last component */
+	const int INamespace_ID_resolveContainer = 6;
 	STATUS resolveContainer([in] const char *path, [in] IContainer *scope, [out] IContainer **container, [out] const char **basename);
 
 	/* resolve a path, then attempt to open it */
+	const int INamespace_ID_open = 7;
 	STATUS open([in] const char *path, [in] IContainer *scope, REFUUID iid, [out, iid_is(iid)] void **container);
 
 	/* create a new object */
+	const int INamespace_ID_create = 8;
 	STATUS create([in] const char *name, [in] IContainer *scope, REFUUID clsid, REFUUID iid, [out, iid_is(iid)] void **container);
 
 	/* add an existing object at the specified path */
+	const int INamespace_ID_add = 9;
 	STATUS add([in] const char *name, [in] IContainer *scope, [in] REFUUID clsid, [in] IObject *target);
 
 	/* create a link to another named object */
+	const int INamespace_ID_createLink = 10;
 	STATUS createLink([in] const char *name, [in] IContainer *scope, [in] const char *target, [in] bool force);
 
 	/* attempt to set the flags on an existing directory entry */
+	const int INamespace_ID_setFlags = 11;
 	STATUS setFlags([in] const char *name, [in] IContainer *scope, [in] DirectoryEntryFlags flags);
 }

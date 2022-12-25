@@ -30,7 +30,14 @@ import "Executive/Errors.idl";
 ]
 interface IObject
 {
+	typedef int DESPATCHID;
+
+	const int IObject_ID_queryInterface = 0;
 	STATUS queryInterface([in] REFUUID riid, [out, iid_is(riid)] void **object);
+
+	const int IObject_ID_retain = 1;
 	REFCOUNT retain();
+
+	const int IObject_ID_release = 2;
 	REFCOUNT release();
 }

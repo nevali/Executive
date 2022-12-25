@@ -28,5 +28,6 @@ import "Executive/IObject.idl";
 ]
 interface IWriteChannel: IObject
 {
+	const int IWriteChannel_ID_write = 3;
 	size_t write([in] const uint8_t *buf, [in] size_t nbytes);
 }

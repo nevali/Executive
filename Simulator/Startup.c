@@ -30,7 +30,11 @@ Simulator_mainThread(IThread *self)
 	UNUSED__(self);
 
 	fprintf(stderr, "Simulator: main thread %p started!\n", self);
-	Rt__Initialise(self);
+	if(!Rt__Initialise(self))
+	{
+		fprintf(stderr, "Simulator: embedded Runtime failed to initialise\n");
+		abort();
+	}
 	fprintf(stderr, "Simulator: transferring control to main thread of user program...\n");
 	/* XXX should not be "self" here!! */
 	mainThread(self);

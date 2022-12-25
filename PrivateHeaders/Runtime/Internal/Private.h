@@ -24,6 +24,6 @@ extern RuntimePrivateData Rt__private__ RUNTIME_PRIVATE__("__Runtime_Private__")
 /* This interface is called by the Simulator infrastructure to initialise the
  * Runtime framework after the embedded Executive has been initialised
  */
-EXTERN_C void Rt__Initialise(IThread *mainThread) RUNTIME_PRIVATE__("__Runtime__Initialise__");
+EXTERN_C bool Rt__Initialise(IThread *mainThread) RUNTIME_PRIVATE__("__Runtime__Initialise__");
 
 #endif /*!RUNTIME_INTERNAL_PRIVATE_H_*/

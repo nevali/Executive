@@ -39,8 +39,10 @@ interface IContainer: IObject
 	 * note that access to the directory entry does not imply access to its
 	 * target object
 	 */
+	const int IContainer_ID_resolve = 3;
 	STATUS resolve([in] const char *name, [out] IDirectoryEntry **entry);
 
 	/* obtain an iterator for the directory entries within this container */
+	const int IContainer_ID_iterator = 4;
 	IIterator *iterator(void);
 }

@@ -99,7 +99,10 @@ RtLog(LogLevel level, const char *string)
 
 	if(Rt__private__.stderr)
 	{
+		const char *newline = "\n";
+		
 		IWriteChannel_write(Rt__private__.stderr, (const uint8_t *) string, RtStrLen(string));
+		IWriteChannel_write(Rt__private__.stderr, (const uint8_t *) newline, RtStrLen(newline));
 	}
 #endif /*!RUNTIME_BUILD_EXEC*/
 }

@@ -46,6 +46,16 @@ DECLARE_INTERFACE_(IContainer, IObject)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t IContainer_ID_resolve = 3;
+	static const int32_t IContainer_ID_iterator = 4;
+
+#  else /*__cplusplus*/
+
+#  define IContainer_ID_resolve 3
+#  define IContainer_ID_iterator 4
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;
@@ -70,6 +80,7 @@ DECLARE_INTERFACE_(IContainer, IObject)
 #  undef INTERFACE
 # endif /*!__IContainer_INTERFACE_DEFINED__*/
 
+#  define IContainer_ID_iterator 4
 
 #endif /*!ICONTAINER_H_IDL_*/
 

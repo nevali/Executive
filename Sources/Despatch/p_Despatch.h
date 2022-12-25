@@ -26,6 +26,7 @@
 # include <Executive/Internal/Classes.h>
 # include <Executive/Internal/Executive.h>
 # include <Executive/Internal/Despatch.h>
+# include <Executive/IWriteChannel.h>
 
 #define EXEC_DESPATCH_HANDLER(name) \
 	void Executive_Despatch_Handlers_ ## name (ExecutiveDespatch *despatch, void *target, Executive_Despatch *context, IThread *currentThread)
@@ -92,6 +93,7 @@ EXTERN_C EXEC_DESPATCH_HANDLER(ITask);
 EXTERN_C EXEC_DESPATCH_HANDLER(IAddressSpace);
 EXTERN_C EXEC_DESPATCH_HANDLER(INamespace);
 EXTERN_C EXEC_DESPATCH_HANDLER(IRegion);
+EXTERN_C EXEC_DESPATCH_HANDLER(IWriteChannel);
 
 EXTERN_C int Executive_Despatch_descriptor(Executive_Despatch *context, void *object, REFUUID iid);
 

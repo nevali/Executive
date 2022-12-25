@@ -42,6 +42,14 @@ DECLARE_INTERFACE_(IWriteChannel, IObject)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t IWriteChannel_ID_write = 3;
+
+#  else /*__cplusplus*/
+
+#  define IWriteChannel_ID_write 3
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;

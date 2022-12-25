@@ -49,7 +49,7 @@ static IAddressSpace_Client IAddressSpace_client;
 
 extern void abort(void);
 
-void
+bool
 Rt__Initialise()
 {
 	int task, addressSpace;
@@ -59,16 +59,14 @@ Rt__Initialise()
 	ExSystemCall(0, 5, &IID_ITask, &task, NULL, NULL, NULL, NULL, NULL);
 	if(task < 0)
 	{
-		abort();
-		return;
+		return false;
 	}
 	/* task, method 7 = ITask::addressSpace() */
 	addressSpace = -1;
 	ExSystemCall(task, 7, &IID_IAddressSpace, &addressSpace, NULL, NULL, NULL, NULL, NULL);
 	if(addressSpace < 0)
 	{
-		abort();
-		return;
+		return false;
 	}
 	IAddressSpace_Client_init_(&IAddressSpace_client, addressSpace);
 	Rt__private__.addressSpace = &(IAddressSpace_client.AddressSpace);
@@ -76,18 +74,22 @@ Rt__Initialise()
 	Rt__private__.mainThread = IThread_Client_create(0);
 	if(!Rt__private__.mainThread)
 	{
-		abort();
-		return;
+		return false;
 	}
 	Rt__private__.task = ITask_Client_create(task);
 	if(!Rt__private__.task)
 	{
-		abort();
-		return;
+		return false;
 	}
 	ITask_ns((Rt__private__.task), &IID_INamespace, (void **) &(Rt__private__.ns));
+	if(!Rt__private__.ns)
+	{
+		return false;
+	}
 	/* XXX inherited descriptors */
 	/* XXX stdin/stdout/stderr */
+	INamespace_open((Rt__private__.ns), "/System/Devices/Console", NULL, &IID_IWriteChannel, (void **) &(Rt__private__.stderr));
+	return true;
 }
 
 #endif /*!RUNTIME_BUILD_EXEC*/
