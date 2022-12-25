@@ -64,6 +64,8 @@ DECLARE_INTERFACE_(ITasker, IObject)
 	STDMETHOD_(void, tick)(THIS) PURE;
 	STDMETHOD_(void, yield)(THIS) PURE;
 	STDMETHOD_(TASKID, createTask)(THIS_ const struct TaskCreationParameters *params, REFUUID iid, void **task) PURE;
+	STDMETHOD_(void, interrupt)(THIS_ int processor, IObject **despatchContext, IThread **curThread) PURE;
+	STDMETHOD_(void, resume)(THIS_ int processor) PURE;
 
 	END_INTERFACE
 };
@@ -75,6 +77,8 @@ DECLARE_INTERFACE_(ITasker, IObject)
 #   define ITasker_tick(__this) __this->lpVtbl->tick(__this)
 #   define ITasker_yield(__this) __this->lpVtbl->yield(__this)
 #   define ITasker_createTask(__this, params, iid, task) __this->lpVtbl->createTask(__this, params, iid, task)
+#   define ITasker_interrupt(__this, processor, despatchContext, curThread) __this->lpVtbl->interrupt(__this, processor, despatchContext, curThread)
+#   define ITasker_resume(__this, processor) __this->lpVtbl->resume(__this, processor)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__ITasker_INTERFACE_DEFINED__*/

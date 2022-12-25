@@ -1,3 +1,22 @@
+/* Executive Microkernel
+ *   PrivateHeaders/Executive/Internal/Classes.h
+ */
+
+/* Copyright (c) 2015-2022 Mo McRoberts.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 #ifndef EXECUTIVE_INTERNAL_CLASSES_H_
 # define EXECUTIVE_INTERNAL_CLASSES_H_
 
@@ -46,9 +65,9 @@
 # define EXEC_COMMON_DECL_RETAIN(classname) REFCOUNT classname ## _retain(IObject *me)
 # define EXEC_COMMON_DECL_RELEASE(classname) REFCOUNT classname ## _release(IObject *me)
 # define EXEC_COMMON_DECL_IOBJECT(classname) \
-	EXEC_COMMON_DECL_QUERYINTERFACE(classname); \
-	EXEC_COMMON_DECL_RETAIN(classname); \
-	EXEC_COMMON_DECL_RELEASE(classname);
+	EXTERN_C EXEC_COMMON_DECL_QUERYINTERFACE(classname); \
+	EXTERN_C EXEC_COMMON_DECL_RETAIN(classname); \
+	EXTERN_C EXEC_COMMON_DECL_RELEASE(classname);
 # define EXEC_COMMON_STATIC_IOBJECT(classname) \
 	static EXEC_COMMON_DECL_QUERYINTERFACE(classname); \
 	static EXEC_COMMON_DECL_RETAIN(classname); \

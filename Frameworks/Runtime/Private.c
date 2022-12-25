@@ -47,6 +47,8 @@
 
 static IAddressSpace_Client IAddressSpace_client;
 
+extern void abort(void);
+
 void
 Rt__Initialise()
 {
@@ -54,14 +56,34 @@ Rt__Initialise()
 
 	task = -1;
 	/* object 0, method 5 = IThread::task() */
-	ExSystemCall(0, 5, &IID_ITask, &task);
+	ExSystemCall(0, 5, &IID_ITask, &task, NULL, NULL, NULL, NULL, NULL);
+	if(task < 0)
+	{
+		abort();
+		return;
+	}
 	/* task, method 7 = ITask::addressSpace() */
 	addressSpace = -1;
-	ExSystemCall(task, 7, &IID_IAddressSpace, &addressSpace);
+	ExSystemCall(task, 7, &IID_IAddressSpace, &addressSpace, NULL, NULL, NULL, NULL, NULL);
+	if(addressSpace < 0)
+	{
+		abort();
+		return;
+	}
 	IAddressSpace_Client_init_(&IAddressSpace_client, addressSpace);
 	Rt__private__.addressSpace = &(IAddressSpace_client.AddressSpace);
 	Rt__private__.mainThread = IThread_Client_create(0);
+	if(!Rt__private__.mainThread)
+	{
+		abort();
+		return;
+	}
 	Rt__private__.task = ITask_Client_create(task);
+	if(!Rt__private__.task)
+	{
+		abort();
+		return;
+	}
 	ITask_ns((Rt__private__.task), &IID_INamespace, (void **) &(Rt__private__.ns));
 	/* XXX inherited descriptors */
 	/* XXX stdin/stdout/stderr */

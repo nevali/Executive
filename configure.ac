@@ -112,6 +112,7 @@ Frameworks/Runtime/Client/Makefile
 PrivateHeaders/Makefile
 PrivateHeaders/Executive/Makefile
 PrivateHeaders/Executive/Internal/Makefile
+Sources/Makefile
 Sources/Executive/Makefile
 Sources/Classes/Makefile
 Sources/Directory/Makefile

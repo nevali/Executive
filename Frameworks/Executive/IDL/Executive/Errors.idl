@@ -36,9 +36,11 @@ interface Errors
 	/* Request/parameter conditions */
 
 	/* Invalid object descriptor */
-	const int E_BADOBJ = -6;
+	const int E_BAD_OBJ = -6;
+	const int E_BADOBJ = E_BAD_OBJ;
 	/* Interface is not implemented */
-	const int E_NOTIMPL = -7;
+	const int E_NOT_IMPL = -7;
+	const int E_NOTIMPL = E_NOT_IMPL;
 	/* Request parameter is invalid */
 	const int E_INVAL = -8;
 

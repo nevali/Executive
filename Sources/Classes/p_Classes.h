@@ -76,15 +76,15 @@ struct Executive_Classes_DirectoryEntry
 };
 
 /* XXX rename */
-extern struct MetaClassEntry metaClass_entries[];
+EXTERN_C struct MetaClassEntry metaClass_entries[];
 
-extern IContainer Executive_Classes_IContainer;
-extern MFactory Executive_Allocator_MFactory;
+EXTERN_C IContainer Executive_Classes_IContainer;
+EXTERN_C MFactory Executive_Allocator_MFactory;
 
-void Executive_Classes_Object_init(Executive_Classes_Object *self);
+EXTERN_C void Executive_Classes_Object_init(Executive_Classes_Object *self);
 EXEC_COMMON_DECL_IOBJECT(Executive_Classes_Object);
 
-extern Executive_Classes_Iterator *Executive_Classes_Iterator_create(void);
-extern Executive_Classes_DirectoryEntry *Executive_Classes_DirectoryEntry_create(const char *name, REFUUID clsid, DirectoryEntryFlags flags);
+EXTERN_C Executive_Classes_Iterator *Executive_Classes_Iterator_create(void);
+EXTERN_C Executive_Classes_DirectoryEntry *Executive_Classes_DirectoryEntry_create(const char *name, REFUUID clsid, DirectoryEntryFlags flags);
 
 #endif /*!P_CLASSES_H_*/

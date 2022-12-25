@@ -31,8 +31,10 @@
 #  define __Errors_INTERFACE_DEFINED__
 typedef int STATUS;
 #  define E_SUCCESS 0
-#  define E_BADOBJ -6
-#  define E_NOTIMPL -7
+#  define E_BAD_OBJ -6
+#  define E_BADOBJ E_BAD_OBJ
+#  define E_NOT_IMPL -7
+#  define E_NOTIMPL E_NOT_IMPL
 #  define E_INVAL -8
 #  define E_PERM -1
 #  define E_ACCESS -2

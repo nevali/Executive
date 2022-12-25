@@ -49,4 +49,6 @@ interface ITasker: IObject
 	void tick(void);
 	void yield(void);
 	TASKID createTask([in] const struct TaskCreationParameters *params, [in] REFUUID iid, [out,iid_is(iid)] void **task);
+	void interrupt([in] int processor, [out] IObject **despatchContext, [out] IThread **curThread);
+	void resume([in] int processor);
 }

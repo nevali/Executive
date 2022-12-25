@@ -1,5 +1,5 @@
 /* Executive Microkernel
- *   PrivateHeaders/Executive/Internal/Resident.h
+ * IObject despatch
  */
 
 /* Copyright (c) 2015-2022 Mo McRoberts.
@@ -17,20 +17,21 @@
  *  limitations under the License.
  */
 
-#ifndef EXECUTIVE_INTERNAL_RESIDENT_H_
-# define EXECUTIVE_INTERNAL_RESIDENT_H_ 1
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
 
-# include <Executive/IObject.h>
+#include "p_Despatch.h"
 
-typedef struct Executive_Resident_Object Executive_Resident_Object;
-
-struct Executive_Resident_Object
+void
+Executive_Despatch_Handlers_IObject(ExecutiveDespatch *despatch, void *object, Executive_Despatch *context, IThread *currentThread)
 {
-	const char *name;
-	REFUUID classid;
-	IObject *instance;
-};
+	IObject *target = (IObject *) object;
+	
+	UNUSED__(despatch);
+	UNUSED__(target);
+	UNUSED__(context);
+	UNUSED__(currentThread);
 
-extern Executive_Resident_Object *Executive_Resident_objects(void);
-
-#endif /*!EXECUTIVE_INTERNAL_RESIDENT_H_*/
+	EXTRACEF(("Executive::Despatch::Handlers::IObject"));
+}

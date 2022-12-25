@@ -34,6 +34,9 @@
 static void Executive_CooperativeTasker_tick(ITasker *me);
 void Executive_CooperativeTasker_yield(ITasker *me);
 static STATUS Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationParameters *params, REFUUID iid, void **out);
+static void Executive_CooperativeTasker_interrupt(ITasker *me, int processor, IObject **despatchContext, IThread **curThread);
+static void Executive_CooperativeTasker_resume(ITasker *me, int processor);
+
 /* PRIVATE */
 static volatile Executive_CooperativeTasker_Thread *Executive_CooperativeTasker_nextRunnableThread(Executive_CooperativeTasker *self);
 
@@ -41,7 +44,9 @@ const struct ITasker_vtable_ Executive_CooperativeTasker_ITasker_vtable = {
 	EXEC_COMMON_VTABLE_IOBJECT(Executive_CooperativeTasker, ITasker),
 	Executive_CooperativeTasker_tick,
 	Executive_CooperativeTasker_yield,
-	Executive_CooperativeTasker_createTask
+	Executive_CooperativeTasker_createTask,
+	Executive_CooperativeTasker_interrupt,
+	Executive_CooperativeTasker_resume
 };
 
 #if 0
@@ -174,6 +179,7 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 {
 	Executive_CooperativeTasker *self = INTF_TO_CLASS(me);
 	Executive_CooperativeTasker_Task *task, *p;
+	STATUS status;
 
 	/* Validate parameters */
 	ExAssert(params != NULL);
@@ -192,8 +198,14 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 		EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::createTask(): ExAlloc(%u) failed", sizeof(Executive_CooperativeTasker_Task)));
 		return E_NOMEM;
 	}
+	if(E_SUCCESS != (status = Executive_createObject(&CLSID_Executive_DespatchContext, &IID_IObject, (void **) &(task->data.despatchContext))))
+	{
+		EXLOGF((LOG_CONDITION, "??? failed to create despatch context for new task!"));
+		ExFree(task);
+		return status;
+	}
 	task->data.vtable = &Executive_CooperativeTasker_Task_vtable;
-	/* Assign the task an ID */
+	task->data.refCount = 1;
 	task->data.tasker = self;
 	task->data.id = self->data.nextTaskId;
 	self->data.nextTaskId++;
@@ -254,3 +266,43 @@ Executive_CooperativeTasker_createTask(ITasker *me, const struct TaskCreationPar
 	}
 	return task->data.id;
 }
+
+static void
+Executive_CooperativeTasker_interrupt(ITasker *me, int processor, IObject **despatchContext, IThread **curThread)
+{
+	Executive_CooperativeTasker *self = INTF_TO_CLASS(me);
+
+	UNUSED__(processor);
+
+	EXTRACEF(("Executive::CooperativeTasker::interrupt(%d)", processor));
+	if(despatchContext)
+	{
+		*despatchContext = NULL;
+		if(self->data.currentTask)
+		{
+			*despatchContext = self->data.currentTask->data.despatchContext;
+		}
+	}
+	if(curThread)
+	{
+		*curThread = (IThread *) &(self->data.currentThread->Thread);
+		if(*curThread)
+		{
+			IThread_retain((*curThread));
+		}
+	}
+	if(self->data.currentThread)
+	{
+		/* XXX set THF_TRAP*/
+	}
+}
+
+static void
+Executive_CooperativeTasker_resume(ITasker *me, int processor)
+{
+	UNUSED__(processor);
+
+	EXTRACEF(("Executive::CooperativeTasker::resume(%d)", processor));
+	Executive_CooperativeTasker_tick(me);
+}
+

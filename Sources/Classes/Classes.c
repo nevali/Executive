@@ -31,7 +31,11 @@
  * Only some registered classes provide any metaclass interfaces
  */
 
-extern STATUS Executive_Subsystems_metaClass(REFUUID clsid, REFUUID iid, void **out);
+EXTERN_C STATUS Executive_MetaClass_metaClass(REFUUID clsid, REFUUID iid, void **out);
+EXTERN_C STATUS Executive_MetaClass_metaClass(REFUUID clsid, REFUUID iid, void **out);
+EXTERN_C STATUS Executive_Subsystems_metaClass(REFUUID clsid, REFUUID iid, void **out);
+
+EXTERN_C MObject Executive_Despatch_MObject;
 
 struct MetaClassEntry metaClass_entries[] = {
 	{ "Executive", &CLSID_Executive_System, "System Domain", Executive_MetaClass_metaClass, NULL },
@@ -51,6 +55,7 @@ struct MetaClassEntry metaClass_entries[] = {
 	{ "Executive::Node", &CLSID_Executive_Node, "Node", NULL, NULL },
 	{ "Executive::Tasker", &CLSID_Executive_Tasker, "Tasker", NULL, NULL },
 	{ "Executive::Subsystems", &CLSID_Executive_Subsystems, "Subsystems", Executive_Subsystems_metaClass, NULL },
+	{ "Executive::DespatchContext", &CLSID_Executive_DespatchContext, "Despatch Context", NULL, &Executive_Despatch_MObject },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 

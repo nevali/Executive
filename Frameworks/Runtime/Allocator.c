@@ -114,6 +114,27 @@ RtMemAlloc(size_t nbytes)
 	return RtAllocator_alloc(&(systemAllocator.Allocator), nbytes);
 }
 
+void *
+RtMemReAlloc(void *ptr, size_t nbytes)
+{
+	if(!systemAllocator.data.refCount)
+	{
+		RTPANIC("attempt to use RtMemReAlloc() before system allocator is available");
+		return NULL;
+	}
+	return RtAllocator_realloc(&(systemAllocator.Allocator), ptr, nbytes);
+}
+
+void
+RtMemFree(void *ptr)
+{
+	if(!systemAllocator.data.refCount)
+	{
+		RTPANIC("attempt to use RtMemFree() before system allocator is available");
+	}
+	return RtAllocator_free(&(systemAllocator.Allocator), ptr);
+}
+
 STATUS
 RtAllocator_MFactory_createInstance(MFactory *me, IObject *outer, REFUUID iid, void **out)
 {

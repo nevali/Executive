@@ -25,5 +25,25 @@
 # define INITGUID_EXTERN               1
 
 # include <Runtime/Internal/Client.h>
+# include <Runtime/Internal/Classes.h>
+# include <Executive/SystemCall.h>
+
+typedef union Runtime_Client Runtime_Client;
+
+union Runtime_Client
+{
+	IObject Object;
+	struct
+	{
+		const void *vtable;
+		REFCOUNT refCount;
+		int descriptor;
+	} data;
+};
+
+RUNTIME_DECL_IOBJECT(Runtime_Client);
+
+EXTERN_C Runtime_Client *Runtime_Client_create(int descriptor);
+EXTERN_C STATUS Runtime_Client_createFor(int descriptor, REFUUID iid, void **out);
 
 #endif /*!P_CLIENT_H_*/

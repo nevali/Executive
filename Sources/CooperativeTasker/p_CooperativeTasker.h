@@ -55,6 +55,7 @@ union Executive_CooperativeTasker_Task
 		IAddressSpace *addressSpace;
 		/* IRegionSet *regions; */
 		Executive_CooperativeTasker_Thread *mainThread;
+		IObject *despatchContext;
 	} data;
 };
 

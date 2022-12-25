@@ -28,7 +28,7 @@
 /* allocate a block of memory with the default allocator */
 EXTERN_C void *RtMemAlloc(size_t nbytes) RUNTIME_LINKAGE__(RtMemAlloc);
 /* resize a block previously allocated with RtMemAlloc() */
-EXTERN_C void RtMemReAlloc(void *ptr, size_t nbytes) RUNTIME_LINKAGE__(RtMemReAlloc);
+EXTERN_C void *RtMemReAlloc(void *ptr, size_t nbytes) RUNTIME_LINKAGE__(RtMemReAlloc);
 /* release a block originally allocated via RtMemAlloc() */
 EXTERN_C void RtMemFree(void *ptr) RUNTIME_LINKAGE__(RtMemFree);
 /* allocate a new block of nbytes via RtMemAlloc() and copy src into it */

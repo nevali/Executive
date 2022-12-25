@@ -41,6 +41,7 @@ libExecutiveServices_la_LIBADD = \
 	Executive/libExecutive.la \
 	Classes/libClasses.la \
 	Directory/libDirectory.la \
+	Despatch/libDespatch.la \
 	CooperativeTasker/libCooperativeTasker.la \
 	Subsystems/libSubsystems.la \
 	${top_builddir}/Frameworks/Runtime/libExecRuntime.la
