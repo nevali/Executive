@@ -30,6 +30,39 @@
 #define EXEC_DESPATCH_HANDLER(name) \
 	void Executive_Despatch_Handlers_ ## name (ExecutiveDespatch *despatch, void *target, Executive_Despatch *context, IThread *currentThread)
 
+#define EXEC_DESPATCH_COPY_FROM_USER(src, dest, nbytes) \
+	if(!src) \
+	{ \
+		/* Trigger an exception */ \
+		despatch->syscall.status = E_INVAL; \
+		return; \
+	} \
+	ExMemCopy((void *) (dest), (void *) (src), (nbytes))
+#define EXEC_DESPATCH_COPY_TO_USER(dest, src, nbytes) \
+	if(!dest) \
+	{ \
+		/* Trigger an exception */ \
+		despatch->syscall.status = E_INVAL; \
+		return; \
+	} \
+	ExMemCopy((void *) (dest), (void *) (src), (nbytes))
+#define EXEC_DESPATCH_DESCRIPTOR(ret, ctx, obj, iid) \
+	if((ret)) \
+	{ \
+		*((int *)(void *)(ret)) = Executive_Despatch_descriptor(ctx, obj, iid); \
+	} \
+	else \
+	{ \
+		IObject_release(((IObject *)(void *)(obj))); \
+	}
+#define EXEC_DESPATCH_OBJECT(object_, context_, descriptor_, type_) \
+	if((descriptor_) > (context_)->data.ndescriptors) \
+	{ \
+		despatch->syscall.status = E_BADOBJ; \
+		return; \
+	} \
+	(object_) = (type_ *) ((context_)->data.descriptors[(descriptor_) - 1].object);
+
 typedef union Executive_Despatch Executive_Despatch;
 typedef struct Executive_Despatch_Descriptor Executive_Despatch_Descriptor;
 typedef void (*ExecutiveDespatchHandler)(ExecutiveDespatch *despatch, void *target, Executive_Despatch *context, IThread *currentThread);
@@ -55,6 +88,10 @@ union Executive_Despatch
 
 EXTERN_C EXEC_DESPATCH_HANDLER(IObject);
 EXTERN_C EXEC_DESPATCH_HANDLER(IThread);
+EXTERN_C EXEC_DESPATCH_HANDLER(ITask);
+EXTERN_C EXEC_DESPATCH_HANDLER(IAddressSpace);
+EXTERN_C EXEC_DESPATCH_HANDLER(INamespace);
+EXTERN_C EXEC_DESPATCH_HANDLER(IRegion);
 
 EXTERN_C int Executive_Despatch_descriptor(Executive_Despatch *context, void *object, REFUUID iid);
 

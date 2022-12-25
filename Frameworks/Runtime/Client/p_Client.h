@@ -24,22 +24,12 @@
 
 # define INITGUID_EXTERN               1
 
+# include <Runtime/Memory.h>
 # include <Runtime/Internal/Client.h>
 # include <Runtime/Internal/Classes.h>
 # include <Executive/SystemCall.h>
 
-typedef union Runtime_Client Runtime_Client;
-
-union Runtime_Client
-{
-	IObject Object;
-	struct
-	{
-		const void *vtable;
-		REFCOUNT refCount;
-		int descriptor;
-	} data;
-};
+# define INTF_TO_CLASS(i)               ((Runtime_Client *)(void *)(i))
 
 RUNTIME_DECL_IOBJECT(Runtime_Client);
 

@@ -40,12 +40,48 @@ Runtime_Client_create(int descriptor)
 	}
 	p->data.vtable = &Runtime_Client_IObject_vtable;
 	p->data.refCount = 1;
-	p->data.descriptor = 1;
+	p->data.descriptor = descriptor;
 	return p;
 }
 
-/* 0 = STATUS */
-static STATUS
+STATUS
+Runtime_Client_createFor(int descriptor, REFUUID iid, void **out)
+{
+	/* XXX check if descriptor is already in our object table, if so,
+	 * just retain the existing object
+	 */
+	if(RtUuidEqual(iid, &IID_IObject))
+	{
+		*out = Runtime_Client_create(descriptor);
+		return E_SUCCESS;
+	}
+	if(RtUuidEqual(iid, &IID_IThread))
+	{
+		*out = IThread_Client_create(descriptor);
+		return E_SUCCESS;
+	}
+	if(RtUuidEqual(iid, &IID_INamespace))
+	{
+		*out = INamespace_Client_create(descriptor);
+		return E_SUCCESS;
+	}
+	if(RtUuidEqual(iid, &IID_IAddressSpace))
+	{
+		*out = IAddressSpace_Client_create(descriptor);
+		return E_SUCCESS;
+	}
+	if(RtUuidEqual(iid, &IID_IRegion))
+	{
+		*out = IRegion_Client_create(descriptor);
+		return E_SUCCESS;
+	}
+	/* XXX */
+	*out = NULL;
+	return E_NOTIMPL;
+}
+
+/* 0 = [local] STATUS queryInterface([in] REFUUID iid, [out, iid_is(iid) void **out]) */
+STATUS
 Runtime_Client_queryInterface(IObject *me, REFUUID iid, void **out)
 {
 	int outd;
@@ -65,6 +101,23 @@ Runtime_Client_queryInterface(IObject *me, REFUUID iid, void **out)
 		ExSystemCall(outd, 2);
 	}
 	return status;
+}
+
+/* 1 = [local] retain(); */
+REFCOUNT
+Runtime_Client_retain(IObject *me)
+{
+	RUNTIME_RETAIN(Runtime_Client);
+}
+
+/* 2 = [local] release(); */
+REFCOUNT
+Runtime_Client_release(IObject *me)
+{
+	RUNTIME_RELEASE(Runtime_Client, {
+		ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 2);
+		RtMemFree(me);
+	});
 }
 
 #endif /*!RUNTIME_BUILD_EXEC*/

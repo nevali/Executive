@@ -72,6 +72,7 @@ Rt__Initialise()
 	}
 	IAddressSpace_Client_init_(&IAddressSpace_client, addressSpace);
 	Rt__private__.addressSpace = &(IAddressSpace_client.AddressSpace);
+	RtAllocator_create(Rt__private__.addressSpace);
 	Rt__private__.mainThread = IThread_Client_create(0);
 	if(!Rt__private__.mainThread)
 	{

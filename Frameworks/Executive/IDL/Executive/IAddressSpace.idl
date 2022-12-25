@@ -44,16 +44,16 @@ interface IAddressSpace: IObject
 	} AddressSpaceFeatures;
 
 	/* Locate the region which includes the address <ptr> */
-	int regionFromPointer([in] void *ptr, [out] IRegion **region);
+	STATUS regionFromPointer([in] void *ptr, [out] IRegion **region);
 	
 	/* Obtain the default page size, in bytes */
 	int pageSize(void);
 	
 	/* Obtain a region of <count> pages, with the supplied IRegionHolder */
-	int obtainRegion([in] size_t count, [in] RegionFlags flags, [in] IRegionHolder *owner, [out] IRegion **region);
+	STATUS obtainRegion([in] size_t count, [in] RegionFlags flags, [in] IRegionHolder *owner, [out] IRegion **region);
 
 	/* Obtain a transient region of <count> pages, with the supplied IRegionHolder */
-	int obtainTransientRegion([in] size_t count, [in] RegionFlags flags, [in] IRegionHolder *owner, [out] IRegion **region);
+	STATUS obtainTransientRegion([in] size_t count, [in] RegionFlags flags, [in] IRegionHolder *owner, [out] IRegion **region);
 
 	/* Create a new scheduling context within the address space */
 	STATUS createContext([in] IThread *thread, [in] void *stackBase, [in] size_t stackSize, [in] ThreadEntrypoint ip, [out] IContext **context);

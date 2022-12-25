@@ -176,6 +176,11 @@ Executive_Despatch_syscall(ExecutiveDespatch *despatch, Executive_Despatch *cont
 	void *target;
 	ExecutiveDespatchHandler handler;
 	
+	EXTRACEF(("Executive::Despatch::syscall(%lx, %lx, %lx, %lx, %lx, %lx, %lx, %lx)",
+		despatch->syscall.arg[0], despatch->syscall.arg[1],
+		despatch->syscall.arg[2], despatch->syscall.arg[3],
+		despatch->syscall.arg[4], despatch->syscall.arg[5],
+		despatch->syscall.arg[6], despatch->syscall.arg[7]));
 	target = NULL;
 	handler = NULL;
 	despatch->syscall.status = E_NOTIMPL;
@@ -185,23 +190,30 @@ Executive_Despatch_syscall(ExecutiveDespatch *despatch, Executive_Despatch *cont
 		EXLOGF((LOG_DEBUG, "Executive::Despatch::syscall(): despatching to current thread"));
 		target = currentThread;
 		handler = Executive_Despatch_Handlers_IThread;
+		if(!currentThread)
+		{
+			EXLOGF((LOG_DEBUG, "no current thread?"));
+		despatch->syscall.status = E_BADOBJ;
+			return;
+		}
 	}
 	else
 	{
+		despatch->syscall.arg[0]--;
 		if(despatch->syscall.arg[0] >= context->data.ndescriptors || !context->data.descriptors[despatch->syscall.arg[0]].object)
 		{
-			EXLOGF((LOG_CONDITION, "%%E-INVAL: descriptor %d is not valid", despatch->syscall.arg[0]));
+			EXLOGF((LOG_CONDITION, "%%E-INVAL: descriptor %d is not valid", despatch->syscall.arg[0] + 1));
 			despatch->syscall.status = E_INVAL;
 			return;
 		}
-		EXLOGF((LOG_DEBUG, "Executive::Despatch::syscall(): despatching to descriptor %d", despatch->syscall.arg[0]));
+		EXLOGF((LOG_DEBUG, "Executive::Despatch::syscall(): despatching to descriptor %d", despatch->syscall.arg[0] + 1));
 		target = context->data.descriptors[despatch->syscall.arg[0]].object;
 		handler = context->data.descriptors[despatch->syscall.arg[0]].handler;
 	}
 	if(!target)
 	{
 		despatch->syscall.status = E_BADOBJ;
-		EXLOGF((LOG_CONDITION, "%%E-BAD-OBJ: Object descriptor %d is not valid", despatch->syscall.arg[0]));
+		EXLOGF((LOG_CONDITION, "%%E-BAD-OBJ: Object descriptor %d is not valid", despatch->syscall.arg[0] + 1));
 		return;
 	}
 	/* if the method ID is 0, 1, or 2, this can be handled by the IObject
@@ -219,6 +231,7 @@ Executive_Despatch_syscall(ExecutiveDespatch *despatch, Executive_Despatch *cont
 		return;
 	}
 	handler(despatch, target, context, currentThread);
+	EXTRACEF(("status = %d", despatch->syscall.status));
 }
 
 ExecutiveDespatchHandler
@@ -234,6 +247,22 @@ Executive_Despatch_handler(Executive_Despatch *context, REFUUID iid)
 	{
 		return Executive_Despatch_Handlers_IThread;
 	}
+	if(RtUuidEqual(iid, &IID_ITask))
+	{
+		return Executive_Despatch_Handlers_ITask;
+	}
+	if(RtUuidEqual(iid, &IID_INamespace))
+	{
+		return Executive_Despatch_Handlers_INamespace;
+	}
+	if(RtUuidEqual(iid, &IID_IAddressSpace))
+	{
+		return Executive_Despatch_Handlers_IAddressSpace;
+	}
+	if(RtUuidEqual(iid, &IID_IRegion))
+	{
+		return Executive_Despatch_Handlers_IRegion;
+	}
 	return NULL;
 }
 
@@ -244,6 +273,10 @@ Executive_Despatch_descriptor(Executive_Despatch *context, void *object, REFUUID
 	ExecutiveDespatchHandler handler;
 	Executive_Despatch_Descriptor *p;
 
+	ExAssert(NULL != context);
+	ExAssert(NULL != object);
+	ExAssert(NULL != iid);
+
 	/* does the object already exist in the context? */
 	for(n = 0; (size_t) n < context->data.ndescriptors; n++)
 	{
@@ -253,7 +286,8 @@ Executive_Despatch_descriptor(Executive_Despatch *context, void *object, REFUUID
 			 * keep one copy per task
 			 */
 			IObject_release(((IObject *) object));
-			return n;
+			EXLOGF((LOG_DEBUG, "Executive::Despatch::descriptor(): object already exists at slot #%d for iid:" UUID_PRINTF_FORMAT, n + 1, UUID_PRINTF_ARGS(iid)));
+			return n + 1;
 		}
 	}
 	handler = Executive_Despatch_handler(context, iid);
@@ -264,7 +298,8 @@ Executive_Despatch_descriptor(Executive_Despatch *context, void *object, REFUUID
 		{
 			context->data.descriptors[n].object = object;
 			context->data.descriptors[n].handler = handler;
-			return n;
+			EXLOGF((LOG_DEBUG, "Executive::Despatch::descriptor(): using empty slot #%d for iid:" UUID_PRINTF_FORMAT, n + 1, UUID_PRINTF_ARGS(iid)));
+			return n + 1;
 		}
 	}
 	p = (Executive_Despatch_Descriptor *) RtMemReAlloc(context->data.descriptors, (context->data.ndescriptors + 8) * sizeof(Executive_Despatch_Descriptor));
@@ -277,6 +312,7 @@ Executive_Despatch_descriptor(Executive_Despatch *context, void *object, REFUUID
 	context->data.ndescriptors += 8;
 	p[n].object = object;
 	p[n].handler = handler;
-	return n;
+	EXLOGF((LOG_DEBUG, "Executive::Despatch::descriptor(): created new slot #%d for iid:" UUID_PRINTF_FORMAT, n + 1, UUID_PRINTF_ARGS(iid)));
+	return n + 1;
 
 }

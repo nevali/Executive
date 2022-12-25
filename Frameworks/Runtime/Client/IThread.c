@@ -23,8 +23,6 @@
 
 #if !RUNTIME_BUILD_EXEC
 
-# define INTF_TO_CLASS(i)               RUNTIME_INTF_TO(i, Runtime_Client)
-
 static THREADID IThread_Client_id(IThread *me);
 static ThreadFlags IThread_Client_flags(IThread *me);
 static STATUS IThread_Client_task(IThread *me, REFUUID iid, void **out);

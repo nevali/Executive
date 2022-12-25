@@ -61,10 +61,10 @@ DECLARE_INTERFACE_(IAddressSpace, IObject)
 # endif /*!__cplusplus*/
 
 	/* IAddressSpace */
-	STDMETHOD_(int, regionFromPointer)(THIS_ void *ptr, IRegion **region) PURE;
+	STDMETHOD_(STATUS, regionFromPointer)(THIS_ void *ptr, IRegion **region) PURE;
 	STDMETHOD_(int, pageSize)(THIS) PURE;
-	STDMETHOD_(int, obtainRegion)(THIS_ size_t count, RegionFlags flags, IRegionHolder *owner, IRegion **region) PURE;
-	STDMETHOD_(int, obtainTransientRegion)(THIS_ size_t count, RegionFlags flags, IRegionHolder *owner, IRegion **region) PURE;
+	STDMETHOD_(STATUS, obtainRegion)(THIS_ size_t count, RegionFlags flags, IRegionHolder *owner, IRegion **region) PURE;
+	STDMETHOD_(STATUS, obtainTransientRegion)(THIS_ size_t count, RegionFlags flags, IRegionHolder *owner, IRegion **region) PURE;
 	STDMETHOD_(STATUS, createContext)(THIS_ IThread *thread, void *stackBase, size_t stackSize, ThreadEntrypoint ip, IContext **context) PURE;
 
 	END_INTERFACE

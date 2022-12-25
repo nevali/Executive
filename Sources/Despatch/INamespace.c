@@ -1,5 +1,5 @@
 /* Executive Microkernel
- * IObject despatch
+ * INamespace despatch
  */
 
 /* Copyright (c) 2015-2022 Mo McRoberts.
@@ -24,18 +24,10 @@
 #include "p_Despatch.h"
 
 void
-Executive_Despatch_Handlers_IObject(ExecutiveDespatch *despatch, void *object, Executive_Despatch *context, IThread *currentThread)
+Executive_Despatch_Handlers_INamespace(ExecutiveDespatch *despatch, void *object, Executive_Despatch *context, IThread *currentThread)
 {
-	IObject *target = (IObject *) object;
-	
 	UNUSED__(despatch);
-	UNUSED__(target);
+	UNUSED__(object);
 	UNUSED__(context);
 	UNUSED__(currentThread);
-
-	EXTRACEF(("Executive::Despatch::Handlers::IObject(%lx, %lx, %lx, %lx, %lx, %lx, %lx, %lx)",
-		despatch->syscall.arg[0], despatch->syscall.arg[1],
-		despatch->syscall.arg[2], despatch->syscall.arg[3],
-		despatch->syscall.arg[4], despatch->syscall.arg[5],
-		despatch->syscall.arg[6], despatch->syscall.arg[7]));
 }

@@ -64,18 +64,18 @@ interface IRegion: IObject
 		
 	} RegionFlags;
 
-	/* Obtain the flags for this region */
+	/* 3 = Obtain the flags for this region */
 	RegionFlags flags(void);
 	
-	/* Attempt to obtain interface <riid> from the region's owner */
+	/* 4 = Attempt to obtain interface <riid> from the region's owner */
 	int queryOwnerInterface([in] REFUUID riid, [out, iid_is(riid)] void **ptr);
 
-	/* Return the base address of the region */
+	/* 5 = Return the base address of the region */
 	uint8_t *base(void);
 
-	/* Return the size of this region in pages */
+	/* 6 = Return the size of this region in pages */
 	size_t pages(void);
 
-	/* Return the size of this region in bytes */
+	/* 7 = Return the size of this region in bytes */
 	size_t bytes(void);
 }

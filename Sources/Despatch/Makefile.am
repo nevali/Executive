@@ -18,6 +18,7 @@
 noinst_LTLIBRARIES = libDespatch.la
 
 libDespatch_la_SOURCES = p_Despatch.h \
-	Gateway.c IObject.c IThread.c
+	Gateway.c IObject.c IThread.c ITask.c INamespace.c IAddressSpace.c \
+	IRegion.c
 
 libDespatch_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
