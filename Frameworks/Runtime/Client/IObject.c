@@ -19,72 +19,19 @@
  *  limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
+
 #include "p_Client.h"
 
 #if !RUNTIME_BUILD_EXEC
 
-static struct IObject_vtable_ Runtime_Client_IObject_vtable = {
+struct IObject_vtable_ Runtime_Client_IObject_vtable = {
 	Runtime_Client_queryInterface,
 	Runtime_Client_release,
 	Runtime_Client_retain
 };
-
-Runtime_Client *
-Runtime_Client_create(int descriptor)
-{
-	Runtime_Client *p;
-
-	if(NULL == (p = RtMemAlloc(sizeof(Runtime_Client))))
-	{
-		return NULL;
-	}
-	p->data.vtable = &Runtime_Client_IObject_vtable;
-	p->data.refCount = 1;
-	p->data.descriptor = descriptor;
-	return p;
-}
-
-STATUS
-Runtime_Client_createFor(int descriptor, REFUUID iid, void **out)
-{
-	/* XXX check if descriptor is already in our object table, if so,
-	 * just retain the existing object
-	 */
-	*out = NULL;
-	if(RtUuidEqual(iid, &IID_IObject))
-	{
-		*out = Runtime_Client_create(descriptor);
-	}
-	else if(RtUuidEqual(iid, &IID_IThread))
-	{
-		*out = IThread_Client_create(descriptor);
-	}
-	else if(RtUuidEqual(iid, &IID_INamespace))
-	{
-		*out = INamespace_Client_create(descriptor);
-	}
-	else if(RtUuidEqual(iid, &IID_IAddressSpace))
-	{
-		*out = IAddressSpace_Client_create(descriptor);
-	}
-	else if(RtUuidEqual(iid, &IID_IRegion))
-	{
-		*out = IRegion_Client_create(descriptor);
-	}
-	else if(RtUuidEqual(iid, &IID_IContainer))
-	{
-		*out = IContainer_Client_create(descriptor);
-	}
-	else if(RtUuidEqual(iid, &IID_IWriteChannel))
-	{
-		*out = IWriteChannel_Client_create(descriptor);
-	}
-	if(*out)
-	{
-		return E_SUCCESS;
-	}
-	return E_NOTIMPL;
-}
 
 /* 0 = [local] STATUS queryInterface([in] REFUUID iid, [out, iid_is(iid) void **out]) */
 STATUS
@@ -104,7 +51,7 @@ Runtime_Client_queryInterface(IObject *me, REFUUID iid, void **out)
 	if(E_SUCCESS != (status = Runtime_Client_createFor(outd, iid, out)))
 	{
 		/* outd<IObject>::release() */
-		ExSystemCall(outd, 2);
+		ExSystemCall(outd, IObject_ID_release);
 	}
 	return status;
 }

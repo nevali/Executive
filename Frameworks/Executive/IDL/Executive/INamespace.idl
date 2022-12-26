@@ -33,30 +33,35 @@ interface INamespace: IContainer
 	cpp_quote("# warning The INamespace interface is currently considered unstable; source and binary compatibility is not assured.");
 	cpp_quote("#endif");
 
+	const int INamespace_ID__MIN_ = 0x0060;
+
 	/* resolve path to a directory entry */
-	const int INamespace_ID_resolveEntry = 5;
+	const int INamespace_ID_resolveEntry = INamespace_ID__MIN_;
 	STATUS resolveEntry([in] const char *path, [in] IContainer *scope, [out] IDirectoryEntry **dentry);
 	/* resolve path to the container which would be scanned to match the last component */
-	const int INamespace_ID_resolveContainer = 6;
+
+	const int INamespace_ID_resolveContainer = INamespace_ID_resolveEntry + 1;
 	STATUS resolveContainer([in] const char *path, [in] IContainer *scope, [out] IContainer **container, [out] const char **basename);
 
 	/* resolve a path, then attempt to open it */
-	const int INamespace_ID_open = 7;
+	const int INamespace_ID_open = INamespace_ID_resolveContainer + 1;
 	STATUS open([in] const char *path, [in] IContainer *scope, REFUUID iid, [out, iid_is(iid)] void **container);
 
 	/* create a new object */
-	const int INamespace_ID_create = 8;
+	const int INamespace_ID_create = INamespace_ID_open + 1;
 	STATUS create([in] const char *name, [in] IContainer *scope, REFUUID clsid, REFUUID iid, [out, iid_is(iid)] void **container);
 
 	/* add an existing object at the specified path */
-	const int INamespace_ID_add = 9;
+	const int INamespace_ID_add = INamespace_ID_create + 1;
 	STATUS add([in] const char *name, [in] IContainer *scope, [in] REFUUID clsid, [in] IObject *target);
 
 	/* create a link to another named object */
-	const int INamespace_ID_createLink = 10;
+	const int INamespace_ID_createLink = INamespace_ID_add + 1;
 	STATUS createLink([in] const char *name, [in] IContainer *scope, [in] const char *target, [in] bool force);
 
 	/* attempt to set the flags on an existing directory entry */
-	const int INamespace_ID_setFlags = 11;
+	const int INamespace_ID_setFlags = INamespace_ID_createLink + 1;
 	STATUS setFlags([in] const char *name, [in] IContainer *scope, [in] DirectoryEntryFlags flags);
+
+	const int INamespace_ID__MAX_ = INamespace_ID_setFlags;
 }

@@ -44,6 +44,20 @@ DECLARE_INTERFACE_(IIterator, IObject)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t IIterator_ID__MIN_ = 128;
+	static const int32_t IIterator_ID_next = IIterator_ID__MIN_;
+	static const int32_t IIterator_ID_current = IIterator_ID_next+1;
+	static const int32_t IITerator_ID__MAX_ = IIterator_ID_current;
+
+#  else /*__cplusplus*/
+
+#  define IIterator_ID__MIN_ 128
+#  define IIterator_ID_next IIterator_ID__MIN_
+#  define IIterator_ID_current IIterator_ID_next+1
+#  define IITerator_ID__MAX_ IIterator_ID_current
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;
@@ -68,6 +82,8 @@ DECLARE_INTERFACE_(IIterator, IObject)
 #  undef INTERFACE
 # endif /*!__IIterator_INTERFACE_DEFINED__*/
 
+#  define IIterator_ID_current IIterator_ID_next+1
+#  define IITerator_ID__MAX_ IIterator_ID_current
 
 #endif /*!IITERATOR_H_IDL_*/
 

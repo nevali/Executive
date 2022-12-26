@@ -1,5 +1,5 @@
 /* Executive Microkernel
- * INamespace despatch
+ * IAddressSpace despatch
  */
 
 /* Copyright (c) 2015-2022 Mo McRoberts.
@@ -23,33 +23,12 @@
 
 #include "p_Despatch.h"
 
-void
-Executive_Despatch_Handlers_IAddressSpace(ExecutiveDespatch *despatch, void *object, Executive_Despatch *context, IThread *currentThread)
+EXEC_DESPATCH_HANDLER(IAddressSpace)
 {
-	IAddressSpace *target = (IAddressSpace *) object;
-	UNUSED__(despatch);
-	UNUSED__(context);
-	UNUSED__(currentThread);
-
-	EXTRACEF(("Executive::Despatch::Handlers::IAddressSpace(%lx, %lx, %lx, %lx, %lx, %lx, %lx, %lx)",
-		despatch->syscall.arg[0], despatch->syscall.arg[1],
-		despatch->syscall.arg[2], despatch->syscall.arg[3],
-		despatch->syscall.arg[4], despatch->syscall.arg[5],
-		despatch->syscall.arg[6], despatch->syscall.arg[7]));
-
-	switch(despatch->syscall.arg[1])
+	EXEC_DESPATCH_BEGIN(IAddressSpace)
 	{
-		case 0:
-			/* 0 = STATUS queryInterface() - handled by Executive::Despatch::Handlers::IObject */
-			return;
-		case 1:
-			/* 1 = REFCOUNT retain() */
-			return;
-		case 2:
-			/* 2 = REFCOUNT release();  */
-			return;
-		case 3:
 			/* 3 = STATUS regionFromPointer([in] void *ptr, [out] IRegion **region); */
+		EXEC_DESPATCH_HANDLE(IAddressSpace, regionFromPointer)
 			{
 				IRegion *out;
 
@@ -57,10 +36,10 @@ Executive_Despatch_Handlers_IAddressSpace(ExecutiveDespatch *despatch, void *obj
 				{
 					EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[3], context, out, &IID_IRegion);
 				}
+				return;
 			}
-			return;
-		case 4:
 			/* 4 = int pageSize(void); */		
+		EXEC_DESPATCH_HANDLE(IAddressSpace, pageSize)
 			{
 				int r2;
 
@@ -72,8 +51,8 @@ Executive_Despatch_Handlers_IAddressSpace(ExecutiveDespatch *despatch, void *obj
 				}
 			}
 			return;
-		case 5:
 			/* 5 = STATUS obtainRegion([in] size_t count, [in] RegionFlags flags, [in,local] IRegionHolder *owner, [out] IRegion **region); */
+		EXEC_DESPATCH_HANDLE(IAddressSpace, obtainRegion)
 			{
 				IRegion *region;
 
@@ -84,8 +63,8 @@ Executive_Despatch_Handlers_IAddressSpace(ExecutiveDespatch *despatch, void *obj
 				}
 			}
 			return;
-		case 6:
-			/* 6 = STATUS obtainTransientRegion([in] size_t count, [in] RegionFlags flags, [in,local] IRegionHolder *owner, [out] IRegion **region); */
+			/* STATUS obtainTransientRegion([in] size_t count, [in] RegionFlags flags, [in,local] IRegionHolder *owner, [out] IRegion **region); */
+		EXEC_DESPATCH_HANDLE(IAddressSpace, obtainTransientRegion)
 			{
 				IRegion *region;
 
@@ -96,6 +75,11 @@ Executive_Despatch_Handlers_IAddressSpace(ExecutiveDespatch *despatch, void *obj
 				}
 			}
 			return;
+		EXEC_DESPATCH_HANDLE(IAddressSpace, createContext)
+		{
+			despatch->syscall.status = E_PERM;
+			return;
+		}
 	}
-	ExPanic("unhandled IAddressSpace method!");
+	EXEC_DESPATCH_END(IAddressSpace);
 }

@@ -46,23 +46,27 @@ DECLARE_INTERFACE_(INamespace, IContainer)
 	BEGIN_INTERFACE
 
 #  ifdef __cplusplus
-	static const int32_t INamespace_ID_resolveEntry = 5;
-	static const int32_t INamespace_ID_resolveContainer = 6;
-	static const int32_t INamespace_ID_open = 7;
-	static const int32_t INamespace_ID_create = 8;
-	static const int32_t INamespace_ID_add = 9;
-	static const int32_t INamespace_ID_createLink = 10;
-	static const int32_t INamespace_ID_setFlags = 11;
+	static const int32_t INamespace_ID__MIN_ = 96;
+	static const int32_t INamespace_ID_resolveEntry = INamespace_ID__MIN_;
+	static const int32_t INamespace_ID_resolveContainer = INamespace_ID_resolveEntry+1;
+	static const int32_t INamespace_ID_open = INamespace_ID_resolveContainer+1;
+	static const int32_t INamespace_ID_create = INamespace_ID_open+1;
+	static const int32_t INamespace_ID_add = INamespace_ID_create+1;
+	static const int32_t INamespace_ID_createLink = INamespace_ID_add+1;
+	static const int32_t INamespace_ID_setFlags = INamespace_ID_createLink+1;
+	static const int32_t INamespace_ID__MAX_ = INamespace_ID_setFlags;
 
 #  else /*__cplusplus*/
 
-#  define INamespace_ID_resolveEntry 5
-#  define INamespace_ID_resolveContainer 6
-#  define INamespace_ID_open 7
-#  define INamespace_ID_create 8
-#  define INamespace_ID_add 9
-#  define INamespace_ID_createLink 10
-#  define INamespace_ID_setFlags 11
+#  define INamespace_ID__MIN_ 96
+#  define INamespace_ID_resolveEntry INamespace_ID__MIN_
+#  define INamespace_ID_resolveContainer INamespace_ID_resolveEntry+1
+#  define INamespace_ID_open INamespace_ID_resolveContainer+1
+#  define INamespace_ID_create INamespace_ID_open+1
+#  define INamespace_ID_add INamespace_ID_create+1
+#  define INamespace_ID_createLink INamespace_ID_add+1
+#  define INamespace_ID_setFlags INamespace_ID_createLink+1
+#  define INamespace_ID__MAX_ INamespace_ID_setFlags
 #  endif /*__cplusplus*/
 
 # if !defined(__cplusplus)
@@ -107,12 +111,13 @@ DECLARE_INTERFACE_(INamespace, IContainer)
 #  undef INTERFACE
 # endif /*!__INamespace_INTERFACE_DEFINED__*/
 
-#  define INamespace_ID_resolveContainer 6
-#  define INamespace_ID_open 7
-#  define INamespace_ID_create 8
-#  define INamespace_ID_add 9
-#  define INamespace_ID_createLink 10
-#  define INamespace_ID_setFlags 11
+#  define INamespace_ID_resolveContainer INamespace_ID_resolveEntry+1
+#  define INamespace_ID_open INamespace_ID_resolveContainer+1
+#  define INamespace_ID_create INamespace_ID_open+1
+#  define INamespace_ID_add INamespace_ID_create+1
+#  define INamespace_ID_createLink INamespace_ID_add+1
+#  define INamespace_ID_setFlags INamespace_ID_createLink+1
+#  define INamespace_ID__MAX_ INamespace_ID_setFlags
 
 #endif /*!INAMESPACE_H_IDL_*/
 

@@ -58,6 +58,28 @@ DECLARE_INTERFACE_(IThread, IObject)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t IThread_ID__MIN_ = 16;
+	static const int32_t IThread_ID_id = IThread_ID__MIN_+1;
+	static const int32_t IThread_ID_flags = IThread_ID_id+1;
+	static const int32_t IThread_ID_task = IThread_ID_flags+1;
+	static const int32_t IThread_ID_job = IThread_ID_task+1;
+	static const int32_t IThread_ID_ns = IThread_ID_job+1;
+	static const int32_t IThread_ID_yield = IThread_ID_ns+1;
+	static const int32_t IThread_ID__MAX_ = IThread_ID_yield;
+
+#  else /*__cplusplus*/
+
+#  define IThread_ID__MIN_ 16
+#  define IThread_ID_id IThread_ID__MIN_+1
+#  define IThread_ID_flags IThread_ID_id+1
+#  define IThread_ID_task IThread_ID_flags+1
+#  define IThread_ID_job IThread_ID_task+1
+#  define IThread_ID_ns IThread_ID_job+1
+#  define IThread_ID_yield IThread_ID_ns+1
+#  define IThread_ID__MAX_ IThread_ID_yield
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;
@@ -90,6 +112,12 @@ DECLARE_INTERFACE_(IThread, IObject)
 #  undef INTERFACE
 # endif /*!__IThread_INTERFACE_DEFINED__*/
 
+#  define IThread_ID_flags IThread_ID_id+1
+#  define IThread_ID_task IThread_ID_flags+1
+#  define IThread_ID_job IThread_ID_task+1
+#  define IThread_ID_ns IThread_ID_job+1
+#  define IThread_ID_yield IThread_ID_ns+1
+#  define IThread_ID__MAX_ IThread_ID_yield
 
 #endif /*!ITHREAD_H_IDL_*/
 

@@ -23,48 +23,26 @@
 
 #include "p_Despatch.h"
 
-void
-Executive_Despatch_Handlers_IRegion(ExecutiveDespatch *despatch, void *object, Executive_Despatch *context, IThread *currentThread)
+EXEC_DESPATCH_HANDLER(IRegion)
 {
-	IRegion *target = (IRegion *) object;
-	
-	UNUSED__(despatch);
-	UNUSED__(target);
-	UNUSED__(context);
-	UNUSED__(currentThread);
-
-	EXTRACEF(("Executive::Despatch::Handlers::IRegion(%lx, %lx, %lx, %lx, %lx, %lx, %lx, %lx)",
-		despatch->syscall.arg[0], despatch->syscall.arg[1],
-		despatch->syscall.arg[2], despatch->syscall.arg[3],
-		despatch->syscall.arg[4], despatch->syscall.arg[5],
-		despatch->syscall.arg[6], despatch->syscall.arg[7]));
-	switch(despatch->syscall.arg[1])
+	EXEC_DESPATCH_BEGIN(IRegion)
 	{
-			case 0:
-			/* 0 = STATUS queryInterface() - handled by Executive::Despatch::Handlers::IObject */
-			return;
-		case 1:
-			/* 1 = REFCOUNT retain() */
-			return;
-		case 2:
-			/* 2 = REFCOUNT release();  */
-			return;
-		case 3:
-			/* 3 = RegionFlags flags(); */
+		/* 3 = RegionFlags flags(); */
+		EXEC_DESPATCH_HANDLE(IRegion, flags)
 			{
 				RegionFlags r2;
 
 				r2 = IRegion_flags(target);
 				EXEC_DESPATCH_COPY_TO_USER(despatch->syscall.arg[2], &r2, sizeof(RegionFlags));
 				despatch->syscall.status = E_SUCCESS;
+				return;
 			}
-			return;
-		case 4:
-			/* 4 =  int queryOwnerInterface([in] REFUUID riid, [out, iid_is(riid)] void **ptr); */
+		/* 4 =  int queryOwnerInterface([in] REFUUID riid, [out, iid_is(riid)] void **ptr); */
+		EXEC_DESPATCH_HANDLE(IRegion, queryOwnerInterface)
 			/* %E-NOT-IMPL - not valid across a syscall boundary */
 			return;
-		case 5:
-			/* 5 = uint8_t *base(void); */
+		/* 5 = uint8_t *base(void); */
+		EXEC_DESPATCH_HANDLE(IRegion, base)
 			{
 				uint8_t *r2;
 
@@ -72,28 +50,28 @@ Executive_Despatch_Handlers_IRegion(ExecutiveDespatch *despatch, void *object, E
 				r2 = IRegion_base(target);
 				EXEC_DESPATCH_COPY_TO_USER(despatch->syscall.arg[2], &r2, sizeof(uint8_t *));
 				despatch->syscall.status = E_SUCCESS;
+				return;
 			}
-			return;
-		case 6:
-			/* 6 = size_t pages(void); */
+		/* size_t pages(void); */
+		EXEC_DESPATCH_HANDLE(IRegion, pages)
 			{
 				size_t r2;
 
 				r2 = IRegion_pages(target);
 				EXEC_DESPATCH_COPY_TO_USER(despatch->syscall.arg[2], &r2, sizeof(size_t));
 				despatch->syscall.status = E_SUCCESS;
+				return;
 			}
-			return;
-		case 7:
-			/* 7 = size_t bytes(void); */
+		/* size_t bytes(void); */
+		EXEC_DESPATCH_HANDLE(IRegion, bytes)
 			{
 				size_t r2;
 
 				r2 = IRegion_bytes(target);
 				EXEC_DESPATCH_COPY_TO_USER(despatch->syscall.arg[2], &r2, sizeof(size_t));
 				despatch->syscall.status = E_SUCCESS;
+				return;
 			}
-			return;
 	}
-	ExPanic("unhandled IRegion method!");
+	EXEC_DESPATCH_END(IRegion);
 }

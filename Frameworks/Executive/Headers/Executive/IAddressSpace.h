@@ -53,6 +53,26 @@ DECLARE_INTERFACE_(IAddressSpace, IObject)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t IAddressSpace_ID__MIN_ = 48;
+	static const int32_t IAddressSpace_ID_regionFromPointer = IAddressSpace_ID__MIN_;
+	static const int32_t IAddressSpace_ID_pageSize = IAddressSpace_ID_regionFromPointer+1;
+	static const int32_t IAddressSpace_ID_obtainRegion = IAddressSpace_ID_pageSize+1;
+	static const int32_t IAddressSpace_ID_obtainTransientRegion = IAddressSpace_ID_obtainRegion+1;
+	static const int32_t IAddressSpace_ID_createContext = IAddressSpace_ID_obtainTransientRegion+1;
+	static const int32_t IAddressSpace_ID__MAX_ = IAddressSpace_ID_createContext;
+
+#  else /*__cplusplus*/
+
+#  define IAddressSpace_ID__MIN_ 48
+#  define IAddressSpace_ID_regionFromPointer IAddressSpace_ID__MIN_
+#  define IAddressSpace_ID_pageSize IAddressSpace_ID_regionFromPointer+1
+#  define IAddressSpace_ID_obtainRegion IAddressSpace_ID_pageSize+1
+#  define IAddressSpace_ID_obtainTransientRegion IAddressSpace_ID_obtainRegion+1
+#  define IAddressSpace_ID_createContext IAddressSpace_ID_obtainTransientRegion+1
+#  define IAddressSpace_ID__MAX_ IAddressSpace_ID_createContext
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;
@@ -83,6 +103,11 @@ DECLARE_INTERFACE_(IAddressSpace, IObject)
 #  undef INTERFACE
 # endif /*!__IAddressSpace_INTERFACE_DEFINED__*/
 
+#  define IAddressSpace_ID_pageSize IAddressSpace_ID_regionFromPointer+1
+#  define IAddressSpace_ID_obtainRegion IAddressSpace_ID_pageSize+1
+#  define IAddressSpace_ID_obtainTransientRegion IAddressSpace_ID_obtainRegion+1
+#  define IAddressSpace_ID_createContext IAddressSpace_ID_obtainTransientRegion+1
+#  define IAddressSpace_ID__MAX_ IAddressSpace_ID_createContext
 
 #endif /*!IADDRESSSPACE_H_IDL_*/
 

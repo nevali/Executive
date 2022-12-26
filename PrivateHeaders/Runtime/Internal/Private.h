@@ -8,7 +8,7 @@ typedef struct RuntimePrivateData RuntimePrivateData;
 
 struct RuntimePrivateData
 {
-	IThread *mainThread;
+	IThread *currentThread;
 	ITask *task;
 	INamespace *ns;
 	IAddressSpace *addressSpace;

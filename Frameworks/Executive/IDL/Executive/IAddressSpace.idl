@@ -43,18 +43,27 @@ interface IAddressSpace: IObject
 		ASF_NONE = 0
 	} AddressSpaceFeatures;
 
+	const int IAddressSpace_ID__MIN_ = 0x0030;
+
 	/* Locate the region which includes the address <ptr> */
+	const int IAddressSpace_ID_regionFromPointer = IAddressSpace_ID__MIN_;
 	STATUS regionFromPointer([in] void *ptr, [out] IRegion **region);
 	
 	/* Obtain the default page size, in bytes */
+	const int IAddressSpace_ID_pageSize = IAddressSpace_ID_regionFromPointer + 1;
 	int pageSize(void);
 	
 	/* Obtain a region of <count> pages, with the supplied IRegionHolder */
+	const int IAddressSpace_ID_obtainRegion = IAddressSpace_ID_pageSize + 1;
 	STATUS obtainRegion([in] size_t count, [in] RegionFlags flags, [in] IRegionHolder *owner, [out] IRegion **region);
 
 	/* Obtain a transient region of <count> pages, with the supplied IRegionHolder */
+	const int IAddressSpace_ID_obtainTransientRegion = IAddressSpace_ID_obtainRegion + 1;
 	STATUS obtainTransientRegion([in] size_t count, [in] RegionFlags flags, [in] IRegionHolder *owner, [out] IRegion **region);
 
 	/* Create a new scheduling context within the address space */
+	const int IAddressSpace_ID_createContext = IAddressSpace_ID_obtainTransientRegion + 1;
 	STATUS createContext([in] IThread *thread, [in] void *stackBase, [in] size_t stackSize, [in] ThreadEntrypoint ip, [out] IContext **context);
+
+	const int IAddressSpace_ID__MAX_ = IAddressSpace_ID_createContext;
 }

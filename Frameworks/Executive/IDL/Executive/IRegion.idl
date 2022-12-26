@@ -64,18 +64,27 @@ interface IRegion: IObject
 		
 	} RegionFlags;
 
-	/* 3 = Obtain the flags for this region */
+	const int IRegion_ID__MIN_ = 0x0040;
+
+	/* Obtain the flags for this region */
+	const int IRegion_ID_flags = IRegion_ID__MIN_;
 	RegionFlags flags(void);
 	
-	/* 4 = Attempt to obtain interface <riid> from the region's owner */
+	/* Attempt to obtain interface <riid> from the region's owner */
+	const int IRegion_ID_queryOwnerInterface = IRegion_ID_flags + 1;
 	int queryOwnerInterface([in] REFUUID riid, [out, iid_is(riid)] void **ptr);
 
-	/* 5 = Return the base address of the region */
+	/* Return the base address of the region */
+	const int IRegion_ID_base = IRegion_ID_queryOwnerInterface + 1;
 	uint8_t *base(void);
 
-	/* 6 = Return the size of this region in pages */
+	/* Return the size of this region in pages */
+	const int IRegion_ID_pages = IRegion_ID_base + 1;
 	size_t pages(void);
 
 	/* 7 = Return the size of this region in bytes */
+	const int IRegion_ID_bytes = IRegion_ID_pages + 1;
 	size_t bytes(void);
+
+	const int IRegion_ID__MAX_ = IRegion_ID_bytes;
 }

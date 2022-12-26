@@ -38,6 +38,7 @@ typedef struct IDirectoryEntry IDirectoryEntry;
 #endif
 typedef enum 
 {
+	 	DEF_INVALID = -1,
 	 	DEF_NONE = 0,
 	 	DEF_SYSTEM = (1<<0),
 	 	DEF_CONTAINER = (1<<1),
@@ -54,6 +55,24 @@ typedef enum
 DECLARE_INTERFACE_(IDirectoryEntry, IObject)
 {
 	BEGIN_INTERFACE
+
+#  ifdef __cplusplus
+	static const int32_t IDirectoryEntry_ID__MIN_ = 112;
+	static const int32_t IDirectoryEntry_ID_queryTargetInterface = IDirectoryEntry_ID__MIN_+1;
+	static const int32_t IDirectoryEntry_ID_name = IDirectoryEntry_ID_queryTargetInterface+1;
+	static const int32_t IDirectoryEntry_ID_classid = IDirectoryEntry_ID_name+1;
+	static const int32_t IDirectoryEntry_ID_flags = IDirectoryEntry_ID_classid+1;
+	static const int32_t IDirectoryEntry_ID_setFlags = IDirectoryEntry_ID_flags+1;
+
+#  else /*__cplusplus*/
+
+#  define IDirectoryEntry_ID__MIN_ 112
+#  define IDirectoryEntry_ID_queryTargetInterface IDirectoryEntry_ID__MIN_+1
+#  define IDirectoryEntry_ID_name IDirectoryEntry_ID_queryTargetInterface+1
+#  define IDirectoryEntry_ID_classid IDirectoryEntry_ID_name+1
+#  define IDirectoryEntry_ID_flags IDirectoryEntry_ID_classid+1
+#  define IDirectoryEntry_ID_setFlags IDirectoryEntry_ID_flags+1
+#  endif /*__cplusplus*/
 
 # if !defined(__cplusplus)
 	/* IObject */
@@ -85,6 +104,10 @@ DECLARE_INTERFACE_(IDirectoryEntry, IObject)
 #  undef INTERFACE
 # endif /*!__IDirectoryEntry_INTERFACE_DEFINED__*/
 
+#  define IDirectoryEntry_ID_name IDirectoryEntry_ID_queryTargetInterface+1
+#  define IDirectoryEntry_ID_classid IDirectoryEntry_ID_name+1
+#  define IDirectoryEntry_ID_flags IDirectoryEntry_ID_classid+1
+#  define IDirectoryEntry_ID_setFlags IDirectoryEntry_ID_flags+1
 
 #endif /*!IDIRECTORYENTRY_H_IDL_*/
 

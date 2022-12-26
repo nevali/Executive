@@ -23,96 +23,75 @@
 
 #include "p_Despatch.h"
 
-void
-Executive_Despatch_Handlers_ITask(ExecutiveDespatch *despatch, void *object, Executive_Despatch *context, IThread *currentThread)
+EXEC_DESPATCH_HANDLER(ITask)
 {
-	ITask *target = (ITask *) object;
-	UNUSED__(despatch);
-	UNUSED__(context);
-	UNUSED__(currentThread);
-
-	EXTRACEF(("Executive::Despatch::Handlers::ITask(%lx, %lx, %lx, %lx, %lx, %lx, %lx, %lx)",
-		despatch->syscall.arg[0], despatch->syscall.arg[1],
-		despatch->syscall.arg[2], despatch->syscall.arg[3],
-		despatch->syscall.arg[4], despatch->syscall.arg[5],
-		despatch->syscall.arg[6], despatch->syscall.arg[7]));
-
-	switch(despatch->syscall.arg[1])
+	EXEC_DESPATCH_BEGIN(ITask)
 	{
-		case 0:
-			/* queryInterface - handled by Executive::Despatch::Handlers::IObject */
+		/* TASKID id(void);
+		 * TREAT AS: STATUS id(TASKID *r2)
+		 */
+		EXEC_DESPATCH_HANDLE(ITask, id)
+		{
+			TASKID r2 = ITask_id(target);
+			EXEC_DESPATCH_COPY_TO_USER(despatch->syscall.arg[2], &r2, sizeof(TASKID));
+			despatch->syscall.status = E_SUCCESS;
 			return;
-		case 1:
-			/* retain */
+		}
+		/* TaskFlags flags(void);
+		 * TREAT AS: STATUS flags(TaskFlags *r2)
+		 */
+		EXEC_DESPATCH_HANDLE(ITask, flags)
+		{
+			TaskFlags r2 = ITask_flags(target);
+			EXEC_DESPATCH_COPY_TO_USER(despatch->syscall.arg[2], &r2, sizeof(TaskFlags));
+			despatch->syscall.status = E_SUCCESS;
 			return;
-		case 2:
-			/* release */
-			return;
-		case 3:
-			/* TASKID id(void);
-			 * TREAT AS: STATUS id(TASKID *r2)
-			 */
-			{
-				TASKID r2 = ITask_id(target);
-				EXEC_DESPATCH_COPY_TO_USER(despatch->syscall.arg[2], &r2, sizeof(TASKID));
-				despatch->syscall.status = E_SUCCESS;
-			}
-			return;
-		case 4:
-			/* TaskFlags flags(void);
-			 * TREAT AS: STATUS flags(TaskFlags *r2)
-			 */
-			{
-				TaskFlags r2 = ITask_flags(target);
-				EXEC_DESPATCH_COPY_TO_USER(despatch->syscall.arg[2], &r2, sizeof(TaskFlags));
-				despatch->syscall.status = E_SUCCESS;
-			}
-			return;
-		case 5:
-			/* STATUS ns([in] REFUUID iid, [out, iid_is(iid)] void **out); */
-			{
-				UUID iid;
-				void *outptr;
+		}
+		/* STATUS ns([in] REFUUID iid, [out, iid_is(iid)] void **out); */
+		EXEC_DESPATCH_HANDLE(ITask, ns)
+		{
+			UUID iid;
+			void *outptr;
 
-				EXEC_DESPATCH_COPY_FROM_USER(despatch->syscall.arg[2], &iid, sizeof(UUID));
-				EXTRACEF(("Executive::Despatch::Handlers::ITask::ns(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(&iid)));
-				despatch->syscall.status = ITask_ns(target, &iid, &outptr);
-				if(despatch->syscall.status == E_SUCCESS)
-				{
-					EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[3], context, outptr, &iid);
-				}
-			}
-			return;
-		case 6:
-			/* STATUS job([in] REFUUID iid, [out, iid_is(iid)] void **out); */
+			EXEC_DESPATCH_COPY_FROM_USER(despatch->syscall.arg[2], &iid, sizeof(UUID));
+			EXTRACEF(("Executive::Despatch::Handlers::ITask::ns(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(&iid)));
+			despatch->syscall.status = ITask_ns(target, &iid, &outptr);
+			if(despatch->syscall.status == E_SUCCESS)
 			{
-				UUID iid;
-				void *outptr;
-
-				EXEC_DESPATCH_COPY_FROM_USER(despatch->syscall.arg[2], &iid, sizeof(UUID));
-				EXTRACEF(("Executive::Despatch::Handlers::ITask::job(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(&iid)));
-				despatch->syscall.status = ITask_job(target, &iid, &outptr);
-				if(despatch->syscall.status == E_SUCCESS)
-				{
-					EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[3], context, outptr, &iid);
-				}
+				EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[3], context, outptr, &iid);
 			}
 			return;
-		case 7:
-			/* STATUS addressSpace([in] REFUUID iid, [out, iid_is(iid)] void **out); */
+		}
+		/* STATUS job([in] REFUUID iid, [out, iid_is(iid)] void **out); */
+		EXEC_DESPATCH_HANDLE(ITask, job)
+		{
+			UUID iid;
+			void *outptr;
+
+			EXEC_DESPATCH_COPY_FROM_USER(despatch->syscall.arg[2], &iid, sizeof(UUID));
+			EXTRACEF(("Executive::Despatch::Handlers::ITask::job(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(&iid)));
+			despatch->syscall.status = ITask_job(target, &iid, &outptr);
+			if(despatch->syscall.status == E_SUCCESS)
 			{
-				UUID iid;
-				void *outptr;
-
-				EXEC_DESPATCH_COPY_FROM_USER(despatch->syscall.arg[2], &iid, sizeof(UUID));
-				EXTRACEF(("Executive::Despatch::Handlers::ITask::addressSpace(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(&iid)));
-				despatch->syscall.status = ITask_addressSpace(target, &iid, &outptr);
-				if(despatch->syscall.status == E_SUCCESS)
-				{
-					EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[3], context, outptr, &iid);
-				}
+				EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[3], context, outptr, &iid);
 			}
 			return;
+		}
+		/* STATUS addressSpace([in] REFUUID iid, [out, iid_is(iid)] void **out); */
+		EXEC_DESPATCH_HANDLE(ITask, addressSpace)
+		{
+			UUID iid;
+			void *outptr;
+
+			EXEC_DESPATCH_COPY_FROM_USER(despatch->syscall.arg[2], &iid, sizeof(UUID));
+			EXTRACEF(("Executive::Despatch::Handlers::ITask::addressSpace(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(&iid)));
+			despatch->syscall.status = ITask_addressSpace(target, &iid, &outptr);
+			if(despatch->syscall.status == E_SUCCESS)
+			{
+				EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[3], context, outptr, &iid);
+			}
+			return;
+		}
 	}
-	ExPanic("unhandled ITask method!");
+	EXEC_DESPATCH_END(ITask);
 }

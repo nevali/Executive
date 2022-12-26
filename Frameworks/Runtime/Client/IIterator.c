@@ -19,9 +19,68 @@
  *  limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
+
 #include "p_Client.h"
 
-#if RUNTIME_BUILD_USER
+#if !RUNTIME_BUILD_EXEC
+
+
+EXTERN_C STATUS IIterator_Client_next(IIterator *me);
+EXTERN_C IObject *IIterator_Client_current(IIterator *me);
+
+static struct IIterator_vtable_ IIterator_Client_vtable = {
+	RUNTIME_VTABLE_IOBJECT(Runtime_Client, IIterator),
+	IIterator_Client_next,
+	IIterator_Client_current
+};
+
+IIterator *
+IIterator_Client_create(int descriptor)
+{
+	Runtime_Client *client;
+
+	if(!(client = Runtime_Client_create(descriptor)))
+	{
+		return NULL;
+	}
+	client->data.vtable = &IIterator_Client_vtable;
+	return (IIterator *) (void *) client;
+}
+
+STATUS 
+IIterator_Client_next(IIterator *me)
+{
+	return ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IIterator_ID_next);
+}
+
+IObject *
+IIterator_Client_current(IIterator *me)
+{
+	STATUS status;
+	int outd;
+	void *outptr;
+
+	outd = -1;
+	outptr = NULL;
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IIterator_ID_current, &outd)))
+	{
+		return NULL;
+	}
+	if(E_SUCCESS != (status = Runtime_Client_createFor(outd, &IID_IObject, &outptr)) || !outptr)
+	{
+		/* outd<IObject>::release() */
+		ExSystemCall(outd, IObject_ID_release);
+		return NULL;
+	}
+	return (IObject *) outptr;
+}
+
+#endif /*!RUNTIME_BUILD_EXEC*/
+
+#if !RUNTIME_BUILD_SIMULATOR
 #define INITGUID                       1
 #include <Executive/initguid.h>
 

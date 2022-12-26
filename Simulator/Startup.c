@@ -39,8 +39,8 @@ Simulator_mainThread(IThread *self)
 		fprintf(stderr, "Simulator: embedded Runtime failed to initialise\n");
 		abort();
 	}
-	fprintf(stderr, "Simulator: transferring control to main thread %p of user program...\n", Rt__private__.mainThread);
-	status = mainThread(Rt__private__.mainThread);
+	fprintf(stderr, "Simulator: transferring control to main thread %p of user program...\n", Rt__private__.currentThread);
+	status = mainThread(Rt__private__.currentThread);
 	fprintf(stderr, "Simulator: main thread ended, exiting with status %d\n", status);
 	if(status < 0)
 	{

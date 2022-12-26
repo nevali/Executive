@@ -56,14 +56,14 @@ Rt__Initialise()
 
 	task = -1;
 	/* object 0, method 5 = IThread::task() */
-	ExSystemCall(0, 5, &IID_ITask, &task, NULL, NULL, NULL, NULL, NULL);
+	ExSystemCall(0, IThread_ID_task, &IID_ITask, &task, NULL, NULL, NULL, NULL, NULL);
 	if(task < 0)
 	{
 		return false;
 	}
 	/* task, method 7 = ITask::addressSpace() */
 	addressSpace = -1;
-	ExSystemCall(task, 7, &IID_IAddressSpace, &addressSpace, NULL, NULL, NULL, NULL, NULL);
+	ExSystemCall(task, ITask_ID_addressSpace, &IID_IAddressSpace, &addressSpace, NULL, NULL, NULL, NULL, NULL);
 	if(addressSpace < 0)
 	{
 		return false;
@@ -71,8 +71,8 @@ Rt__Initialise()
 	IAddressSpace_Client_init_(&IAddressSpace_client, addressSpace);
 	Rt__private__.addressSpace = &(IAddressSpace_client.AddressSpace);
 	RtAllocator_create(Rt__private__.addressSpace);
-	Rt__private__.mainThread = IThread_Client_create(0);
-	if(!Rt__private__.mainThread)
+	Rt__private__.currentThread = IThread_Client_create(0);
+	if(!Rt__private__.currentThread)
 	{
 		return false;
 	}

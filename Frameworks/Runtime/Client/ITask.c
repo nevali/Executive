@@ -19,6 +19,11 @@
  *  limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
+
+
 #include "p_Client.h"
 
 #if !RUNTIME_BUILD_EXEC
@@ -59,7 +64,7 @@ ITask_Client_id(ITask *me)
 	TASKID id;
 	STATUS status;
 
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 3, &id)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, ITask_ID_id, &id)))
 	{
 		return (TASKID) status;
 	}
@@ -74,7 +79,7 @@ ITask_Client_flags(ITask *me)
 	TaskFlags id;
 	STATUS status;
 
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 3, &id)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, ITask_ID_flags, &id)))
 	{
 		return (TaskFlags) 0;
 	}
@@ -93,7 +98,7 @@ ITask_Client_ns(ITask *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 5, iid, &outd)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, ITask_ID_ns, iid, &outd)))
 	{
 		return status;
 	}
@@ -117,7 +122,7 @@ ITask_Client_job(ITask *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 6, iid, &outd)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, ITask_ID_job, iid, &outd)))
 	{
 		return status;
 	}
@@ -141,7 +146,7 @@ ITask_Client_addressSpace(ITask *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 7, iid, &outd)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, ITask_ID_addressSpace, iid, &outd)))
 	{
 		return status;
 	}

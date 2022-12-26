@@ -23,32 +23,10 @@
 
 #include "p_Despatch.h"
 
-void
-Executive_Despatch_Handlers_IWriteChannel(ExecutiveDespatch *despatch, void *object, Executive_Despatch *context, IThread *currentThread)
+EXEC_DESPATCH_HANDLER(IWriteChannel)
 {
-	IWriteChannel *target = (IWriteChannel *) object;
-	
-	UNUSED__(despatch);
-	UNUSED__(target);
-	UNUSED__(context);
-	UNUSED__(currentThread);
-
-	EXTRACEF(("Executive::Despatch::Handlers::IWriteChannel(%lx, %lx, %lx, %lx, %lx, %lx, %lx, %lx)",
-		despatch->syscall.arg[0], despatch->syscall.arg[1],
-		despatch->syscall.arg[2], despatch->syscall.arg[3],
-		despatch->syscall.arg[4], despatch->syscall.arg[5],
-		despatch->syscall.arg[6], despatch->syscall.arg[7]));
-	switch(despatch->syscall.arg[1])
+	EXEC_DESPATCH_BEGIN(IWriteChannel)
 	{
-		case IObject_ID_queryInterface:
-			/* 0 = STATUS queryInterface() - handled by Executive::Despatch::Handlers::IObject */
-			return;
-		case IObject_ID_retain:
-			/* 1 = REFCOUNT retain() */
-			return;
-		case IObject_ID_release:
-			/* 2 = REFCOUNT release();  */
-			return;
 		case IWriteChannel_ID_send:
 			/* 3 = size_t send(const uint8_t *buf, size_t buflen); */
 			{
@@ -109,5 +87,5 @@ Executive_Despatch_Handlers_IWriteChannel(ExecutiveDespatch *despatch, void *obj
 			}
 			return;
 	}
-	ExPanic("unhandled IWriteChannel method!");
+	EXEC_DESPATCH_END(IWriteChannel);
 }

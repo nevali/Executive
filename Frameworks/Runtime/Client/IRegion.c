@@ -19,11 +19,13 @@
  *  limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
+
 #include "p_Client.h"
 
 #if !RUNTIME_BUILD_EXEC
-
-#include <stdio.h>
 
 static void IRegion_Client_init_(IRegion_Client *client, int descriptor);
 
@@ -36,20 +38,27 @@ static uint8_t *IRegion_Client_base(IRegion *me);
 static size_t IRegion_Client_pages(IRegion *me);
 static size_t IRegion_Client_bytes(IRegion *me);
 
-static struct IRegion_vtable_ IRegion_Client_vtable = {
-	RUNTIME_VTABLE_IOBJECT(Runtime_Client, IRegion),
-	IRegion_Client_flags,
-	IRegion_Client_queryOwnerInterface,
-	IRegion_Client_base,
-	IRegion_Client_pages,
-	IRegion_Client_bytes
+/* Because IRegion is used as part of the interface between the memory manager
+ * (via the AddressSpace), we can't use the allocator to obtain memory for
+ * client structures unless and until we know it has room to do so
+ *
+ * therefore we allocate structures in blocks of four, and allocate the next
+ * block as soon as the first structure has been filled, to give ourselves
+ * plenty of headroom (this allows for the case where attempting to allocate
+ * the next block triggers a request for a new region)
+ */
+
+#define REGION_BLOCK_SIZE              4
+
+struct RegionBlock
+{
+	struct RegionBlock *next;
+	IRegion_Client client[REGION_BLOCK_SIZE];
 };
 
-/* IRegion is required to bootstrap the allocator, so ensure one is statically allocated */
+static struct RegionBlock regionAnchors, *lastRegionBlock;
 
-static IRegion_Client IRegion_Client_initial, *firstRegion;
-
-static struct IRegion_vtable_ IRegion_Client_vtable_static = {
+static struct IRegion_vtable_ IRegion_Client_vtable = {
 	(STATUS (*)(IRegion *, REFUUID, void **)) &Runtime_Client_queryInterface,
 	IRegion_Client_retain_noop,
 	IRegion_Client_release_noop,
@@ -64,19 +73,42 @@ IRegion *
 IRegion_Client_create(int descriptor)
 {
 	Runtime_Client *client;
+	size_t c;
+	client = NULL;
 
-	if(!firstRegion)
+	RTTRACEF(("IRegion::Client::create(%d)", descriptor));
+	if(NULL == lastRegionBlock)
 	{
-		IRegion_Client_init_(&IRegion_Client_initial, descriptor);
-		firstRegion = &IRegion_Client_initial;
-		return &(firstRegion->Region);
+		/* Obtaining a region for the very first time */
+		lastRegionBlock = &regionAnchors;
+		client = &(regionAnchors.client[0]);
 	}
-	if(!(client = Runtime_Client_create(descriptor)))
+	else
 	{
+		for(c = 0; c < REGION_BLOCK_SIZE; c++)
+		{
+			if(0 == lastRegionBlock->client[c].data.descriptor)
+			{
+				client = &(regionAnchors.client[c]);
+				break;
+			}
+		}
+	}
+	if(!client)
+	{
+		/* this should not happen, in theory */
 		return NULL;
 	}
-	client->data.vtable = &IRegion_Client_vtable;
+	IRegion_Client_init_(client, descriptor);
 	return (IRegion *) (void *) client;
+}
+
+/* INTERNAL: called by the allocator after allocation has completed, to trigger
+ * the creation of an additional region block if needed */
+void
+IRegion_Client_update_(void)
+{
+	RTTRACEF(("IRegion::Client::update_()"));
 }
 
 static void
@@ -84,7 +116,7 @@ IRegion_Client_init_(IRegion_Client *client, int descriptor)
 {
 	client->data.refCount = 1;
 	client->data.descriptor = descriptor;
-	client->data.vtable = &IRegion_Client_vtable_static;
+	client->data.vtable = &IRegion_Client_vtable;
 }
 
 /* 1 = REFCOUNT retain(void); */
@@ -112,7 +144,7 @@ IRegion_Client_flags(IRegion *me)
 {
 	RegionFlags flags;
 
-	if(E_SUCCESS != ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 3, &flags))
+	if(E_SUCCESS != ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IRegion_ID_flags, &flags))
 	{
 		return 0;
 	}
@@ -132,7 +164,7 @@ IRegion_Client_queryOwnerInterface(IRegion *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 4, iid, (out ? &outd : NULL))))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IRegion_ID_queryOwnerInterface, iid, (out ? &outd : NULL))))
 	{
 		return status;
 	}
@@ -141,7 +173,7 @@ IRegion_Client_queryOwnerInterface(IRegion *me, REFUUID iid, void **out)
 		if(E_SUCCESS != (status = Runtime_Client_createFor(outd, iid, out)))
 		{
 			/* outd<IObject>::release() */
-			ExSystemCall(outd, 2);
+			ExSystemCall(outd, IObject_ID_release, NULL, NULL, NULL, NULL, NULL, NULL);
 		}
 	}
 	return status;
@@ -154,8 +186,8 @@ IRegion_Client_base(IRegion *me)
 	uint8_t *out;
 
 	out = NULL;
-	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 5, &out);
-	fprintf(stderr, "IRegion::base(%p) => %p\n", me, out);
+	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IRegion_ID_base, &out);
+	RTLOGF((LOG_DEBUG7, "IRegion::base(%p) => %p\n", me, out));
 	return out;
 }
 
@@ -166,7 +198,7 @@ IRegion_Client_pages(IRegion *me)
 	size_t out;
 
 	out = (size_t) -1;
-	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 6, &out);
+	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IRegion_ID_pages, &out);
 	return out;
 }
 
@@ -177,7 +209,7 @@ IRegion_Client_bytes(IRegion *me)
 	size_t out;
 
 	out = (size_t) -1;
-	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 7, &out);
+	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IRegion_ID_bytes, &out);
 	return out;
 }
 

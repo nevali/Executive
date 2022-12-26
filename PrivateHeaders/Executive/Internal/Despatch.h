@@ -22,6 +22,7 @@
 
 # include <Executive/Types.h>
 # include <Executive/Linkage.h>
+# include <Executive/MObject.h>
 
 typedef union ExecutiveDespatch ExecutiveDespatch;
 
@@ -65,6 +66,8 @@ union ExecutiveDespatch
 		ExecutiveDespatchType type;
 	} watchdog;
 };
+
+EXTERN_C MObject Executive_Despatch_Context_MObject;
 
 EXTERN_C void Executive_despatch(ExecutiveDespatch *parameters) EXEC_LINKAGE__(despatch, "0.0");
 

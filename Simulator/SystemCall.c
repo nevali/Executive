@@ -19,7 +19,6 @@ ExSystemCall(int descriptor, int method, ...)
 	va_list ap;
 	ExecutiveDespatch despatch;
 
-	fprintf(stderr, "Simulator: ExSystemCall(%d, %d, ...)\n", descriptor, method);
 	/* Hand off the call to the Executive's Despatch Gateway, which is responsible
 	 * for informing the scheduler that it's currently suspended on the current
 	 * processor, and routing the request (amongst other things)
@@ -52,6 +51,10 @@ ExSystemCall(int descriptor, int method, ...)
 		despatch.syscall.arg[7] = va_arg(ap, uintptr_t);
 	}
 	va_end(ap);
+	fprintf(stderr, "Simulator:  ExSystemCall(%d, %04x, %lx, %lx, %lx, %lx, %lx, %lx)\n", descriptor, method,
+		despatch.syscall.arg[2], despatch.syscall.arg[3],
+		despatch.syscall.arg[4], despatch.syscall.arg[5],
+		despatch.syscall.arg[6], despatch.syscall.arg[7]);
 	Executive_despatch(&despatch);
 	return despatch.syscall.status;
 }

@@ -42,8 +42,9 @@
 
 typedef union RtAllocator RtAllocator;
 
-# define RTLOGF(P)                    RtLogFormat P
-# define RTPANIC(P)                   RtPanic(P)
+# define RTLOGF(P)                     RtLogFormat P
+# define RTTRACEF(P)                   RtTraceFormat P
+# define RTPANIC(P)                    RtPanic(P)
 
 # define STR__(x)                      STR2__(x)
 # define STR2__(x)                     #x

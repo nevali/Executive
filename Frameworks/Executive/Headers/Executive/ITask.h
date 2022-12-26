@@ -59,6 +59,26 @@ DECLARE_INTERFACE_(ITask, IObject)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t ITask_ID__MIN_ = 32;
+	static const int32_t ITask_ID_id = ITask_ID__MIN_;
+	static const int32_t ITask_ID_flags = ITask_ID_id+1;
+	static const int32_t ITask_ID_ns = ITask_ID_flags+1;
+	static const int32_t ITask_ID_job = ITask_ID_ns+1;
+	static const int32_t ITask_ID_addressSpace = ITask_ID_job+1;
+	static const int32_t ITask_ID__MAX_ = ITask_ID_addressSpace;
+
+#  else /*__cplusplus*/
+
+#  define ITask_ID__MIN_ 32
+#  define ITask_ID_id ITask_ID__MIN_
+#  define ITask_ID_flags ITask_ID_id+1
+#  define ITask_ID_ns ITask_ID_flags+1
+#  define ITask_ID_job ITask_ID_ns+1
+#  define ITask_ID_addressSpace ITask_ID_job+1
+#  define ITask_ID__MAX_ ITask_ID_addressSpace
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;
@@ -89,6 +109,11 @@ DECLARE_INTERFACE_(ITask, IObject)
 #  undef INTERFACE
 # endif /*!__ITask_INTERFACE_DEFINED__*/
 
+#  define ITask_ID_flags ITask_ID_id+1
+#  define ITask_ID_ns ITask_ID_flags+1
+#  define ITask_ID_job ITask_ID_ns+1
+#  define ITask_ID_addressSpace ITask_ID_job+1
+#  define ITask_ID__MAX_ ITask_ID_addressSpace
 
 #endif /*!ITASK_H_IDL_*/
 

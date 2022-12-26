@@ -19,6 +19,10 @@
  *  limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
+
 #include "p_Client.h"
 
 #if !RUNTIME_BUILD_EXEC

@@ -36,7 +36,7 @@ endif
 ## The ExecRuntime library contains the subset of the Runtime framework useable
 ## within the Executive
 
-libExecRuntime_la_SOURCES = Memory.c Allocator.c Strings.c UUID.c Status.c Log.c
+libExecRuntime_la_SOURCES = Memory.c Allocator.c Strings.c UUID.c Status.c Log.c Namespace.c
 libExecRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
 libExecRuntime_la_LIBADD = ThirdParty/libExecRuntimeThirdParty.la Client/libExecRuntimeClient.la
 libExecRuntime_la_LDFLAGS = -export-symbols-regex '^_?EXECUTIVE__'

@@ -23,62 +23,45 @@
 
 #include "p_Despatch.h"
 
-void
-Executive_Despatch_Handlers_INamespace(ExecutiveDespatch *despatch, void *object, Executive_Despatch *context, IThread *currentThread)
+EXEC_DESPATCH_HANDLER(INamespace)
 {
-	INamespace *target = (INamespace *) object;
-
-	UNUSED__(despatch);
-	UNUSED__(object);
-	UNUSED__(context);
-	UNUSED__(currentThread);
-
-	EXTRACEF(("Executive::Despatch::Handlers::INamespace(%lx, %lx, %lx, %lx, %lx, %lx, %lx, %lx)",
-		despatch->syscall.arg[0], despatch->syscall.arg[1],
-		despatch->syscall.arg[2], despatch->syscall.arg[3],
-		despatch->syscall.arg[4], despatch->syscall.arg[5],
-		despatch->syscall.arg[6], despatch->syscall.arg[7]));
-	switch(despatch->syscall.arg[1])
+	EXEC_DESPATCH_BEGIN(INamespace)
 	{
-		case IObject_ID_queryInterface:
-			/* 0 = STATUS queryInterface() - handled by Executive::Despatch::Handlers::IObject */
-			return;
-		case IObject_ID_retain:
-			/* 1 = REFCOUNT retain() */
-			return;
-		case IObject_ID_release:
-			/* 2 = REFCOUNT release();  */
-			return;
-		case IContainer_ID_resolve:
-			/* XXX */
-			return;
-		case IContainer_ID_iterator:
-			/* XXX */
-			return;
-		case INamespace_ID_resolveEntry:
-			return;
-		case INamespace_ID_resolveContainer:
-			return;
-			/* STATUS open([in] const char *path, [in] IContainer *scope, REFUUID iid, [out, iid_is(iid)] void **target); */
-		case INamespace_ID_open:
-			{
-				IContainer *r3;
-				void *r5;
+		/* IContainer */
+		EXEC_DESPATCH_HANDLE(IContainer, resolve)
+		EXEC_DESPATCH_HANDLE(IContainer, iterator)
+			return Executive_Despatch_Handlers_IContainer(despatch, object, context, currentThread);
+		
+		EXEC_DESPATCH_HANDLE(INamespace, resolveEntry)
+			break;
+		EXEC_DESPATCH_HANDLE(INamespace, resolveContainer)
+			break;
+		/* STATUS open([in] const char *path, [in] IContainer *scope, REFUUID iid, [out, iid_is(iid)] void **target); */
+		EXEC_DESPATCH_HANDLE(INamespace, open)
+		{
+			IContainer *r3;
+			void *r5;
 
-				r3 = NULL;
-				r5 = NULL;
-				if(E_SUCCESS == (despatch->syscall.status = INamespace_open(target,
-					(const char *) (void *) despatch->syscall.arg[2],
-					r3,
-					(REFUUID) (void *) despatch->syscall.arg[4],
-					&r5)))
-				{
-					EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[5], context, r5, ((REFUUID) (void *) despatch->syscall.arg[4]));
-				}
+			r3 = NULL;
+			r5 = NULL;
+			if(E_SUCCESS == (despatch->syscall.status = INamespace_open(target,
+				(const char *) (void *) despatch->syscall.arg[2],
+				r3,
+				(REFUUID) (void *) despatch->syscall.arg[4],
+				&r5)))
+			{
+				EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[5], context, r5, ((REFUUID) (void *) despatch->syscall.arg[4]));
 			}
 			return;
-		case INamespace_ID_create:
+		}
+		EXEC_DESPATCH_HANDLE(INamespace, create)
+			break;
+		EXEC_DESPATCH_HANDLE(INamespace, add)
+			break;
+		EXEC_DESPATCH_HANDLE(INamespace, createLink)
+			break;
+		EXEC_DESPATCH_HANDLE(INamespace, setFlags)
 			break;
 	}
-	ExPanic("unhandled INamespace method!");
+	EXEC_DESPATCH_END(INamespace);
 }

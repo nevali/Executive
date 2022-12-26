@@ -63,6 +63,26 @@ DECLARE_INTERFACE_(IRegion, IObject)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t IRegion_ID__MIN_ = 64;
+	static const int32_t IRegion_ID_flags = IRegion_ID__MIN_;
+	static const int32_t IRegion_ID_queryOwnerInterface = IRegion_ID_flags+1;
+	static const int32_t IRegion_ID_base = IRegion_ID_queryOwnerInterface+1;
+	static const int32_t IRegion_ID_pages = IRegion_ID_base+1;
+	static const int32_t IRegion_ID_bytes = IRegion_ID_pages+1;
+	static const int32_t IRegion_ID__MAX_ = IRegion_ID_bytes;
+
+#  else /*__cplusplus*/
+
+#  define IRegion_ID__MIN_ 64
+#  define IRegion_ID_flags IRegion_ID__MIN_
+#  define IRegion_ID_queryOwnerInterface IRegion_ID_flags+1
+#  define IRegion_ID_base IRegion_ID_queryOwnerInterface+1
+#  define IRegion_ID_pages IRegion_ID_base+1
+#  define IRegion_ID_bytes IRegion_ID_pages+1
+#  define IRegion_ID__MAX_ IRegion_ID_bytes
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;
@@ -93,6 +113,11 @@ DECLARE_INTERFACE_(IRegion, IObject)
 #  undef INTERFACE
 # endif /*!__IRegion_INTERFACE_DEFINED__*/
 
+#  define IRegion_ID_queryOwnerInterface IRegion_ID_flags+1
+#  define IRegion_ID_base IRegion_ID_queryOwnerInterface+1
+#  define IRegion_ID_pages IRegion_ID_base+1
+#  define IRegion_ID_bytes IRegion_ID_pages+1
+#  define IRegion_ID__MAX_ IRegion_ID_bytes
 
 #endif /*!IREGION_H_IDL_*/
 

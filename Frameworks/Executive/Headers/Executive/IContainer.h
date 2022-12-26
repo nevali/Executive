@@ -47,13 +47,17 @@ DECLARE_INTERFACE_(IContainer, IObject)
 	BEGIN_INTERFACE
 
 #  ifdef __cplusplus
-	static const int32_t IContainer_ID_resolve = 3;
-	static const int32_t IContainer_ID_iterator = 4;
+	static const int32_t IContainer_ID__MIN_ = 80;
+	static const int32_t IContainer_ID_resolve = IContainer_ID__MIN_;
+	static const int32_t IContainer_ID_iterator = IContainer_ID_resolve+1;
+	static const int32_t IContainer_ID__MAX_ = IContainer_ID_iterator;
 
 #  else /*__cplusplus*/
 
-#  define IContainer_ID_resolve 3
-#  define IContainer_ID_iterator 4
+#  define IContainer_ID__MIN_ 80
+#  define IContainer_ID_resolve IContainer_ID__MIN_
+#  define IContainer_ID_iterator IContainer_ID_resolve+1
+#  define IContainer_ID__MAX_ IContainer_ID_iterator
 #  endif /*__cplusplus*/
 
 # if !defined(__cplusplus)
@@ -80,7 +84,8 @@ DECLARE_INTERFACE_(IContainer, IObject)
 #  undef INTERFACE
 # endif /*!__IContainer_INTERFACE_DEFINED__*/
 
-#  define IContainer_ID_iterator 4
+#  define IContainer_ID_iterator IContainer_ID_resolve+1
+#  define IContainer_ID__MAX_ IContainer_ID_iterator
 
 #endif /*!ICONTAINER_H_IDL_*/
 

@@ -215,18 +215,20 @@ Rt_AllocatorMap(RtAllocator *self, size_t size, RegionFlags flags)
 	size_t pages;
 	IRegion *region;
 	
-	RTLOGF((LOG_DEBUG7, "DEBUG: %s: request for %lu bytes (flags %d)", __FUNCTION__, (unsigned long) size, flags));
+	RTTRACEF(("Rt_AllocatorMap(%p, %lu, %x)", self, (unsigned long) size, flags));
 	RTASSERT(NULL != self->data.addressSpace);
 	/* ASSERT(0 == size % self->data.pageSize); */
 	if(size % self->data.pageSize)
 	{
-		RTPANIC("Executive::Allocator::map(): ASSERTION FAILED: size % self->data.pageSize is nonzero; request is not page-aligned");
+		RTPANIC("Rt_AllocatorMap(): ASSERTION FAILED: size % self->data.pageSize is nonzero; request is not page-aligned");
+		return NULL;
 	}
 	pages = size / self->data.pageSize;
 	RTLOGF((LOG_DEBUG7, "DEBUG: %s: request is for %lu pages", __FUNCTION__, pages));
 	if(IAddressSpace_obtainTransientRegion(self->data.addressSpace, pages, flags, &(systemAllocator.RegionHolder), &region) != E_SUCCESS)
 	{
-		RTPANIC("Executive::Allocator::map(): IAddressSpace::obtainTransientRegion() failed (out of memory?)");
+		RTPANIC("Rt_AllocatorMap(): IAddressSpace::obtainTransientRegion() failed (out of memory?)");
+		return NULL;
 	}
 	if(!self->data.firstRegion)
 	{
@@ -234,7 +236,7 @@ Rt_AllocatorMap(RtAllocator *self, size_t size, RegionFlags flags)
 		RTLOGF((LOG_DEBUG7, "DEBUG: %s: obtained first region (%llu bytes) from the address space", __FUNCTION__, (unsigned long long) size));
 		return IRegion_base(region);
 	}
-	RTLOGF((LOG_WARNING, "WARNING: Executive::Allocator::map(): second region obtained but that isn't handled yet"));
+	RTLOGF((LOG_WARNING, "WARNING: Rt_AllocatorMap(): second region obtained but that isn't handled yet"));
 	return IRegion_base(region);
 }
 

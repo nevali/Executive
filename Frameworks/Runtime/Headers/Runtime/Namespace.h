@@ -19,15 +19,12 @@
  *  limitations under the License.
  */
 
-#ifdef HAVE_CONFIG_H
-# include "BuildConfiguration.h"
-#endif
+#ifndef RUNTIME_NAMESPACE_H_
+# define RUNTIME_NAMEPACE_H_           1
 
-#include "p_Client.h"
+# include <Runtime/Linkage.h>
+# include <Runtime/Types.h>
 
-#if RUNTIME_BUILD_USER
-#define INITGUID                       1
-#include <Executive/initguid.h>
+EXTERN_C STATUS RtOpenAs(const char *path, REFUUID iid, void **intf) RUNTIME_LINKAGE__(RtOpenAs);
 
-# include <Executive/ILink.h>
-#endif
+#endif /*!RUNTIME_NAMESPACE_H_*/

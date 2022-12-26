@@ -55,9 +55,22 @@ interface ITask: IObject
 		/* Condition flags */
 	} TaskFlags;
 
+	const int ITask_ID__MIN_ = 0x0020;
+
+	const int ITask_ID_id = ITask_ID__MIN_;
 	TASKID id(void);
+
+	const int ITask_ID_flags = ITask_ID_id + 1;
 	TaskFlags flags(void);
+
+	const int ITask_ID_ns = ITask_ID_flags + 1;
 	STATUS ns([in] REFUUID iid, [out, iid_is(iid)] void **out);
+
+	const int ITask_ID_job = ITask_ID_ns + 1;
 	STATUS job([in] REFUUID iid, [out, iid_is(iid)] void **out);
+
+	const int ITask_ID_addressSpace = ITask_ID_job + 1;
 	STATUS addressSpace([in] REFUUID iid, [out, iid_is(iid)] void **out);
+
+	const int ITask_ID__MAX_ = ITask_ID_addressSpace;
 }

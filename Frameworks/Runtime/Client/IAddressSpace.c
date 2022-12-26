@@ -19,6 +19,10 @@
  *  limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
+
 #include "p_Client.h"
 
 #if !RUNTIME_BUILD_EXEC
@@ -72,7 +76,7 @@ IAddressSpace_Client_regionFromPointer(IAddressSpace *me, void *ptr, IRegion **r
 	{
 		*region = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 3, ptr, (region ? &outd : NULL))))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IAddressSpace_ID_regionFromPointer, ptr, (region ? &outd : NULL))))
 	{
 		return status;
 	}
@@ -95,7 +99,7 @@ IAddressSpace_Client_pageSize(IAddressSpace *me)
 	STATUS status;
 	int out;
 
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 4, &out)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IAddressSpace_ID_pageSize, &out)))
 	{
 		return (int) status;
 	}
@@ -115,7 +119,7 @@ IAddressSpace_Client_obtainRegion(IAddressSpace *me, size_t count, RegionFlags f
 	{
 		*region = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 5, count, flags, owner, (region ? &outd : NULL))))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IAddressSpace_ID_obtainRegion, count, flags, owner, (region ? &outd : NULL))))
 	{
 		return status;
 	}
@@ -143,7 +147,7 @@ IAddressSpace_Client_obtainTransientRegion(IAddressSpace *me, size_t count, Regi
 	{
 		*region = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 6, count, flags, owner, (region ? &outd : NULL))))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IAddressSpace_ID_obtainTransientRegion, count, flags, owner, (region ? &outd : NULL))))
 	{
 		return status;
 	}

@@ -234,6 +234,18 @@ Executive_Directory_open(INamespace *me, const char *path, IContainer *scope, RE
 	{
 		*out = NULL;
 	}
+	if(path)
+	{
+		/* If the path is simply "/" or "", query ourselves */
+		while(path && *path == '/')
+		{
+			path++;
+		}
+		if(!*path)
+		{
+			return INamespace_queryInterface(me, iid, out);
+		}
+	}
 	if(E_SUCCESS != (status = Executive_Directory_resolveEntry(me, path, scope, &dentry)))
 	{
 		return status;

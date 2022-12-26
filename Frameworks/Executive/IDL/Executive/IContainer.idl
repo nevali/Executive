@@ -33,16 +33,20 @@ interface IContainer: IObject
 	cpp_quote("# warning The IContainer interface is currently considered unstable; source and binary compatibility is not assured.");
 	cpp_quote("#endif");
 
+	const int IContainer_ID__MIN_ = 0x0050;
+
 	/* resolve a single path component to a directory entry within this
 	 * container
 	 *
 	 * note that access to the directory entry does not imply access to its
 	 * target object
 	 */
-	const int IContainer_ID_resolve = 3;
+	const int IContainer_ID_resolve = IContainer_ID__MIN_;
 	STATUS resolve([in] const char *name, [out] IDirectoryEntry **entry);
 
 	/* obtain an iterator for the directory entries within this container */
-	const int IContainer_ID_iterator = 4;
+	const int IContainer_ID_iterator = IContainer_ID_resolve + 1;
 	IIterator *iterator(void);
+	
+	const int IContainer_ID__MAX_ = IContainer_ID_iterator;
 }

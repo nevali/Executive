@@ -25,6 +25,7 @@
 # define INITGUID_EXTERN               1
 
 # include <Runtime/Memory.h>
+# include <Runtime/Log.h>
 # include <Runtime/Internal/Client.h>
 # include <Runtime/Internal/Classes.h>
 # include <Executive/SystemCall.h>
@@ -35,8 +36,13 @@
 # include <Executive/IDirectoryEntry.h>
 # include <Executive/ILink.h>
 # include <Executive/IWriteChannel.h>
+# include <Executive/IIterator.h>
 
-# define INTF_TO_CLASS(i)               ((Runtime_Client *)(void *)(i))
+# define INTF_TO_CLASS(i)              ((Runtime_Client *)(void *)(i))
+
+# define RTLOGF(P)                     RtLogFormat P
+# define RTTRACEF(P)                   RtTraceFormat P
+# define RTPANIC(P)                    RtPanic(P)
 
 RUNTIME_DECL_IOBJECT(Runtime_Client);
 
@@ -62,14 +68,17 @@ RUNTIME_DECL_IOBJECT(Runtime_Client);
 		if(E_SUCCESS != (status = Runtime_Client_createFor(desc, riid, (void **) param))) \
 		{ \
 			/* outd<IObject>::release() */ \
-			ExSystemCall(desc, IObject_ID_release); \
+			ExSystemCall(desc, IObject_ID_release, NULL, NULL, NULL, NULL, NULL, NULL); \
 		} \
 	}
 #define RUNTIME_CLIENT_HANDLE_IN_DESCRIPTOR(param, desc) /* */
 
+EXTERN_C struct IObject_vtable_ Runtime_Client_IObject_vtable;
+
 EXTERN_C Runtime_Client *Runtime_Client_create(int descriptor);
 EXTERN_C STATUS Runtime_Client_createFor(int descriptor, REFUUID iid, void **out);
 
+/* These have external linkage because IMutableContainer and INamespace also use them */
 EXTERN_C STATUS IContainer_Client_resolve(IContainer *me, const char *name, IDirectoryEntry **entry);
 EXTERN_C IIterator *IContainer_Client_iterator(IContainer *me);
 

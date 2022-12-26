@@ -19,6 +19,10 @@
  *  limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
+
 #include "p_Client.h"
 
 #if !RUNTIME_BUILD_EXEC
@@ -78,7 +82,7 @@ EXTERN_C IIterator *IContainer_Client_iterator(IContainer *me)
 
 	outd = -1;
 	outptr = NULL;
-	if(E_SUCCESS == ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IContainer_ID_iterator, &outd))
+	if(E_SUCCESS != ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IContainer_ID_iterator, &outd))
 	{
 		return NULL;
 	}

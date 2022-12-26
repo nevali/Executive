@@ -19,6 +19,10 @@
  *  limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
+
 #include "p_Client.h"
 
 #if !RUNTIME_BUILD_EXEC
@@ -56,7 +60,7 @@ IThread_Client_id(IThread *me)
 {
 	THREADID id;
 
-	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 3, &id);
+	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_id, &id);
 	return id;
 }
 
@@ -66,7 +70,7 @@ IThread_Client_flags(IThread *me)
 {
 	ThreadFlags flags;
 
-	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 4, &flags);
+	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_flags, &flags);
 	return flags;
 }
 
@@ -81,7 +85,7 @@ IThread_Client_task(IThread *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 5, iid, &outd)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_task, iid, &outd)))
 	{
 		return status;
 	}
@@ -104,7 +108,7 @@ IThread_Client_job(IThread *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 6, iid, &outd)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_job, iid, &outd)))
 	{
 		return status;
 	}
@@ -127,7 +131,7 @@ IThread_Client_ns(IThread *me, REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 7, iid, &outd)))
+	if(E_SUCCESS != (status = ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_ns, iid, &outd)))
 	{
 		return status;
 	}
@@ -143,7 +147,7 @@ IThread_Client_ns(IThread *me, REFUUID iid, void **out)
 static void
 IThread_Client_yield(IThread *me)
 {
-	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, 8);
+	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_yield);
 }
 
 #endif /*!RUNTIME_BUILD_EXEC*/

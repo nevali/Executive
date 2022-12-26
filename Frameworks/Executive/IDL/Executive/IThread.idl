@@ -57,10 +57,25 @@ interface IThread: IObject
 		/* Condition flags */
 	} ThreadFlags;
 
+	const int IThread_ID__MIN_ = 0x0010;
+
+	const int IThread_ID_id = IThread_ID__MIN_ + 1;
 	THREADID id(void);
+
+	const int IThread_ID_flags = IThread_ID_id + 1;
 	ThreadFlags flags(void);
+
+	const int IThread_ID_task = IThread_ID_flags + 1;
 	STATUS task([in] REFUUID iid, [out, iid_is(iid)] void **out);
+
+	const int IThread_ID_job = IThread_ID_task + 1;
 	STATUS job([in] REFUUID iid, [out, iid_is(iid)] void **out);
+
+	const int IThread_ID_ns = IThread_ID_job + 1;
 	STATUS ns([in] REFUUID iid, [out, iid_is(iid)] void **out);
+
+	const int IThread_ID_yield = IThread_ID_ns + 1;
 	[local] void yield(void);
+
+	const int IThread_ID__MAX_ = IThread_ID_yield;
 }

@@ -7,6 +7,7 @@
 # include <Executive/Internal/Runtime.h>
 # include <Executive/Internal/Classes.h>
 # include <Executive/Internal/Executive.h>
+# include <Executive/Internal/Despatch.h>
 # include <PAL/PAL.h>
 
 typedef struct Executive_Classes_Object Executive_Classes_Object;

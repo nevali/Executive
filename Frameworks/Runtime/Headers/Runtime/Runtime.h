@@ -30,5 +30,6 @@
 # include <Runtime/Log.h>
 # include <Runtime/Status.h>
 # include <Runtime/Task.h>
+# include <Runtime/Namespace.h>
 
 #endif /*!RUNTIME_RUNTIME_H_*/

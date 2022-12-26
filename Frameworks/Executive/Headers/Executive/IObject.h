@@ -45,15 +45,19 @@ DECLARE_INTERFACE(IObject)
 	BEGIN_INTERFACE
 
 #  ifdef __cplusplus
-	static const int32_t IObject_ID_queryInterface = 0;
-	static const int32_t IObject_ID_retain = 1;
-	static const int32_t IObject_ID_release = 2;
+	static const int32_t IObject_ID__MIN_ = 0;
+	static const int32_t IObject_ID_queryInterface = IObject_ID__MIN_;
+	static const int32_t IObject_ID_retain = IObject_ID_queryInterface+1;
+	static const int32_t IObject_ID_release = IObject_ID_retain+1;
+	static const int32_t IObject_ID__MAX_ = IObject_ID_release;
 
 #  else /*__cplusplus*/
 
-#  define IObject_ID_queryInterface 0
-#  define IObject_ID_retain 1
-#  define IObject_ID_release 2
+#  define IObject_ID__MIN_ 0
+#  define IObject_ID_queryInterface IObject_ID__MIN_
+#  define IObject_ID_retain IObject_ID_queryInterface+1
+#  define IObject_ID_release IObject_ID_retain+1
+#  define IObject_ID__MAX_ IObject_ID_release
 #  endif /*__cplusplus*/
 
 	/* IObject */
@@ -72,8 +76,9 @@ DECLARE_INTERFACE(IObject)
 #  undef INTERFACE
 # endif /*!__IObject_INTERFACE_DEFINED__*/
 
-#  define IObject_ID_retain 1
-#  define IObject_ID_release 2
+#  define IObject_ID_retain IObject_ID_queryInterface+1
+#  define IObject_ID_release IObject_ID_retain+1
+#  define IObject_ID__MAX_ IObject_ID_release
 
 #endif /*!IOBJECT_H_IDL_*/
 

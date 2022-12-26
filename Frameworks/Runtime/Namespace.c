@@ -23,11 +23,22 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Client.h"
+#include "p_Runtime.h"
 
-#if RUNTIME_BUILD_USER
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-# include <Executive/ILink.h>
+STATUS
+RtOpenAs(const char *path, REFUUID iid, void **out)
+{
+#if RUNTIME_BUILD_EXEC
+	if(!executive.data.rootNS)
+	{
+		return E_NOTIMPL;
+	}
+	return INamespace_open(executive.data.rootNS, path, NULL, iid, out);
+#else
+	if(!Rt__private__.ns)
+	{
+		return E_NOTIMPL;
+	}
+	return INamespace_open(Rt__private__.ns, path, NULL, iid, out);
 #endif
+}

@@ -31,6 +31,12 @@ interface IIterator: IObject
 	cpp_quote("# warning The IIterator interface is currently considered unstable; source and binary compatibility is not assured.");
 	cpp_quote("#endif");
 	
+	const int IIterator_ID__MIN_ = 0x0080;
+
+	const int IIterator_ID_next = IIterator_ID__MIN_;
 	STATUS next(void);
+	const int IIterator_ID_current = IIterator_ID_next + 1;
 	IObject *current(void);
+
+	const int IITerator_ID__MAX_ = IIterator_ID_current;
 }

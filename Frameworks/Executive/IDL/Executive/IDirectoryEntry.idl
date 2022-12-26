@@ -33,6 +33,7 @@ interface IDirectoryEntry: IObject
 
 	typedef enum
 	{
+		DEF_INVALID = -1,
 		DEF_NONE = 0,
 		DEF_SYSTEM = (1<<0),
 		DEF_CONTAINER = (1<<1),
@@ -43,12 +44,20 @@ interface IDirectoryEntry: IObject
 		DEF_MOUNTPOINT = (1<<6)
 	} DirectoryEntryFlags;
 
+	const int IDirectoryEntry_ID__MIN_ = 0x0070;
+
 	/* Attempt to obtain an interface on the entry's target object */
+	const int IDirectoryEntry_ID_queryTargetInterface = IDirectoryEntry_ID__MIN_ + 1;
 	STATUS queryTargetInterface([in] REFUUID iid, [out,iid_is(iid)] void **out);
 
 	/* Retrieve the entry's properties */
+	const int IDirectoryEntry_ID_name = IDirectoryEntry_ID_queryTargetInterface + 1;
 	[local] const char *name(void);
+
+	const int IDirectoryEntry_ID_classid = IDirectoryEntry_ID_name + 1;
 	void classid([out] UUID *clsid);
+
+	const int IDirectoryEntry_ID_flags = IDirectoryEntry_ID_classid + 1;
 	DirectoryEntryFlags flags(void);
 	/* timestamps */
 	/* size */
@@ -57,5 +66,6 @@ interface IDirectoryEntry: IObject
 	/* storage reference (device, inode) */
 
 	/* Set properties on the entry */
+	const int IDirectoryEntry_ID_setFlags = IDirectoryEntry_ID_flags + 1;
 	STATUS setFlags(DirectoryEntryFlags flags);
 }
