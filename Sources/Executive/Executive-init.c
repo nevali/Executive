@@ -176,10 +176,6 @@ Executive_init_directory(void)
 		Executive_init_sysContainer();
 	}
 	EXLOGF((LOG_DEBUG, "Executive::init_directory(): initial population of the object directory completed"));
-#ifdef EXEC_BUILD_DEBUG
-	EXLOGF((LOG_NOTICE, "Executive::init_directory(): dump of object directory follows:-"));
-	Executive_Directory_dump((IContainer *) (void *) executive.data.rootNS);
-#endif
 }
 
 /*PRIVATE*/

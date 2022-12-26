@@ -26,7 +26,7 @@ Executive_Directory_MDirectoryEntryTarget_createInstance(MDirectoryEntryTarget *
 	 */
 	ExAssert(NULL != out);
 
-	EXLOGF((LOG_TRACE, "Executive::Directory::[Generic]<MDirectoryEntryTarget>::+createInstance(%d, %s)", self->kind, (entry ? IDirectoryEntry_name(entry) : "NULL" )));
+/*	EXLOGF((LOG_TRACE, "Executive::Directory::[Generic]<MDirectoryEntryTarget>::+createInstance(%d, %s)", self->kind, (entry ? IDirectoryEntry_name(entry) : "NULL" ))); */
 
 	*out = NULL;
 	if(self->kind == DK_ROOT)
@@ -42,7 +42,7 @@ Executive_Directory_MDirectoryEntryTarget_createInstance(MDirectoryEntryTarget *
 		ExAssert(NULL != entry);
 		if(NULL == entry)
 		{
-			EXLOGF((LOG_CONDITION, "%%E-INVAL: Executive::Directory::[Generic]::+createInstance() invoked with entry == NULL and self->kind = %d", self->kind));
+/*			EXLOGF((LOG_CONDITION, "%%E-INVAL: Executive::Directory::[Generic]::+createInstance() invoked with entry == NULL and self->kind = %d", self->kind)); */
 			return E_INVAL;
 		}
 	}
@@ -77,22 +77,22 @@ Executive_Directory_MDirectoryEntryTarget_createInstance(MDirectoryEntryTarget *
 			/* ExAssert(NULL == executive.data.rootDirectory); */
 			break;
 		case DK_DOMAIN:
-			EXLOGF((LOG_DEBUG, "created Executive::Directory::Domain ('%s')", IDirectoryEntry_name(entry)));
+/*			EXLOGF((LOG_DEBUG, "created Executive::Directory::Domain ('%s')", IDirectoryEntry_name(entry))); */
 			break;
 		case DK_SYSTEM:
-			EXLOGF((LOG_DEBUG, "created Executive::Directory::System ('%s')", IDirectoryEntry_name(entry)));
+/*			EXLOGF((LOG_DEBUG, "created Executive::Directory::System ('%s')", IDirectoryEntry_name(entry))); */
 			break;
 		case DK_NETWORK:
-			EXLOGF((LOG_DEBUG, "created Executive::Directory::Network ('%s')",  IDirectoryEntry_name(entry)));
+/*			EXLOGF((LOG_DEBUG, "created Executive::Directory::Network ('%s')",  IDirectoryEntry_name(entry))); */
 			break;
 		case DK_LOCAL:
-			EXLOGF((LOG_DEBUG, "created Executive::Directory::Local ('%s')",  IDirectoryEntry_name(entry)));
+/*			EXLOGF((LOG_DEBUG, "created Executive::Directory::Local ('%s')",  IDirectoryEntry_name(entry))); */
 			break;
 		case DK_CLUSTER:
-			EXLOGF((LOG_DEBUG, "created Executive::Directory::Cluster ('%s')",  IDirectoryEntry_name(entry)));
+/*			EXLOGF((LOG_DEBUG, "created Executive::Directory::Cluster ('%s')",  IDirectoryEntry_name(entry))); */
 			break;
 		case DK_CONTAINER:
-			EXLOGF((LOG_DEBUG, "created Executive::Directory::Container ('%s')",  IDirectoryEntry_name(entry)));
+/*			EXLOGF((LOG_DEBUG, "created Executive::Directory::Container ('%s')",  IDirectoryEntry_name(entry))); */
 			break;
 	}
 #endif

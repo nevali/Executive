@@ -83,7 +83,7 @@ DECLARE_INTERFACE_(IDirectoryEntry, IObject)
 
 	/* IDirectoryEntry */
 	STDMETHOD_(STATUS, queryTargetInterface)(THIS_ REFUUID iid, void **out) PURE;
-	STDMETHOD_(const char*, name)(THIS) PURE;
+	STDMETHOD_(STATUS, name)(THIS_ char *buf, size_t buflen) PURE;
 	STDMETHOD_(void, classid)(THIS_ UUID *clsid) PURE;
 	STDMETHOD_(DirectoryEntryFlags, flags)(THIS) PURE;
 	STDMETHOD_(STATUS, setFlags)(THIS_ DirectoryEntryFlags flags) PURE;
@@ -96,7 +96,7 @@ DECLARE_INTERFACE_(IDirectoryEntry, IObject)
 #   define IDirectoryEntry_retain(__this) __this->lpVtbl->retain(__this)
 #   define IDirectoryEntry_release(__this) __this->lpVtbl->release(__this)
 #   define IDirectoryEntry_queryTargetInterface(__this, iid, out) __this->lpVtbl->queryTargetInterface(__this, iid, out)
-#   define IDirectoryEntry_name(__this) __this->lpVtbl->name(__this)
+#   define IDirectoryEntry_name(__this, buf, buflen) __this->lpVtbl->name(__this, buf, buflen)
 #   define IDirectoryEntry_classid(__this, clsid) __this->lpVtbl->classid(__this, clsid)
 #   define IDirectoryEntry_flags(__this) __this->lpVtbl->flags(__this)
 #   define IDirectoryEntry_setFlags(__this, flags) __this->lpVtbl->setFlags(__this, flags)

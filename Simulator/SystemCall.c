@@ -51,10 +51,12 @@ ExSystemCall(int descriptor, int method, ...)
 		despatch.syscall.arg[7] = va_arg(ap, uintptr_t);
 	}
 	va_end(ap);
+#if 0
 	fprintf(stderr, "Simulator:  ExSystemCall(%d, %04x, %lx, %lx, %lx, %lx, %lx, %lx)\n", descriptor, method,
 		despatch.syscall.arg[2], despatch.syscall.arg[3],
 		despatch.syscall.arg[4], despatch.syscall.arg[5],
 		despatch.syscall.arg[6], despatch.syscall.arg[7]);
+#endif
 	Executive_despatch(&despatch);
 	return despatch.syscall.status;
 }

@@ -15,7 +15,7 @@ static REFCOUNT Executive_Directory_Entry_retain(IDirectoryEntry *me);
 static REFCOUNT Executive_Directory_Entry_release(IDirectoryEntry *me);
 /* IDirectoryEntry */
 static STATUS Executive_Directory_Entry_queryTargetInterface(IDirectoryEntry *me, REFUUID iid, void **out);
-static const char *Executive_Directory_Entry_name(IDirectoryEntry *me);
+static STATUS Executive_Directory_Entry_name(IDirectoryEntry *me, char *buf, size_t bufsize);
 static void Executive_Directory_Entry_classid(IDirectoryEntry *me, UUID *clsid);
 static DirectoryEntryFlags Executive_Directory_Entry_flags(IDirectoryEntry *me);
 static STATUS Executive_Directory_Entry_setFlags(IDirectoryEntry *me, DirectoryEntryFlags flags);
@@ -111,12 +111,16 @@ Executive_Directory_Entry_queryTargetInterface(IDirectoryEntry *me, REFUUID iid,
     return E_NOTIMPL;   
 }
 
-static const char *
-Executive_Directory_Entry_name(IDirectoryEntry *me)
+static STATUS
+Executive_Directory_Entry_name(IDirectoryEntry *me, char *buf, size_t bufsize)
 {
     Executive_Directory_Entry *self = INTF_TO_CLASS(me);
 
-    return self->data.name;
+    if(buf)
+    {
+        return ExStrCopy(buf, bufsize, self->data.name);
+    }
+    return ExStrLen(self->data.name);
 }
 
 static void

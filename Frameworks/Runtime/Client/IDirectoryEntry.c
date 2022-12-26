@@ -28,7 +28,7 @@
 #if !RUNTIME_BUILD_EXEC
 
 static STATUS IDirectoryEntry_Client_queryTargetInterface(IDirectoryEntry *self, REFUUID iid, void **out);
-static const char *IDirectoryEntry_Client_name(IDirectoryEntry *self);
+static STATUS IDirectoryEntry_Client_name(IDirectoryEntry *self, char *buf, size_t bufsize);
 static void IDirectoryEntry_Client_classid(IDirectoryEntry *self, UUID *classid);
 static DirectoryEntryFlags IDirectoryEntry_Client_flags(IDirectoryEntry *self);
 static STATUS IDirectoryEntry_Client_setFlags(IDirectoryEntry *self, DirectoryEntryFlags flags);
@@ -71,12 +71,10 @@ IDirectoryEntry_Client_queryTargetInterface(IDirectoryEntry *me, REFUUID iid, vo
 	return status;
 }
 
-static const char *
-IDirectoryEntry_Client_name(IDirectoryEntry *me)
+static STATUS
+IDirectoryEntry_Client_name(IDirectoryEntry *me, char *buf, size_t bufsize)
 {
-	UNUSED__(me);
-
-	return "(no names yet)";
+	return ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IDirectoryEntry_ID_name, buf, bufsize);
 }
 
 static void

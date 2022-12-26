@@ -41,9 +41,14 @@ EXEC_DESPATCH_HANDLER(IDirectoryEntry)
 			}
 			return;
 		}
-		/* [local] const char *name(void); */
+		/* [local] STATUS name(char *buf, size_t buflen); */
 		EXEC_DESPATCH_HANDLE(IDirectoryEntry, name)
 		{
+			char *r2;
+
+			EXEC_DESPATCH_XFER_OUT_FROM_USER(despatch->syscall.arg[2], r2, despatch->syscall.arg[3]);
+			despatch->syscall.status = IDirectoryEntry_name(target, r2, despatch->syscall.arg[3]);
+			EXEC_DESPATCH_XFER_OUT_TO_USER(despatch->syscall.arg[2], r2, despatch->syscall.arg[3]);
 			return;
 		}
 		/* void classid([out] UUID *clsid); */

@@ -52,7 +52,7 @@ interface IDirectoryEntry: IObject
 
 	/* Retrieve the entry's properties */
 	const int IDirectoryEntry_ID_name = IDirectoryEntry_ID_queryTargetInterface + 1;
-	[local] const char *name(void);
+	[local] STATUS name([out, string] char *buf, [in] size_t buflen);
 
 	const int IDirectoryEntry_ID_classid = IDirectoryEntry_ID_name + 1;
 	void classid([out] UUID *clsid);

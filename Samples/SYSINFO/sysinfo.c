@@ -47,7 +47,7 @@ static void
 dumpDir(IContainer *self, const char *name, int depth)
 {
 	size_t c;
-	char space[80], flagsbuf[16];
+	char ename[64], space[80], flagsbuf[16];
 	UUID clsid;
 	UUIDBUF cbuf;
 	const char *cname;
@@ -121,18 +121,19 @@ dumpDir(IContainer *self, const char *name, int depth)
 			flagsbuf[3] = '-';
 		}
 		flagsbuf[4] = 0;
+		IDirectoryEntry_name(dirent, ename, sizeof(ename));
 		if((flags & DEF_LINK) && E_SUCCESS == IDirectoryEntry_queryTargetInterface(dirent, &IID_ILink, (void **) &link))
 		{
-			RTLOGF((LOG_NOTICE, "%42s %s  %s%s -> %s", cname, flagsbuf, space, IDirectoryEntry_name(dirent), ILink_target(link)));
+			RTLOGF((LOG_NOTICE, "%42s %s  %s%s -> %s", cname, flagsbuf, space, ename, ILink_target(link)));
 			ILink_release(link);
 		}
 		else
 		{
-			RTLOGF((LOG_NOTICE, "%42s %s  %s%s", cname, flagsbuf, space, IDirectoryEntry_name(dirent)));
+			RTLOGF((LOG_NOTICE, "%42s %s  %s%s", cname, flagsbuf, space, ename));
 		}
 		if((flags & DEF_CONTAINER) && E_SUCCESS == IDirectoryEntry_queryTargetInterface(dirent, &IID_IContainer, (void **) &container))
 		{
-			dumpDir(container, IDirectoryEntry_name(dirent), depth + 2);
+			dumpDir(container, ename, depth + 2);
 			IContainer_release(container);
 		}
 		IDirectoryEntry_release(dirent);

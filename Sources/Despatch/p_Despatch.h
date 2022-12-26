@@ -75,6 +75,12 @@
 		return; \
 	} \
 	ExMemCopy((void *) (dest), (void *) (src), (nbytes))
+/* Map userspace region from src + nybtes corresponding to an [out] parameter to pointer ptr */
+# define EXEC_DESPATCH_XFER_OUT_FROM_USER(src, ptr, nbytes) \
+	ptr = (void *) (src);
+/* Undo previous buffer mapping */
+# define EXEC_DESPATCH_XFER_OUT_TO_USER(src, ptr, nbytes)
+
 /* create a descriptor for interface type iid provided by obj and store the
  * result in 'ret', which is assumed to be castable to an int * pointer into
  * userspace (just call Executive_Despatch_Context_descriptor if you want the

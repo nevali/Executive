@@ -103,8 +103,6 @@ void Executive_Directory_unlinked(IDirectoryEntryTarget *me, IDirectoryEntry *en
 /** Executive::Directory::Entry **/
 Executive_Directory_Entry *Executive_Directory_Entry_create(const char *name, REFUUID clsid, DirectoryEntryFlags flags);
 
-void Executive_Directory_dump(IContainer *me);
-
 /** Executive::Directory::Iterator */
 Executive_Directory_Iterator *Executive_Directory_Iterator_create(Executive_Directory_Entry *dirent);
 
