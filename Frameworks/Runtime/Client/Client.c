@@ -85,6 +85,10 @@ Runtime_Client_createFor(int descriptor, REFUUID iid, void **out)
 	{
 		*out = IDirectoryEntry_Client_create(descriptor);
 	}
+	else if(RtUuidEqual(iid, &IID_ILink))
+	{
+		*out = ILink_Client_create(descriptor);
+	}
 	else
 	{
 		RTLOGF((LOG_WARNING, "Runtime: WARNING: iid:" UUID_PRINTF_FORMAT " is not supported", UUID_PRINTF_ARGS(iid)));

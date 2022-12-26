@@ -124,7 +124,14 @@ dumpDir(IContainer *self, const char *name, int depth)
 		IDirectoryEntry_name(dirent, ename, sizeof(ename));
 		if((flags & DEF_LINK) && E_SUCCESS == IDirectoryEntry_queryTargetInterface(dirent, &IID_ILink, (void **) &link))
 		{
-			RTLOGF((LOG_NOTICE, "%42s %s  %s%s -> %s", cname, flagsbuf, space, ename, ILink_target(link)));
+			char *linkbuf;
+			size_t bufsize;
+
+			bufsize = ILink_target(link, NULL, 0);
+			linkbuf = RtMemAlloc(bufsize);
+			ILink_target(link, linkbuf, bufsize);
+			RTLOGF((LOG_NOTICE, "%42s %s  %s%s -> %s", cname, flagsbuf, space, ename, linkbuf));
+			RtMemFree(linkbuf);
 			ILink_release(link);
 		}
 		else

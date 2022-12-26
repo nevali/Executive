@@ -9,3 +9,4 @@
 0x006x => INamespace
 0x007x => IDirectoryEntry
 0x008x => IIterator
+0x009x => ILink

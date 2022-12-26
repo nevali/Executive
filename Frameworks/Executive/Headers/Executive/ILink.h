@@ -44,6 +44,18 @@ DECLARE_INTERFACE_(ILink, IObject)
 {
 	BEGIN_INTERFACE
 
+#  ifdef __cplusplus
+	static const int32_t ILink_ID__MIN_ = 144;
+	static const int32_t ILink_ID_target = ILink_ID__MIN_;
+	static const int32_t ILink_ID__MAX_ = ILink_ID_target;
+
+#  else /*__cplusplus*/
+
+#  define ILink_ID__MIN_ 144
+#  define ILink_ID_target ILink_ID__MIN_
+#  define ILink_ID__MAX_ ILink_ID_target
+#  endif /*__cplusplus*/
+
 # if !defined(__cplusplus)
 	/* IObject */
 	STDMETHOD_(STATUS, queryInterface)(THIS_ REFUUID riid, void **object) PURE;
@@ -52,7 +64,7 @@ DECLARE_INTERFACE_(ILink, IObject)
 # endif /*!__cplusplus*/
 
 	/* ILink */
-	STDMETHOD_(const char*, target)(THIS) PURE;
+	STDMETHOD_(STATUS, target)(THIS_ char *buf, size_t buflen) PURE;
 
 	END_INTERFACE
 };
@@ -61,11 +73,12 @@ DECLARE_INTERFACE_(ILink, IObject)
 #   define ILink_queryInterface(__this, riid, object) __this->lpVtbl->queryInterface(__this, riid, object)
 #   define ILink_retain(__this) __this->lpVtbl->retain(__this)
 #   define ILink_release(__this) __this->lpVtbl->release(__this)
-#   define ILink_target(__this) __this->lpVtbl->target(__this)
+#   define ILink_target(__this, buf, buflen) __this->lpVtbl->target(__this, buf, buflen)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__ILink_INTERFACE_DEFINED__*/
 
+#  define ILink_ID__MAX_ ILink_ID_target
 
 #endif /*!ILINK_H_IDL_*/
 

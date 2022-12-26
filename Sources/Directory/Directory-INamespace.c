@@ -143,9 +143,18 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 				EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: Executive::Directory::ResolveContainer(): '%s' does not support ILink", buffer));
 				break;
 			}
-			EXLOGF((LOG_DEBUG7, "attempting to resolve '%s'", ILink_target(link)));
-			status = Executive_Directory_resolveEntry(me, ILink_target(link), scope, &linkEntry);
-			ILink_release(link);
+			{
+				char *buf;
+				size_t buflen;
+
+				buflen = ILink_target(link, NULL, 0);
+				buf = ExAlloc(buflen);
+				ILink_target(link, buf, buflen);
+				EXLOGF((LOG_DEBUG7, "attempting to resolve '%s'", buf));
+				status = Executive_Directory_resolveEntry(me, buf, scope, &linkEntry);
+				ExFree(buf);
+				ILink_release(link);
+			}
 			if(E_SUCCESS != status)
 			{
 				EXLOGF((LOG_DEBUG, "resolveEntry() failed %d", status));

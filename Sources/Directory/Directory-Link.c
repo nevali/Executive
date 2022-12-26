@@ -25,7 +25,7 @@ static STATUS Executive_Directory_Link_queryInterface(ILink *me, REFUUID iid, vo
 static REFCOUNT Executive_Directory_Link_retain(ILink *me);
 static REFCOUNT Executive_Directory_Link_release(ILink *me);
 /* ILink */
-static const char *Executive_Directory_Link_target(ILink *me);
+static STATUS Executive_Directory_Link_target(ILink *me, char *buf, size_t bufsize);
 
 static struct ILink_vtable_ Executive_Directory_Link_vtable = {
     Executive_Directory_Link_queryInterface,
@@ -82,10 +82,14 @@ Executive_Directory_Link_release(ILink *me)
     });
 }
 
-static const char *
-Executive_Directory_Link_target(ILink *me)
+static STATUS
+Executive_Directory_Link_target(ILink *me, char *buf, size_t bufsize)
 {
     Executive_Directory_Link *self = INTF_TO_CLASS(me);
     
-    return self->data.target;
+    if(buf)
+    {
+        ExStrCopy(buf, bufsize, self->data.target);
+    }
+    return ExStrLen(self->data.target) + 1;
 }

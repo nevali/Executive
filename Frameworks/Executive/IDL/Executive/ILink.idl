@@ -31,5 +31,10 @@ interface ILink: IObject
 	cpp_quote("# warning The ILink interface is currently considered unstable; source and binary compatibility is not assured.");
 	cpp_quote("#endif");
 
-	[local] const char *target(void);
+	const int ILink_ID__MIN_ = 0x0090;
+
+	const int ILink_ID_target = ILink_ID__MIN_;
+	STATUS target([out, string] char *buf, [in] size_t buflen);
+
+	const int ILink_ID__MAX_ = ILink_ID_target;
 }

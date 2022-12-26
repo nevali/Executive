@@ -48,7 +48,8 @@ static struct Executive_Despatch_Context_Handler handlers[] = {
 	DECLARE_HANDLER(IIterator),
 	DECLARE_HANDLER(IContainer),
 	DECLARE_HANDLER(IDirectoryEntry),
-
+	DECLARE_HANDLER(ILink),
+	
 	{ NULL, NULL }
 };
 

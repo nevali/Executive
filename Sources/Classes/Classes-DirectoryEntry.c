@@ -21,7 +21,7 @@ static STATUS Executive_Classes_DirectoryEntry_setFlags(IDirectoryEntry *me, Dir
 static STATUS Executive_Classes_DirectoryEntry_resolve(IContainer *me, const char *name, IDirectoryEntry **entry);
 static IIterator *Executive_Classes_DirectoryEntry_iterator(IContainer *me);
 /* ILink */
-static const char *Executive_Classes_DirectoryEntry_target(ILink *me);
+static STATUS Executive_Classes_DirectoryEntry_target(ILink *me, char *buf, size_t bufsize);
 
 static struct IDirectoryEntry_vtable_ Executive_Classes_DirectoryEntry_vtable = {
 	EXEC_COMMON_VTABLE_IOBJECT(Executive_Classes_DirectoryEntry, IDirectoryEntry),
@@ -146,7 +146,7 @@ Executive_Classes_DirectoryEntry_name(IDirectoryEntry *me, char *buf, size_t buf
     {
         return ExStrCopy(buf, bufsize, self->data.name);
     }
-    return ExStrLen(self->data.name);
+    return ExStrLen(self->data.name) + 1;
 }
 
 static void
@@ -205,14 +205,18 @@ Executive_Classes_DirectoryEntry_iterator(IContainer *me)
 
 /* ILink */
 
-const char *
-Executive_Classes_DirectoryEntry_target(ILink *me)
+static STATUS
+Executive_Classes_DirectoryEntry_target(ILink *me, char *buf, size_t bufsize)
 {
     Executive_Classes_DirectoryEntry *self = INTF_TO_CLASS(me);
 
     if(!(self->data.flags & DEF_LINK))
     {
-        return NULL;
+        return 0;
     }
-    return self->data.target;
+    if(buf)
+    {
+        ExStrCopy(buf, bufsize, self->data.target);
+    }
+    return ExStrLen(self->data.target);
 }

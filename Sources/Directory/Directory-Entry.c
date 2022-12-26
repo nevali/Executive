@@ -120,7 +120,7 @@ Executive_Directory_Entry_name(IDirectoryEntry *me, char *buf, size_t bufsize)
     {
         return ExStrCopy(buf, bufsize, self->data.name);
     }
-    return ExStrLen(self->data.name);
+    return ExStrLen(self->data.name) + 1;
 }
 
 static void

@@ -27,6 +27,7 @@
 # include <Executive/Internal/Executive.h>
 # include <Executive/Internal/Despatch.h>
 # include <Executive/IWriteChannel.h>
+# include <Executive/ILink.h>
 
 #define EXEC_DESPATCH_HANDLER(name) \
 	void Executive_Despatch_Handlers_ ## name (ExecutiveDespatch *despatch, void *object, Executive_Despatch_Context *context, IThread *currentThread)
@@ -145,6 +146,7 @@ EXTERN_C EXEC_DESPATCH_HANDLER(IRegion);
 EXTERN_C EXEC_DESPATCH_HANDLER(IWriteChannel);
 EXTERN_C EXEC_DESPATCH_HANDLER(IIterator);
 EXTERN_C EXEC_DESPATCH_HANDLER(IDirectoryEntry);
+EXTERN_C EXEC_DESPATCH_HANDLER(ILink);
 
 EXTERN_C int Executive_Despatch_Context_descriptor(Executive_Despatch_Context *context, void *object, REFUUID iid);
 

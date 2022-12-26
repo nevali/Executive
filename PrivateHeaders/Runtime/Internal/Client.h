@@ -10,6 +10,7 @@
 # include <Executive/IAddressSpace.h>
 # include <Executive/INamespace.h>
 # include <Executive/IWriteChannel.h>
+# include <Executive/ILink.h>
 
 typedef union Runtime_Client Runtime_Client;
 
@@ -42,6 +43,7 @@ DECLARE_CLIENT(IContainer);
 DECLARE_CLIENT(IWriteChannel);
 DECLARE_CLIENT(IIterator);
 DECLARE_CLIENT(IDirectoryEntry);
+DECLARE_CLIENT(ILink);
 
 /* Invoked by the runtime during initialisation */
 EXTERN_C void IAddressSpace_Client_init_(IAddressSpace_Client *self, int descriptor) RUNTIME_PRIVATE__(IAddressSpace_Client_init_);
