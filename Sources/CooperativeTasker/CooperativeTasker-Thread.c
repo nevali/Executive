@@ -21,6 +21,7 @@ static STATUS Executive_CooperativeTasker_Thread_task(IThread *me, REFUUID iid, 
 static STATUS Executive_CooperativeTasker_Thread_job(IThread *me, REFUUID iid, void **out);
 static STATUS Executive_CooperativeTasker_Thread_namespace(IThread *me, REFUUID iid, void **out);
 static void Executive_CooperativeTasker_Thread_yield(IThread *me);
+static STATUS Executive_CooperativeTasker_Thread_sleepSeconds(IThread *me, int seconds);
 
 /*PRIVATE*/
 static void Executive_CooperativeTasker_Thread_destroy(Executive_CooperativeTasker_Thread *self);
@@ -35,7 +36,8 @@ const struct IThread_vtable_ Executive_CooperativeTasker_Thread_vtable = {
 	Executive_CooperativeTasker_Thread_task,
 	Executive_CooperativeTasker_Thread_job,
 	Executive_CooperativeTasker_Thread_namespace,
-	Executive_CooperativeTasker_Thread_yield
+	Executive_CooperativeTasker_Thread_yield,
+	Executive_CooperativeTasker_Thread_sleepSeconds
 };
 
 /*INTERNAL*/
@@ -167,6 +169,17 @@ Executive_CooperativeTasker_Thread_yield(IThread *me)
 	ExAssert(self->data.task->data.tasker);
 
 	Executive_CooperativeTasker_yield(&(self->data.task->data.tasker->Tasker));
+}
+
+static STATUS
+Executive_CooperativeTasker_Thread_sleepSeconds(IThread *me, int seconds)
+{
+	Executive_CooperativeTasker_Thread *self = INTF_TO_CLASS(me);
+
+	UNUSED__(self);
+	UNUSED__(seconds);
+
+	return E_NOTIMPL;
 }
 
 /*INTERNAL*/

@@ -60,6 +60,9 @@ Executive_init(Executive *self, struct ExecutiveEntryParameters *params, IPlatfo
 	Executive_init_diagnostics();
 	Executive_init_directory();
 	Executive_init_tasker();
+#if FEATURE_BOOTPROGRESS
+	ExLog(LOG_INFO, " - " PACKAGE_NAME " subsystems initialised");
+#endif
 	return E_SUCCESS;
 }
 
@@ -134,7 +137,10 @@ Executive_init_diagnostics(void)
 
 	ExNotice(PRODUCT_FULLNAME " " PACKAGE_NAME " [" HOST_FAMILY "] - " PRODUCT_RELEASE);
 	ExNotice("  version " PACKAGE_VERSION ", build " PRODUCT_BUILD_ID_STR ", built at " PRODUCT_BUILD_DATE " " PRODUCT_BUILD_TIME " by " PRODUCT_BUILD_USER "@" PRODUCT_BUILD_HOST);
-
+#if FEATURE_BOOTPROGRESS
+	ExLog(LOG_INFO, "");
+	ExLog(LOG_INFO, "System initialisation progress:");
+#endif
 }
 
 /*PRIVATE*/
@@ -145,8 +151,11 @@ Executive_init_directory(void)
 	IDirectoryEntryTarget *target;
 
 	/* Request the MDirectoryEntryTarget metaclass interface from Executive::Directory::Root */
-	ExPhaseShift(PHASE_STARTUP_ROOT);
+	ExPhaseShift(PHASE_STARTUP_ROOT);	
 	EXLOGF((LOG_DEBUG, "Executive::init_directory(): populating the root directory"));
+#if FEATURE_BOOTPROGRESS
+	ExLog(LOG_INFO, " - Populating initial object directory...");
+#endif
 	ExAssert(E_SUCCESS == Executive_metaClass(&CLSID_Executive_Root, &IID_MDirectoryEntryTarget, (void **) &meta));
 	/* invoke the constructor on the metaclass interface, MDirectoryEntryTarget::createInstance()
 	 * to create the root instance itself
@@ -184,6 +193,9 @@ Executive_init_tasker(void)
 {
 	/* Create an instance of the built-in co-operative tasker */
 	ExPhaseShift(PHASE_STARTUP_TASKER);
+#if FEATURE_BOOTPROGRESS
+	ExLog(LOG_INFO, " - Starting the Tasker...");
+#endif
 	/* XXX this should be via a metaclass interface */
 	executive.data.tasker = Executive_CooperativeTasker_create();
 	if(NULL == executive.data.tasker)

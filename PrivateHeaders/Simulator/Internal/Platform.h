@@ -1,6 +1,8 @@
 #ifndef SIMULATOR_INTERNAL_PLATFORM_H_
 # define SIMULATOR_INTERNAL_PLATFORM_H_ 1
 
+# include <signal.h>
+
 # include <PAL/PAL.h>
 # include <Simulator/Internal/Diagnostics.h>
 # include <Simulator/Internal/AddressSpace.h>
@@ -27,6 +29,7 @@ namespace PAL
 			Platform();
 		public:
 			/* Static APIs and helpers */
+			static STATUS metaClass(REFUUID clsid, REFUUID iid, void **out);
 			static void log(LogLevel level, const char *str);
 			static void logf(LogLevel level, const char *format, ...);
 			static void trace(const char *str);
@@ -59,6 +62,10 @@ namespace PAL
 			virtual IIterator *iterator(void);
 		private:
 			bool createPlatformContainer(void);
+			void installSignalHandlers(void);
+		private:
+			static void powerSignalHandler(int signo);
+			static void exceptionHandler(int signo, siginfo_t *info, void *context);
 		};
 	}
 }

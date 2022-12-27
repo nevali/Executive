@@ -38,7 +38,7 @@ AddressSpace::AddressSpace(void)
 # warning PAL::Simulator::AddressSpace: no available API to determine default page size
 	pageSize_ = 4096; /* Default to 4KB pages without other info */
 #endif
-	Platform::logf(LOG_DEBUG, "PAL::Simulator::AddressSpace: page size is %u", pageSize_);
+	Platform::logf(LOG_DEBUG3, "PAL::Simulator::AddressSpace: page size is %u", pageSize_);
 }
 
 /* IObject */

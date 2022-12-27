@@ -36,9 +36,9 @@ static PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics = {
 	{ NULL, NULL }, /* WriteChannel */
 	{
 #if EXEC_BUILD_RELEASE
-		LOG_INFO
+		LOG_NOTICE
 #elif EXEC_BUILD_DEBUG
-		LOG_DEBUG2
+		LOG_INFO
 #else
 		LOG_CONDITION
 #endif
@@ -185,11 +185,19 @@ PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel(void)
 		{ "alert", LOG_ALERT },
 		{ "crit", LOG_CRITICAL },
 		{ "critical", LOG_CRITICAL },
+		{ "notice", LOG_NOTICE },
+		{ "err", LOG_ERROR },
+		{ "error", LOG_ERROR },
+		{ "warn", LOG_WARNING },
+		{ "warning", LOG_WARNING },
 		{ "info", LOG_INFO },
 		{ "condition", LOG_CONDITION },
 		{ "cond", LOG_CONDITION },
 		{ "debug", LOG_DEBUG },
 		{ "debug2", LOG_DEBUG2 },
+		{ "debug3", LOG_DEBUG3 },
+		{ "debug4", LOG_DEBUG4 },
+		{ "debug5", LOG_DEBUG5 },
 		{ "debug6", LOG_DEBUG6 },
 		{ "debug7", LOG_DEBUG7 },
 		{ "trace", LOG_TRACE },

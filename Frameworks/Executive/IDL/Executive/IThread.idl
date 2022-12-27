@@ -77,5 +77,8 @@ interface IThread: IObject
 	const int IThread_ID_yield = IThread_ID_ns + 1;
 	[local] void yield(void);
 
-	const int IThread_ID__MAX_ = IThread_ID_yield;
+	const int IThread_ID_sleepSeconds = IThread_ID_yield + 1;
+	STATUS sleepSeconds(int seconds);
+
+	const int IThread_ID__MAX_ = IThread_ID_sleepSeconds;
 }

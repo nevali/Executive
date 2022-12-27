@@ -66,7 +66,8 @@ DECLARE_INTERFACE_(IThread, IObject)
 	static const int32_t IThread_ID_job = IThread_ID_task+1;
 	static const int32_t IThread_ID_ns = IThread_ID_job+1;
 	static const int32_t IThread_ID_yield = IThread_ID_ns+1;
-	static const int32_t IThread_ID__MAX_ = IThread_ID_yield;
+	static const int32_t IThread_ID_sleepSeconds = IThread_ID_yield+1;
+	static const int32_t IThread_ID__MAX_ = IThread_ID_sleepSeconds;
 
 #  else /*__cplusplus*/
 
@@ -77,7 +78,8 @@ DECLARE_INTERFACE_(IThread, IObject)
 #  define IThread_ID_job IThread_ID_task+1
 #  define IThread_ID_ns IThread_ID_job+1
 #  define IThread_ID_yield IThread_ID_ns+1
-#  define IThread_ID__MAX_ IThread_ID_yield
+#  define IThread_ID_sleepSeconds IThread_ID_yield+1
+#  define IThread_ID__MAX_ IThread_ID_sleepSeconds
 #  endif /*__cplusplus*/
 
 # if !defined(__cplusplus)
@@ -94,6 +96,7 @@ DECLARE_INTERFACE_(IThread, IObject)
 	STDMETHOD_(STATUS, job)(THIS_ REFUUID iid, void **out) PURE;
 	STDMETHOD_(STATUS, ns)(THIS_ REFUUID iid, void **out) PURE;
 	STDMETHOD_(void, yield)(THIS) PURE;
+	STDMETHOD_(STATUS, sleepSeconds)(THIS_ int seconds) PURE;
 
 	END_INTERFACE
 };
@@ -108,6 +111,7 @@ DECLARE_INTERFACE_(IThread, IObject)
 #   define IThread_job(__this, iid, out) __this->lpVtbl->job(__this, iid, out)
 #   define IThread_ns(__this, iid, out) __this->lpVtbl->ns(__this, iid, out)
 #   define IThread_yield(__this) __this->lpVtbl->yield(__this)
+#   define IThread_sleepSeconds(__this, seconds) __this->lpVtbl->sleepSeconds(__this, seconds)
 #  endif /*!__cplusplus*/
 #  undef INTERFACE
 # endif /*!__IThread_INTERFACE_DEFINED__*/
@@ -117,7 +121,8 @@ DECLARE_INTERFACE_(IThread, IObject)
 #  define IThread_ID_job IThread_ID_task+1
 #  define IThread_ID_ns IThread_ID_job+1
 #  define IThread_ID_yield IThread_ID_ns+1
-#  define IThread_ID__MAX_ IThread_ID_yield
+#  define IThread_ID_sleepSeconds IThread_ID_yield+1
+#  define IThread_ID__MAX_ IThread_ID_sleepSeconds
 
 #endif /*!ITHREAD_H_IDL_*/
 

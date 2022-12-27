@@ -32,7 +32,9 @@ Executive_startup(Executive *self)
 	UNUSED__(self);
 	
 	ExPhaseShift(PHASE_STARTUP_EXECTASK);
-
+#if FEATURE_BOOTPROGRESS
+	ExLog(LOG_INFO, " - Starting the Bootstrap subsystem...");
+#endif
 	/* Open the Bootstrap subsystem */
 	if(E_SUCCESS != (status = ExOpen("/System/Subsystems/Bootstrap", &IID_ISubsystem, &subsystem)))
 	{

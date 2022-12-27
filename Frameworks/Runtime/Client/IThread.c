@@ -33,6 +33,7 @@ static STATUS IThread_Client_task(IThread *me, REFUUID iid, void **out);
 static STATUS IThread_Client_job(IThread *me, REFUUID iid, void **out);
 static STATUS IThread_Client_ns(IThread *me, REFUUID iid, void **out);
 static void IThread_Client_yield(IThread *me);
+static STATUS IThread_Client_sleepSeconds(IThread *me, int seconds);
 
 static struct IThread_vtable_ IThread_Client_vtable = {
 	RUNTIME_VTABLE_IOBJECT(Runtime_Client, IThread),
@@ -41,7 +42,8 @@ static struct IThread_vtable_ IThread_Client_vtable = {
 	IThread_Client_task,
 	IThread_Client_job,
 	IThread_Client_ns,
-	IThread_Client_yield
+	IThread_Client_yield,
+	IThread_Client_sleepSeconds,
 };
 
 IThread *
@@ -148,6 +150,13 @@ static void
 IThread_Client_yield(IThread *me)
 {
 	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_yield);
+}
+
+/* STATUS sleepSeconds(int seconds); */
+static STATUS
+IThread_Client_sleepSeconds(IThread *me, int seconds)
+{
+	return ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_sleepSeconds, seconds);
 }
 
 #endif /*!RUNTIME_BUILD_EXEC*/

@@ -73,6 +73,8 @@ EX_CHECK_PALS
 EX_CHECK_DISPOSITIONS
 ## Should Simulator versions be built?
 EX_CHECK_SIMULATOR
+## Check which features to enable
+EX_CHECK_FEATURES
 ## Checks for the Executive runtime library 
 AC_CHECK_HEADERS([stdarg.h stddef.h stdint.h stdlib.h float.h inttypes.h])
 if test $ac_cv_sizeof_long_long -gt 0 ; then
@@ -130,6 +132,7 @@ PAL/Stand-in/Makefile
 PAL/POSIX/Makefile
 Samples/Makefile
 Samples/SYSINFO/Makefile
+Samples/SLEEP/Makefile
 Subsystems/Makefile
 Subsystems/Stubs/Makefile
 Subsystems/Bootstrap/Makefile

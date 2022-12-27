@@ -25,25 +25,7 @@ operator delete(void *ptr)
 EXTERN_C STATUS
 metaClass(REFUUID clsid, REFUUID iid, void **out)
 {
-	Platform::tracef("PAL::Simulator::metaClass(): clsid:" UUID_PRINTF_FORMAT " iid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid));
-	if(out)
-	{
-		*out = NULL;
-	}
-	if(0 == memcmp(&clsid, &CLSID_PAL_Platform, sizeof(UUID)))
-	{
-		return platform.queryInterface(iid, out);
-	}
-	if(0 == memcmp(&clsid, &CLSID_PAL_MemoryManager, sizeof(UUID)))
-	{
-		return platform.addressSpace.queryInterface(iid, out);
-	}
-	if(0 == memcmp(&clsid, &CLSID_PAL_PlatformDiagnostics, sizeof(UUID)))
-	{
-		return platform.diagnostics.queryInterface(iid, out);
-	}
-	platform.logf(LOG_CONDITION, "%%E-NOENT: PAL::Simulator::metaClass(): unsupported clsid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid));
-	return E_NOENT;
+	return Platform::metaClass(clsid, iid, out);
 }
 
 Platform::Platform():
@@ -57,6 +39,7 @@ Platform::Platform():
 #else
 	log(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - Simulator Platform Adaptation Layer [build " PRODUCT_BUILD_ID_STR "]");
 #endif
+	installSignalHandlers();
 }
 
 /* Static utility methods */
@@ -92,32 +75,6 @@ Platform::tracef(const char *format, ...)
 	va_end(args);
 }
 
-/*PRIVATE*/
-bool
-Platform::createPlatformContainer(void)
-{
-	IMutableContainer *devices;
-
-	/* XXX wait until we have a namespace */
-	Platform::trace("PAL::Simulator::Platform::createPlatformContainer(): creating platform container");
-	if(E_SUCCESS != Executive_createObjectByName("Executive::Container", IID_IMutableContainer, (void **) &(platformContainer_)))
-	{
-		Platform::panic("PAL::Simulator::Platform::createPlatformContainer(): Executive::createObjectByName(Executive::Container, IMutableContainer) failed");
-		return false;
-	}
-	if(E_SUCCESS != platformContainer_->create("Devices", CLSID_Executive_Container, IID_IMutableContainer, (void **) &devices))
-	{
-		Platform::panic("PAL::Simulator::Platform::createPlatformContainer(): IMutableContainer::create('Devices') failed");
-		return false;
-	}
-	devices->add("Diagnostics", CLSID_PAL_PlatformDiagnostics, static_cast<IPlatformDiagnostics *>(&diagnostics));
-	devices->add("Console", CLSID_PAL_PlatformDiagnostics, static_cast<IPlatformDiagnostics *>(&diagnostics));
-	devices->add("AddressSpace", CLSID_PAL_MemoryManager, static_cast<IAddressSpace *>(&addressSpace));
-	devices->release();
-	Platform::logf(LOG_DEBUG, "PAL::Simulator::Platform::createPlatformContainer(): platform container successfully created");
-	return true;
-}
-
 /* IObject */
 
 STATUS
@@ -127,15 +84,7 @@ Platform::queryInterface(REFUUID iid, void **out)
 	{
 		*out = NULL;
 	}
-	if(!memcmp(&iid, &IID_IObject, sizeof(UUID)))
-	{
-		if(out)
-		{
-			*out = static_cast<IPlatform *>(this);
-		}
-		return E_SUCCESS;
-	}
-	if(!memcmp(&iid, &IID_IPlatform, sizeof(UUID)))
+	if(!memcmp(&iid, &IID_IObject, sizeof(UUID)) || !memcmp(&iid, &IID_IPlatform, sizeof(UUID)))
 	{
 		if(out)
 		{
@@ -145,13 +94,6 @@ Platform::queryInterface(REFUUID iid, void **out)
 	}
 	if(!memcmp(&iid, &IID_IContainer, sizeof(UUID)))
 	{
-		if(!platformContainer_)
-		{
-			if(!createPlatformContainer())
-			{
-				return E_NOTIMPL;
-			}
-		}
 		if(out)
 		{
 			*out = static_cast<IContainer *>(this);
@@ -193,6 +135,10 @@ Platform::namespaceActivated(INamespace *ns)
 		ns_->release();
 	}
 	ns_ = ns;
+	if(!platformContainer_)
+	{
+		createPlatformContainer();
+	}
 }
 
 void
@@ -223,19 +169,19 @@ Platform::phaseTransition(PHASE phase)
 #if !EXEC_BUILD_RELEASE
 	if(phase / 0x1000 != phase_ / 0x1000)
 	{
-		logf(LOG_ALERT, ">>>> PHASE TRANSITION >>>> new system phase is %04x (previous phase was %04x)", phase, phase_);
+		logf(LOG_DEBUG, ">>>> PHASE LEAP      >>>> new system phase is %04x (previous phase was %04x)", phase, phase_);
 	}
 	else if(phase / 0x100 != phase_ / 0x100)
 	{
-		logf(LOG_ALERT, " >>> PHASE SHIFT       >>> new system phase is %04x (previous phase was %04x)", phase, phase_);
+		logf(LOG_DEBUG, " >>> PHASE JUMP       >>> new system phase is %04x (previous phase was %04x)", phase, phase_);
 	}
 	else if(phase / 0x10 != phase_ / 0x10)
 	{
-		logf(LOG_ALERT, "  >> PHASE JUMP         >> new system phase is %04x (previous phase was %04x)", phase, phase_);
+		logf(LOG_DEBUG, "  >> PHASE SHIFT       >> new system phase is %04x (previous phase was %04x)", phase, phase_);
 	}
 	else
 	{
-		logf(LOG_ALERT, "   > PHASE STEP          > new system phase is %04x (previous phase was %04x)", phase, phase_);
+		logf(LOG_DEBUG, "   > PHASE STEP         > new system phase is %04x (previous phase was %04x)", phase, phase_);
 	}
 #endif /*!EXEC_BUILD_RELEASE*/
 	phase_ = phase;
@@ -265,4 +211,102 @@ Platform::iterator(void)
 		return NULL;
 	}
 	return platformContainer_->iterator();
+}
+
+/*INTERNAL*/
+STATUS
+Platform::metaClass(REFUUID clsid, REFUUID iid, void **out)
+{
+	Platform::tracef("PAL::Simulator::Platform::metaClass(): clsid:" UUID_PRINTF_FORMAT " iid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid));
+	if(out)
+	{
+		*out = NULL;
+	}
+	if(0 == memcmp(&clsid, &CLSID_PAL_Platform, sizeof(UUID)))
+	{
+		return platform.queryInterface(iid, out);
+	}
+	if(0 == memcmp(&clsid, &CLSID_PAL_MemoryManager, sizeof(UUID)))
+	{
+		return platform.addressSpace.queryInterface(iid, out);
+	}
+	if(0 == memcmp(&clsid, &CLSID_PAL_PlatformDiagnostics, sizeof(UUID)))
+	{
+		return platform.diagnostics.queryInterface(iid, out);
+	}
+	platform.logf(LOG_CONDITION, "%%E-NOENT: PAL::Simulator::Platform::metaClass(): unsupported clsid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid));
+	return E_NOENT;
+}
+
+/*PRIVATE*/
+bool
+Platform::createPlatformContainer(void)
+{
+	IMutableContainer *devices;
+
+	/* XXX wait until we have a namespace */
+	Platform::trace("PAL::Simulator::Platform::createPlatformContainer(): creating platform container");
+	if(E_SUCCESS != Executive_createObjectByName("Executive::Container", IID_IMutableContainer, (void **) &(platformContainer_)))
+	{
+		Platform::panic("PAL::Simulator::Platform::createPlatformContainer(): Executive::createObjectByName(Executive::Container, IMutableContainer) failed");
+		return false;
+	}
+	if(E_SUCCESS != platformContainer_->create("Devices", CLSID_Executive_Container, IID_IMutableContainer, (void **) &devices))
+	{
+		Platform::panic("PAL::Simulator::Platform::createPlatformContainer(): IMutableContainer::create('Devices') failed");
+		return false;
+	}
+	devices->add("Diagnostics", CLSID_PAL_PlatformDiagnostics, static_cast<IPlatformDiagnostics *>(&diagnostics));
+	devices->add("Console", CLSID_PAL_PlatformDiagnostics, static_cast<IPlatformDiagnostics *>(&diagnostics));
+	devices->add("AddressSpace", CLSID_PAL_MemoryManager, static_cast<IAddressSpace *>(&addressSpace));
+	devices->release();
+	Platform::logf(LOG_DEBUG, "PAL::Simulator::Platform::createPlatformContainer(): platform container successfully created");
+	return true;
+}
+
+/*PRIVATE*/
+
+void
+Platform::installSignalHandlers(void)
+{
+	struct sigaction sa;
+
+	sa.sa_handler = powerSignalHandler;
+	sigemptyset(&sa.sa_mask);
+	/* XXX SA_RESETHAND in case it fails */
+	sa.sa_flags = SA_RESETHAND|SA_NODEFER;
+	if(-1 == sigaction(SIGINT, &sa, NULL))
+	{
+		Platform::logf(LOG_WARNING, "PAL::Simulator::installSignalHandlers(): failed to install handler for SIGINT: %s", strerror(errno));
+	}
+	sa.sa_sigaction = exceptionHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_SIGINFO;
+	if(-1 == sigaction(SIGBUS, &sa, NULL) ||
+		 -1 == sigaction(SIGFPE, &sa, NULL) ||
+		 -1 == sigaction(SIGILL, &sa, NULL) ||
+		 -1 == sigaction(SIGSEGV, &sa, NULL) ||
+		 -1 == sigaction(SIGSYS, &sa, NULL) ||
+		 -1 == sigaction(SIGTRAP, &sa, NULL))
+	{
+		Platform::logf(LOG_WARNING, "PAL::Simulator::installSignalHandlers(): failed to install at least one exception handler: %s", strerror(errno));
+	}
+}
+
+void
+Platform::powerSignalHandler(int signo)
+{
+	UNUSED__(signo);
+
+	_exit(0);
+}
+
+void
+Platform::exceptionHandler(int signo, siginfo_t *info, void *context)
+{
+	UNUSED__(signo);
+	UNUSED__(info);
+	UNUSED__(context);
+	
+	abort();
 }
