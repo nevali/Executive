@@ -111,6 +111,8 @@ Frameworks/Runtime/Headers/Runtime/Makefile
 Frameworks/Runtime/ThirdParty/Makefile
 Frameworks/Runtime/ThirdParty/dlmalloc/Makefile
 Frameworks/Runtime/Client/Makefile
+Frameworks/Runtime/libc/Makefile
+Frameworks/Runtime/libc/stdlib/Makefile
 PrivateHeaders/Makefile
 PrivateHeaders/Executive/Makefile
 PrivateHeaders/Executive/Internal/Makefile

@@ -13,4 +13,7 @@ fi
 # original arguments, useful after running autoreconf in an
 # already-configured tree
 
-./config.status --recheck && ./config.status
+./config.status --recheck && \
+	./config.status && \
+	./DeveloperTools/idl/config.status --recheck && \
+	./DeveloperTools/idl/config.status

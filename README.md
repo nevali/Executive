@@ -7,21 +7,24 @@ An experimental minimal microkernel.
 
 ## Top of the pile
 
+* DeveloperTools/uuid
+
 * Signals / despatch / process contexts for callbacks
 * Reserved descriptors
 * External tasks flag
 * Tasker should return to caller when no tasks available
-* POSIX: check signal handling setup in thread creation
+* ~~POSIX: check signal handling setup in thread creation~~
 * POSIX: check timing of naps and ticks
 * PAL: platform timer
+* POSIX: plain vs light vs full/curses Console
 
 * Build: --enable-native-glue (build native glue on hosted build if one is available)
+* Toolchain checks
+* Short-cuts feature flag -- whether inter-module access is strictly via accessors, or direct access to data structures
 
 * Runtime: libc - implement a basic c90 libc (no descriptors, only streams, no fork, etc.)
 
-* POSIX: plain vs curses Console
-
-* Short-cuts feature flag -- whether inter-module access is strictly via accessors, or direct access to data structures
+* Startup (? Boot?) Archive - initramfs for the object directory, more widely useful than hostfs
 
 
 ## Introduction
