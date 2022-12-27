@@ -61,7 +61,7 @@ Executive_init(Executive *self, struct ExecutiveEntryParameters *params, IPlatfo
 	Executive_init_directory();
 	Executive_init_tasker();
 #if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, " - " PACKAGE_NAME " subsystems initialised");
+	ExLog(LOG_INFO, PACKAGE_NAME " subsystems initialised");
 #endif
 	return E_SUCCESS;
 }
@@ -139,12 +139,34 @@ Executive_init_diagnostics(void)
 		return;
 	}
 
-	ExNotice(PRODUCT_FULLNAME " " PACKAGE_NAME " [" HOST_FAMILY "] - " PRODUCT_RELEASE);
-	ExNotice("  version " PACKAGE_VERSION ", build " PRODUCT_BUILD_ID_STR ", built at " PRODUCT_BUILD_DATE " " PRODUCT_BUILD_TIME " by " PRODUCT_BUILD_USER "@" PRODUCT_BUILD_HOST);
+	ExLog(LOG_INFO, PRODUCT_NAME " (" PRODUCT_RELEASE " for " HOST_FAMILY ") is starting");
+	ExLog(LOG_INFO, "Diagnostic channel activated");
 #if FEATURE_BOOTPROGRESS
 	ExLog(LOG_INFO, "");
-	ExLog(LOG_INFO, "System initialisation progress:");
+	ExLog(LOG_INFO, "System initialisation is in progress...");
 #endif
+#if FEATURE_SELF_TESTS && !NDEBUG
+	ExLog(LOG_NOTICE,    "A test of the diagnostic logging system is commencing:");
+	ExLog(LOG_INFO, "");
+	ExLog(LOG_EMERGENCY, "    This is a test message at the EMERGENCY level");
+	ExLog(LOG_ALERT, "    This is a test message at the ALERT level");
+	ExLog(LOG_CRITICAL, "    This is a test message at the CRITICAL level");
+	ExLog(LOG_ERROR, "    This is a test message at the ERROR level");
+	ExLog(LOG_WARNING, "    This is a test message at the WARNING level");
+	ExLog(LOG_NOTICE, "    This is a test message at the NOTICE level");
+	ExLog(LOG_INFO, "    This is a test message at the INFO level");
+	ExLog(LOG_CONDITION, "    This is a test message at the CONDITION level");
+	ExLog(LOG_DEBUG, "    This is a test message at the DEBUG-1 level");
+	ExLog(LOG_DEBUG2, "    This is a test message at the DEBUG-2 level");
+	ExLog(LOG_DEBUG3, "    This is a test message at the DEBUG-3 level");
+	ExLog(LOG_DEBUG4, "    This is a test message at the DEBUG-4 level");
+	ExLog(LOG_DEBUG5, "    This is a test message at the DEBUG-5 level");
+	ExLog(LOG_DEBUG6, "    This is a test message at the DEBUG-6 level");
+	ExLog(LOG_DEBUG7, "    This is a test message at the DEBUG-7 level");
+	ExLog(LOG_TRACE, "    This is a test message at the TRACE level");
+	ExLog(LOG_INFO, "");
+	ExLog(LOG_NOTICE,    "Diagnostic logging self-test concluded. Normal logging resuming.");
+#endif /*FEATURE_SELF_TESTS && !NDEBUG*/
 }
 
 /*PRIVATE*/
@@ -156,9 +178,9 @@ Executive_init_directory(void)
 
 	/* Request the MDirectoryEntryTarget metaclass interface from Executive::Directory::Root */
 	ExPhaseShift(PHASE_STARTUP_ROOT);	
-	EXLOGF((LOG_DEBUG, "Executive::init_directory(): populating the root directory"));
+	EXTRACEF(("Executive::init_directory(): populating the root directory"));
 #if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, " - Populating initial object directory...");
+	ExLog(LOG_INFO, "Populating initial object directory...");
 #endif
 	ExAssert(E_SUCCESS == Executive_metaClass(&CLSID_Executive_Root, &IID_MDirectoryEntryTarget, (void **) &meta));
 	/* invoke the constructor on the metaclass interface, MDirectoryEntryTarget::createInstance()
@@ -198,7 +220,7 @@ Executive_init_tasker(void)
 	/* Create an instance of the built-in co-operative tasker */
 	ExPhaseShift(PHASE_STARTUP_TASKER);
 #if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, " - Starting the Tasker...");
+	ExLog(LOG_INFO, "Starting the Tasker...");
 #endif
 	/* XXX this should be via a metaclass interface */
 	executive.data.tasker = Executive_CooperativeTasker_create();

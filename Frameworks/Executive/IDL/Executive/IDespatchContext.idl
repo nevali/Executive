@@ -1,6 +1,6 @@
 cpp_quote("/* Executive Microkernel");
-cpp_quote(" * ILink.idl");
-cpp_quote(" *   Represents a link to another object");
+cpp_quote(" * IDespatchContext.idl");
+cpp_quote(" *   Represents a task's despatch context");
 cpp_quote(" */");
 cpp_quote("");
 cpp_quote("/* Copyright 2015-2022 Mo McRoberts.");
@@ -21,13 +21,14 @@ cpp_quote(" */");
 import "Executive/IObject.idl";
 
 [
+	local,
 	object,
 	uuid(75d9e760-48ee-4f9a-a01e-d1a38cf2cd96),
-	cheader("Executive/ILink.h")
+	cheader("Executive/IDespatchContext.h")
 ]
 interface IDespatchContext: IObject
 {
 	cpp_quote("#ifndef W_NO_UNSTABLE_INTERFACES");
-	cpp_quote("# warning The ILink interface is currently considered unstable; source and binary compatibility is not assured.");
+	cpp_quote("# warning The IDespatchContext interface is currently considered unstable; source and binary compatibility is not assured.");
 	cpp_quote("#endif");
 }

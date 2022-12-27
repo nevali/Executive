@@ -25,8 +25,9 @@ AC_DEFUN([EX_CHECK_FEATURE_DISABLED],[
 
 AC_DEFUN([EX_CHECK_FEATURES],[
 	EX_CHECK_FEATURE_ENABLED([BOOTPROGRESS],[boot-progress],[boot progress messages (at LogLevel=INFO)])
-	EX_CHECK_FEATURE_ENABLED([PAL_DIAGNOSITICS],[pal-diagnostics],[/System/Platform/Diagnostics (where supported)])
+	EX_CHECK_FEATURE_ENABLED([PAL_DIAGNOSTICS],[pal-diagnostics],[/System/Platform/Diagnostics (where supported)])
 	EX_CHECK_FEATURE_ENABLED([CONSOLE],[console],[/System/Platform/Console (where supported)])
 	EX_CHECK_FEATURE_DISABLED([DEBUG_PHASING],[debug-phasing],[additional diagnostics when phase transitions occur])
 	EX_CHECK_FEATURE_DISABLED([DEBUG_CONTEXTS],[debug-contexts],[additional diagnostics when context-switching (on some platforms)])
+	EX_CHECK_FEATURE_ENABLED([SELF_TESTS],[self-tests],[self-tests (where supported)])
 ])

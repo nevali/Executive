@@ -60,6 +60,18 @@ PAL_metaClass(REFUUID clsid, REFUUID iid, void **out)
 #endif /*FEATURE_PAL_DIAGNOSTICS*/
 		PALLOGF((LOG_CONDITION, "%%E-NOT-AVAIL: the platform diagnostics object is not available"));
 	}
+#if 0
+	if(0 == memcmp(clsid, &CLSID_PAL_Console, sizeof(UUID)))
+	{
+#if FEATURE_CONSOLE
+		if(PAL_POSIX->data.console)
+		{
+			return IObject_queryInterface((&(PAL_POSIX->data.Console->Object)), iid, out);
+		}
+#endif /*FEATURE_CONSOLE*/
+		PALLOGF((LOG_CONDITION, "%%E-NOT-AVAIL: the console object is not available"));
+	}
+#endif
 	/* Class unsupported */
 	PALLOGF((LOG_CONDITION, "%%E-NOENT: PAL::POSIX::metaClass(): unsupported clsid:" UUID_PRINTF_FORMAT " requested via PAL$metaClass()",
 		UUID_PRINTF_ARGS(clsid)));

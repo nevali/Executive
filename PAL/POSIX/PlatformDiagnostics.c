@@ -36,28 +36,11 @@ static PAL_POSIX_PlatformDiagnostics PAL_POSIX_diagnostics = {
 	{ NULL, NULL }, /* PlatformDiagnostics*/
 	{ NULL, NULL }, /* Object */
 	{ NULL, NULL }, /* WriteChannel */
-	{
-#if EXEC_BUILD_RELEASE
-		LOG_NOTICE
-#elif EXEC_BUILD_DEBUG
-		LOG_INFO
-#else
-		LOG_CONDITION
-#endif
-	}
 };
-
-
-#ifndef EXEC_BUILD_RELEASE
-static void PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel(void);
-#endif
 
 void
 PAL_POSIX_PlatformDiagnostics_init(void)
 {
-#ifndef EXEC_BUILD_RELEASE
-	PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel();
-#endif
 	PAL_POSIX_diagnostics.PlatformDiagnostics.lpVtbl = &PAL_POSIX_PlatformDiagnostics_vtable;
 	PAL_POSIX_diagnostics.PlatformDiagnostics.instptr = &PAL_POSIX_diagnostics;
 	PAL_POSIX_diagnostics.Object.lpVtbl = (void *) &PAL_POSIX_PlatformDiagnostics_vtable;
@@ -123,7 +106,14 @@ PAL_POSIX_PlatformDiagnostics_log(struct IPlatformDiagnostics *self, LogLevel le
 {
 	UNUSED__(self);
 
-	if(level >= PAL_POSIX_diagnostics.data.level)
+#if FEATURE_CONSOLE
+	if(PAL_POSIX && PAL_POSIX->data.console)
+	{
+		PAL_POSIX_Console_logf(PAL_POSIX->data.console, level, "%s", str);
+		return;
+	}
+#endif
+	if(level >= PAL_POSIX->data.logLevel)
 	{
 		fprintf(stderr, "<%d> %s\n", level, str);
 	}
@@ -135,8 +125,16 @@ PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str, ...)
 {
 	va_list ap;
 
+#if FEATURE_CONSOLE
+	if(PAL_POSIX && PAL_POSIX->data.console)
+	{
+		va_start(ap, str);
+		PAL_POSIX_Console_vlogf(PAL_POSIX->data.console, level, str, ap);
+		return;
+	}
+#endif
 	va_start(ap, str);
-	if(level >= PAL_POSIX_diagnostics.data.level)
+	if(level >= PAL_POSIX->data.logLevel)
 	{
 		fprintf(stderr, "<%d> ", level);
 		vfprintf(stderr, str, ap);
@@ -150,6 +148,12 @@ PAL_POSIX_PlatformDiagnostics_send(IWriteChannel *self, const uint8_t *buf, size
 {
 	UNUSED__(self);
 
+#if FEATURE_CONSOLE
+	if(PAL_POSIX && PAL_POSIX->data.console)
+	{
+		return PAL_POSIX_Console_send((&(PAL_POSIX->data.console->WriteChannel)), buf, nbytes);
+	}
+#endif
 	fprintf(stderr, "\033[0;33m");
 	fwrite((void *) buf, nbytes, 1, stderr);
 	fprintf(stderr, "\033[0m");
@@ -159,67 +163,17 @@ PAL_POSIX_PlatformDiagnostics_send(IWriteChannel *self, const uint8_t *buf, size
 size_t
 PAL_POSIX_PlatformDiagnostics_write(IWriteChannel *self, const char *str)
 {
-	UNUSED__(self);
-
-	fprintf(stderr, "\033[0;33m%s\033[0m", str);
-	return strlen(str);
+	return PAL_POSIX_PlatformDiagnostics_send(self, (const uint8_t *) str, strlen(str));
 }
 
 size_t
 PAL_POSIX_PlatformDiagnostics_writeLn(IWriteChannel *self, const char *str)
 {
-	UNUSED__(self);
+	size_t n;
 
-	fprintf(stderr, "\033[0;33m%s\033[0m\n", str);
-	return strlen(str);
+	n = PAL_POSIX_PlatformDiagnostics_send(self, (const uint8_t *) str, strlen(str));
+	n += PAL_POSIX_PlatformDiagnostics_send(self, (const uint8_t *) "\n", 1);
+	return n;
 }
-
-#ifndef EXEC_BUILD_RELEASE
-/* INTERNAL */
-static void
-PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel(void)
-{
-	const char *level;
-	size_t c;
-	const struct { const char *name; LogLevel level; } levels[] = {
-		{ "emerg", LOG_EMERGENCY },
-		{ "emergency", LOG_EMERGENCY },
-		{ "alert", LOG_ALERT },
-		{ "crit", LOG_CRITICAL },
-		{ "critical", LOG_CRITICAL },
-		{ "notice", LOG_NOTICE },
-		{ "err", LOG_ERROR },
-		{ "error", LOG_ERROR },
-		{ "warn", LOG_WARNING },
-		{ "warning", LOG_WARNING },
-		{ "info", LOG_INFO },
-		{ "condition", LOG_CONDITION },
-		{ "cond", LOG_CONDITION },
-		{ "debug", LOG_DEBUG },
-		{ "debug2", LOG_DEBUG2 },
-		{ "debug3", LOG_DEBUG3 },
-		{ "debug4", LOG_DEBUG4 },
-		{ "debug5", LOG_DEBUG5 },
-		{ "debug6", LOG_DEBUG6 },
-		{ "debug7", LOG_DEBUG7 },
-		{ "trace", LOG_TRACE },
-		{ NULL, 0 }
-	};
-	if(NULL != (level = getenv("EXEC_PAL_LOGLEVEL")))
-	{
-		PALLOGF((LOG_DEBUG, "PAL::POSIX::PlatformDiagnostics: EXEC_PAL_LOGLEVEL='%s'\n", level));
-		for(c = 0; levels[c].name; c++)
-		{
-			if(!strcasecmp(levels[c].name, level))
-			{
-				PAL_POSIX_diagnostics.data.level = levels[c].level;
-				PALLOGF((LOG_INFO, "Diagnostic level set to '%s' (%d) via EXEC_PAL_LOGLEVEL environment variable", level, levels[c].level));
-				return;
-			}
-		}
-		fprintf(stderr, "POSIX: WARNING: unknown log level '%s'\n", level);
-	}
-}
-#endif /*!EXEC_BUILD_RELEASE*/
 
 #endif /*FEATURE_PAL_DIAGNOSTICS*/

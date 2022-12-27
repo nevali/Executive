@@ -25,7 +25,7 @@ if test $exec_glue = posix ; then
 	AC_SUBST([EXEC_POSIX_PAL_EXT])
 	AC_DEFINE_UNQUOTED([EXEC_POSIX_PAL_DEFAULT], ["PAL.POSIX$EXEC_BUILD_SUFFIX$EXEC_POSIX_PAL_EXT"], ["define to the name of the PAL the dynamic Posix Glue should attempt to load by default"])
 
-	AC_CHECK_HEADERS([unistd.h sys/mman.h])
+	AC_CHECK_HEADERS([unistd.h sys/mman.h term.h])
 	AC_CHECK_FUNCS([sysconf getpagesize])
 
 	AC_CHECK_LIB([curses],[setupterm],[AS_VAR_APPEND([EXEC_PAL_LIBS],["${EXEC_PAL_LIBS} -lcurses"])])

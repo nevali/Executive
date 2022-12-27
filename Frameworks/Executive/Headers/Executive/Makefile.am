@@ -28,7 +28,7 @@ idlgenerated = Types.h Errors.h UUID.h \
 	IDirectoryEntryTarget.h ILink.h \
 	IWriteChannel.h \
 	ITasker.h ITask.h IThread.h IJob.h IEvent.h IExecutable.h IContext.h \
-	ISubsystem.h
+	ISubsystem.h IDespatchContext.h
 
 Executivedir = $(includedir)/Executive
 

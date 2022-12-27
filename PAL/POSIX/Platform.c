@@ -8,6 +8,8 @@
 
 #define INTF_TO_CLASS(i) (PAL_POSIX_Platform *)((void *)(i)->instptr)
 
+static void PAL_POSIX_setEnvironmentLogLevel(void);
+
 static STATUS PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out);
 static REFCOUNT PAL_POSIX_Platform_retain(IObject *self);
 static REFCOUNT PAL_POSIX_Platform_release(IObject *self);
@@ -58,6 +60,16 @@ PAL_POSIX_Platform_init(void)
 	{
 		return;
 	}
+#if EXEC_BUILD_RELEASE
+	PAL_POSIX_platform.data.logLevel = LOG_NOTICE;
+#elif EXEC_BUILD_DEBUG
+	PAL_POSIX_platform.data.logLevel = LOG_INFO;
+#else
+	PAL_POSIX_platform.data.logLevel = LOG_CONDITION;
+#endif
+	PAL_POSIX_setEnvironmentLogLevel();
+	/* do this early so that diagnostics can check the log level */
+	PAL_POSIX = &PAL_POSIX_platform;
 #ifdef EXEC_BUILD_CONFIG
 	PALLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - POSIX Platform Adaptation Layer [" EXEC_BUILD_CONFIG " build " PRODUCT_BUILD_ID_STR "]");
 #else
@@ -77,7 +89,9 @@ PAL_POSIX_Platform_init(void)
 	PAL_POSIX_PlatformDiagnostics_init();
 	PALLOGF((LOG_DEBUG7, "- PAL::POSIX::diagnostics<IPlatformDiagnostics> = %p", PAL_POSIX_platform.data.diagnostics));
 #endif
-	PAL_POSIX = &PAL_POSIX_platform;
+#if FEATURE_CONSOLE
+	PAL_POSIX_Console_init();
+#endif
 	PALLOGF((LOG_DEBUG6, "PAL::POSIX::init(): early initialisation complete"));
 }
 
@@ -92,15 +106,34 @@ PAL_POSIX_Platform_setAddressSpace(IAddressSpace *addressSpace)
 	}
 }
 
-/* INTERNAL */
+/*INTERNAL*/
 void
 PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag)
 {
-	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setDiagnostics(): PlatformDiagnostics object is available"));
+	UNUSED__(diag);
+
+#if FEATURE_PAL_DIAGNOSTICS
 	if(!PAL_POSIX_platform.data.diagnostics)
 	{
 		PAL_POSIX_platform.data.diagnostics = diag;
 	}
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setDiagnostics(): PlatformDiagnostics object is available"));
+#endif
+}
+
+/*INTERNAL*/
+void
+PAL_POSIX_Platform_setConsole(PAL_POSIX_Console *console)
+{
+	UNUSED__(console);
+
+#if FEATURE_CONSOLE
+	if(!PAL_POSIX_platform.data.console)
+	{
+		PAL_POSIX_platform.data.console = console;
+	}
+	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setConsole(): Console object is available"));
+#endif
 }
 
 /* IObject */
@@ -215,13 +248,18 @@ PAL_POSIX_Platform_namespaceActivated(IPlatform *self, INamespace *ns)
 	{
 		PAL_panic("PAL::POSIX::Platform::namespaceActivated(): IMutableContainer::create('Devices') failed");
 	}
+#if FEATURE_PAL_DIAGNOSTICS
 	if(PAL_POSIX_platform.data.diagnostics)
 	{
 		IMutableContainer_add(devices, "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
 	}
-#if 0
-	IMutableContainer_add(devices, "Console", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
-#endif
+#endif /*FEATURE_PAL_DIAGNOSTICS*/
+#if FEATURE_CONSOLE
+	if(PAL_POSIX_platform.data.console)
+	{
+		IMutableContainer_add(devices, "Console", &CLSID_PAL_PlatformDiagnostics, &(PAL_POSIX_platform.data.console->Object));
+	}
+#endif /*FEATURE_CONSOLE*/
 	IMutableContainer_add(devices, "AddressSpace", &CLSID_PAL_MemoryManager, (IObject *) (void *) PAL_POSIX_platform.data.addressSpace);
 	IMutableContainer_release(devices);
 	PALDebug("PAL::POSIX::Platform::namespaceActivated(): population of Platfom container complete");
@@ -326,4 +364,50 @@ PAL_POSIX_Platform_iterator(IContainer *self)
 		return NULL;
 	}
 	return IMutableContainer_iterator(me->data.platformContainer);
+}
+
+/*INTERNAL*/
+static void
+PAL_POSIX_setEnvironmentLogLevel(void)
+{
+	const char *level;
+	size_t c;
+	const struct { const char *name; LogLevel level; } levels[] = {
+		{ "emerg", LOG_EMERGENCY },
+		{ "emergency", LOG_EMERGENCY },
+		{ "alert", LOG_ALERT },
+		{ "crit", LOG_CRITICAL },
+		{ "critical", LOG_CRITICAL },
+		{ "notice", LOG_NOTICE },
+		{ "err", LOG_ERROR },
+		{ "error", LOG_ERROR },
+		{ "warn", LOG_WARNING },
+		{ "warning", LOG_WARNING },
+		{ "info", LOG_INFO },
+		{ "condition", LOG_CONDITION },
+		{ "cond", LOG_CONDITION },
+		{ "debug", LOG_DEBUG },
+		{ "debug2", LOG_DEBUG2 },
+		{ "debug3", LOG_DEBUG3 },
+		{ "debug4", LOG_DEBUG4 },
+		{ "debug5", LOG_DEBUG5 },
+		{ "debug6", LOG_DEBUG6 },
+		{ "debug7", LOG_DEBUG7 },
+		{ "trace", LOG_TRACE },
+		{ NULL, 0 }
+	};
+	if(NULL != (level = getenv("EXEC_PAL_LOGLEVEL")))
+	{
+		PALLOGF((LOG_DEBUG, "PAL::POSIX::Platform: EXEC_PAL_LOGLEVEL='%s'\n", level));
+		for(c = 0; levels[c].name; c++)
+		{
+			if(!strcasecmp(levels[c].name, level))
+			{
+				PAL_POSIX_platform.data.logLevel = levels[c].level;
+				PALLOGF((LOG_INFO, "Log level set to '%s' (%d) via EXEC_PAL_LOGLEVEL environment variable", level, levels[c].level));
+				return;
+			}
+		}
+		fprintf(stderr, "POSIX: WARNING: unknown log level '%s'\n", level);
+	}
 }

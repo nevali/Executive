@@ -33,7 +33,12 @@
 
 typedef struct PAL_POSIX_Platform PAL_POSIX_Platform;
 typedef union PAL_POSIX_BootEnvironment PAL_POSIX_BootEnvironment;
+#if FEATURE_PAL_DIAGNOSTICS
 typedef struct PAL_POSIX_PlatformDiagnostics PAL_POSIX_PlatformDiagnostics;
+#endif
+#if FEATURE_CONSOLE
+typedef struct PAL_POSIX_Console PAL_POSIX_Console;
+#endif
 
 extern PAL_POSIX_Platform *PAL_POSIX;
 
@@ -54,7 +59,13 @@ struct PAL_POSIX_Platform
 		IMutableContainer *platformContainer;
 		IAddressSpace *addressSpace;
 		IBootEnvironment *BootEnvironment;
+#if FEATURE_PAL_DIAGNOSTICS
 		IPlatformDiagnostics *diagnostics;
+#endif
+#if FEATURE_CONSOLE
+		PAL_POSIX_Console *console;
+		LogLevel logLevel;
+#endif
 	} data;
 };
 
@@ -68,16 +79,26 @@ union PAL_POSIX_BootEnvironment
 	} data;
 };
 
+#if FEATURE_PAL_DIAGNOSTICS
 struct PAL_POSIX_PlatformDiagnostics
 {
 	IObject Object;
 	IPlatformDiagnostics PlatformDiagnostics;
 	IWriteChannel WriteChannel;
+};
+#endif /*FEATURE_PAL_DIAGNOSTICS*/
+
+#if FEATURE_CONSOLE
+struct PAL_POSIX_Console
+{
+	IObject Object;
+	IWriteChannel WriteChannel;
 	struct
 	{
-		LogLevel level;
+		bool started;
 	} data;
 };
+#endif /*FEATURE_CONSOLE*/
 
 # ifdef __cplusplus
 extern "C" {
@@ -87,13 +108,21 @@ void PAL_POSIX_panic(const char *string);
 void PAL_POSIX_init(void);
 void PAL_POSIX_Platform_init(void);
 void PAL_POSIX_Platform_setAddressSpace(IAddressSpace *mm);
-void PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag);
 void PAL_POSIX_AddressSpace_init(void);
 
-#if FEATURE_PAL_DIAGNOSTICS
+# if FEATURE_PAL_DIAGNOSTICS
 void PAL_POSIX_PlatformDiagnostics_init(void);
 extern void PAL_POSIX_PlatformDiagnostics_log(IPlatformDiagnostics *me, LogLevel level, const char *str);
-#endif
+void PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag);
+# endif /*FEATURE_PAL_DIAGNOSTICS*/
+
+# if FEATURE_CONSOLE
+void PAL_POSIX_Console_init(void);
+void PAL_POSIX_Platform_setConsole(PAL_POSIX_Console *console);
+size_t PAL_POSIX_Console_send(IWriteChannel *self, const uint8_t *buf, size_t nbytes);
+size_t PAL_POSIX_Console_logf(PAL_POSIX_Console *self, LogLevel level, const char *format, ...);
+size_t PAL_POSIX_Console_vlogf(PAL_POSIX_Console *self, LogLevel level, const char *format, va_list args);
+# endif /*FEATURE_CONSOLE*/
 
 extern PHASE PAL_POSIX_phase;
 

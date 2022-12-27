@@ -33,7 +33,7 @@ Executive_startup(Executive *self)
 	
 	ExPhaseShift(PHASE_STARTUP_EXECTASK);
 #if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, " - Starting the Bootstrap subsystem...");
+	ExLog(LOG_INFO, "Starting the Bootstrap subsystem...");
 #endif
 	/* Open the Bootstrap subsystem */
 	if(E_SUCCESS != (status = ExOpen("/System/Subsystems/Bootstrap", &IID_ISubsystem, &subsystem)))
@@ -46,7 +46,11 @@ Executive_startup(Executive *self)
 	{
 		ExPanic("Bootstrap subsystem failed to start");
 	}
+#if FEATURE_BOOTPROGRESS
+	ExLog(LOG_INFO, "Bootstrap subsystem started successfully");
+#else
 	ExLog(LOG_DEBUG, "Bootstrap subsystem started successfully");
+#endif
 	/* Release the reference */
 	ISubsystem_release(subsystem);
 	return status;
