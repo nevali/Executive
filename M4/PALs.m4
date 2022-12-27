@@ -17,6 +17,8 @@ dnl selection of an appropriate PAL at runtime, as opposed to build time
 
 AC_MSG_RESULT([configuring Platform Adaptation Layers (PALs) for $host ($host_type)...])
 
+save_LIBS="$LIBS"
+
 AS_VAR_SET([exec_pal_list], [""])
 AC_SUBST([exec_pal_list])
 
@@ -24,6 +26,8 @@ dnl ## POSIX PAL
 dnl
 
 EXEC_PAL_CONFIG([POSIX])
+
+LIBS="$save_LIBS"
 
 AC_MSG_CHECKING([which Platform Adaptation Layers (PALs) to build])
 test $enable_pals = no && exec_pal_list=""
@@ -50,14 +54,16 @@ m4_foreach([BUILDTYPE],[[Release], [Free], [Debug]], [
 		AS_VAR_SET([EXEC_PAL_]$1[_]OBJTYPE[_]BUILDTYPE, [""])
 	])
 ])
-AS_VAR_SET([EXEC_PAL_]$1[_CPPFLAGS], [""])
-AS_VAR_SET([EXEC_PAL_]$1[_LDFLAGS], [""])
+AS_VAR_SET([EXEC_PAL_]$1[_cppflags], [""])
+AS_VAR_SET([EXEC_PAL_]$1[_ldflags], [""])
+AS_VAR_SET([EXEC_PAL_]$1[_libs], [""])
 
 AS_VAR_SET([exec_pal_enabled],["no"])
 AS_VAR_SET([exec_pal_build_targeted], [no])
 AS_VAR_SET([exec_pal_build_monolith], [no])
-AS_VAR_SET([EXEC_PAL_CPPFLAGS], [""])
-AS_VAR_SET([EXEC_PAL_LDFLAGS], [""])
+AS_VAR_SET([EXEC_PAL_cppflags], [""])
+AS_VAR_SET([EXEC_PAL_ldflags], [""])
+AS_VAR_SET([EXEC_PAL_libs], [""])
 
 m4_include([PAL/]$1[/config.ac])dnl
 
@@ -78,10 +84,12 @@ if test $exec_pal_enabled = yes ; then
 			AC_SUBST([EXEC_PAL_]$1[_]OBJTYPE[_]BUILDTYPE)
 		])
 	])
-	AS_VAR_SET([EXEC_PAL_]$1[_CPPFLAGS], ["$EXEC_PAL_CPPFLAGS"])
-	AC_SUBST([EXEC_PAL_]$1[_CPPFLAGS])
-	AS_VAR_SET([EXEC_PAL_]$1[_LDFLAGS], ["$EXEC_PAL_LDFLAGS"])
-	AC_SUBST([EXEC_PAL_]$1[_LDFLAGS])
+	AS_VAR_SET([EXEC_PAL_]$1[_cppflags], ["$EXEC_PAL_cppflags"])
+	AC_SUBST([EXEC_PAL_]$1[_cppflags])
+	AS_VAR_SET([EXEC_PAL_]$1[_LDFLAGS], ["$EXEC_PAL_ldflags"])
+	AC_SUBST([EXEC_PAL_]$1[_ldflags])
+	AS_VAR_SET([EXEC_PAL_]$1[_LIBS], ["$EXEC_PAL_libs"])
+	AC_SUBST([EXEC_PAL_]$1[_libs])
 fi
 
 AM_CONDITIONAL([EXEC_BUILD_TARGETED_]$1, [test "$exec_pal_]$1[_build_targeted" = "yes"])

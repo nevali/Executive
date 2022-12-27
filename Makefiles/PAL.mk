@@ -1,8 +1,7 @@
 ## Executive Microkernel
-##
 ## Platform Adaptation Layers (PALs)
 
-## Copyright 2017 Mo McRoberts.
+## Copyright 2015-2022 Mo McRoberts.
 ##
 ##  Licensed under the Apache License, Version 2.0 (the "License");
 ##  you may not use this file except in compliance with the License.
@@ -25,7 +24,7 @@ noinst_LTLIBRARIES =
 nodist_noinst_DATA = libPAL.${PALNAME}@EXEC_BUILD_SUFFIX@.Static.la ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.lo
 LIBS =
 CLEANFILES = *.la *.lo
-PALCPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}
+PALCPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} ${EXEC_PAL_cppflags} -DEXEC_PAL_BUILD=1
 
 # Build convenience libraries for each of the types of PAL we can use
 noinst_LTLIBRARIES += libPALx.Static.la
@@ -38,22 +37,25 @@ endif
 
 libPALx_Static_la_SOURCES = ${PALSRC}
 libPALx_Static_la_CPPFLAGS = $(PALCPPFLAGS) -DEXEC_PAL_BUILD_STATIC=1
+libPALx_Static_la_LDFLAGS = ${EXEC_PAL_ldflags}
+libPALx_Static_la_LIBADD = ${EXEC_PAL_libs}
 libPALx_Module_la_SOURCES = ${PALSRC}
 libPALx_Module_la_CPPFLAGS = $(PALCPPFLAGS) -DEXEC_PAL_BUILD_MOD=1
+libPALx_Module_la_LDFLAGS = ${EXEC_PAL_ldflags}
+libPALx_Module_la_LIBADD = ${EXEC_PAL_libs}
 libPALx_DLL_la_SOURCES = ${PALSRC}
 libPALx_DLL_la_CPPFLAGS = $(PALCPPFLAGS) -DEXEC_PAL_BUILD_DLL=1
+libPALx_DLL_la_LDFLAGS = ${EXEC_PAL_ldflags}
+libPALx_DLL_la_LIBADD = ${EXEC_PAL_libs}
 
-
-# XXX TODO: this should be if PAL_BUILD_MOD
-if EXEC_BUILD_DYNAMIC
+if EXEC_PAL_BUILD_MOD
 ## Dynamic configuration: the Executive has the capability to locate and
 ## initialise an appropriate PAL (which does not need to be specified at build
 ## time) itself - to support this configuration we build a "PAL" module
 nodist_noinst_DATA += ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la
 endif
 
-# XXX TODO: this should be if PAL_BUILD_DLL
-if EXEC_BUILD_MODULAR
+if EXEC_PAL_BUILD_DLL
 ## Modular configuration: an external loader arranges for the correct PAL to be
 ## loaded, and so it doesn't need to be specified at build time - to support this
 ## configuration we build a libPAL shared (dynamically-linked) library
@@ -81,13 +83,13 @@ install-exec-hook:
 	  $(MKDIR_P) "$(DESTDIR)$(libdir)" || exit 1; \
 	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.lo '$(DESTDIR)$(libdir)'"; \
 	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.lo "$(DESTDIR)$(libdir)"
-if EXEC_BUILD_DYNAMIC
+if EXEC_PAL_BUILD_MOD
 	@echo " $(MKDIR_P) '$(DESTDIR)$(libdir)'"; \
 	  $(MKDIR_P) "$(DESTDIR)$(libdir)" || exit 1; \
 	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la '$(DESTDIR)$(libdir)'"; \
 	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) ../PAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la "$(DESTDIR)$(libdir)"
 endif
-if EXEC_BUILD_MODULAR
+if EXEC_PAL_BUILD_DLL
 	@echo " $(MKDIR_P) '$(DESTDIR)$(libdir)'"; \
 	  $(MKDIR_P) "$(DESTDIR)$(libdir)" || exit 1; \
 	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) ../libPAL.${PALNAME}@EXEC_BUILD_SUFFIX@.la '$(DESTDIR)$(libdir)'"; \

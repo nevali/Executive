@@ -151,7 +151,9 @@ PAL_POSIX_Context_setup(PAL_POSIX_Context *self)
 		longjmp(VOLATILE_JMPBUF(trampoline_jb), 1);
 	}
 	/* we are done */
+#if FEATURE_DEBUG_CONTEXTS
 	fprintf(stderr, "PAL::POSIX::Context::setup(): context %p created\n", self);
+#endif
 	return;
 }
 
@@ -166,7 +168,9 @@ PAL_POSIX_Context_trampoline(int signo)
 		trampoline_sprung = true;
 		return;
 	}
+#if FEATURE_DEBUG_CONTEXTS
 	fprintf(stderr, "PAL::POSIX::Context::trampoline: resumed after setjmp(), bootstrapping context %p\n", trampoline_context);
+#endif
 	PAL_POSIX_Context_bootstrap();
 }
 
@@ -181,23 +185,31 @@ PAL_POSIX_Context_bootstrap(void)
 	trampoline_context = NULL;
 	memcpy((void *) caller, (void *) trampoline_caller, sizeof(jmp_buf));
 	/* save our real state */
+#if FEATURE_DEBUG_CONTEXTS
 	fprintf(stderr, "PAL::POSIX::Context(%p)::bootstrap: saving initial state\n", ctx);
+#endif
 #if 0
 	if(false == PAL_POSIX_Context_suspend((IContext *) &(ctx->Context)))
 #endif
 	if(0 == setjmp(VOLATILE_JMPBUF(ctx->data.jb)))
 	{
+#if FEATURE_DEBUG_CONTEXTS
 		fprintf(stderr, "PAL::POSIX::Context(%p)::bootstrap: jumping back to caller\n", ctx);
+#endif
 		longjmp(VOLATILE_JMPBUF(caller), 1);
 	}
+#if FEATURE_DEBUG_CONTEXTS
 	fprintf(stderr, "PAL::POSIX::Context(%p)::bootstrap: starting context\n", ctx);
+#endif
 	PAL_POSIX_Context_start((PAL_POSIX_Context *) ctx);
 }
 
 static void
 PAL_POSIX_Context_start(PAL_POSIX_Context *ctx)
 {
+#if FEATURE_DEBUG_CONTEXTS
 	fprintf(stderr, "PAL::POSIX::Context(%p)::start: calling entrypoint (Thread %p)\n", ctx, ctx->data.thread);
+#endif
 	ctx->data.entry(ctx->data.thread);
 	abort();
 }
@@ -269,23 +281,31 @@ PAL_POSIX_Context_swap(IContext *me, IContext *to)
 
 	self = INTF_TO_CLASS(me);
 	other = INTF_TO_CLASS(to);
+#if FEATURE_DEBUG_CONTEXTS
 	fprintf(stderr, "PAL::POSIX::Context::swap(%p, %p)\n", self, other);
+#endif
 	if(me == to)
 	{
 		return true;
 	}
 	if(NULL == to)
 	{
+#if FEATURE_DEBUG_CONTEXTS
 		fprintf(stderr, "PAL::POSIX::Context::swap(%p): switching to first context\n", self);
+#endif
 		longjmp(VOLATILE_JMPBUF(self->data.jb), 1);
 		abort();
 	}
 	if(0 == setjmp(VOLATILE_JMPBUF(self->data.jb)))
 	{
+#if FEATURE_DEBUG_CONTEXTS
 		fprintf(stderr, "PAL::POSIX::Context::swap(%p) - context suspended\n", self);
+#endif
 		longjmp(VOLATILE_JMPBUF(other->data.jb), 1);
 		return false;
 	}
+#if FEATURE_DEBUG_CONTEXTS
 	fprintf(stderr, "PAL::POSIX::Context::swap(%p) - context restored\n", self);
+#endif
 	return true;
 }

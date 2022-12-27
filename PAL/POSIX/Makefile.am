@@ -19,11 +19,15 @@
 
 PALNAME = POSIX
 PALSRC = p_POSIX.h \
-	BuildInformation.c init.c panic.c \
+	BuildInformation.c panic.c \
 	metaClass.c Platform.c PlatformDiagnostics.c \
 	BootEnvironment.c \
 	p_AddressSpace.h \
 	AddressSpace.c Region.c Context.c
+
+EXEC_PAL_cppflags = @EXEC_PAL_POSIX_cppflags@
+EXEC_PAL_ldflags = @EXEC_PAL_POSIX_ldflags@
+EXEC_PAL_libs = @EXEC_PAL_POSIX_libs@
 
 PAL_MOD_EXT = ${EXEC_POSIX_PAL_EXT}
 PAL_MOD_ldflags= -shared -module -avoid-version -shrext ${PAL_MOD_EXT} -rpath ${libdir}

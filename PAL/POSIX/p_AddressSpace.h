@@ -70,7 +70,7 @@ union PAL_POSIX_Context
 	} data;
 };
 
-# ifdef NDEBUG
+# if NDEBUG || !FEATURE_PAL_DIAGNOSTICS
 #  define PALLOGF(x)
 #  define PALLog(level, str)
 #  define PALDebug(str)

@@ -52,10 +52,12 @@ PAL_metaClass(REFUUID clsid, REFUUID iid, void **out)
 	}
 	if(0 == memcmp(clsid, &CLSID_PAL_PlatformDiagnostics, sizeof(UUID)))
 	{
+#if FEATURE_PAL_DIAGNOSTICS
 		if(PAL_POSIX->data.diagnostics)
 		{
 			return IPlatformDiagnostics_queryInterface(PAL_POSIX->data.diagnostics, iid, out);
 		}
+#endif /*FEATURE_PAL_DIAGNOSTICS*/
 		PALLOGF((LOG_CONDITION, "%%E-NOT-AVAIL: the platform diagnostics object is not available"));
 	}
 	/* Class unsupported */

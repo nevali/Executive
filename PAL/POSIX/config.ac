@@ -27,4 +27,6 @@ if test $exec_glue = posix ; then
 
 	AC_CHECK_HEADERS([unistd.h sys/mman.h])
 	AC_CHECK_FUNCS([sysconf getpagesize])
+
+	AC_CHECK_LIB([curses],[setupterm],[AS_VAR_APPEND([EXEC_PAL_LIBS],["${EXEC_PAL_LIBS} -lcurses"])])
 fi

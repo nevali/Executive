@@ -8,9 +8,9 @@ Targeted_glue =  $(top_builddir)/@EXEC_GLUE_OBJECT_TARGETED@
 Targeted_resident = $(top_builddir)/Subsystems/libResident.la
 
 Targeted_POSIX_sources = $(Targeted_sources)
-Targeted_POSIX_cppflags = $(Targeted_cppflags) @EXEC_PAL_POSIX_CPPFLAGS@
+Targeted_POSIX_cppflags = $(Targeted_cppflags) @EXEC_PAL_POSIX_cppflags@
 Targeted_POSIX_glue = $(Targeted_glue)
-Targeted_POSIX_ldflags = $(Targeted_ldflags) @EXEC_GLUE_LDFLAGS@ @EXEC_PAL_POSIX_LDFLAGS@ -no-undefined
+Targeted_POSIX_ldflags = $(Targeted_ldflags) @EXEC_GLUE_LDFLAGS@ @EXEC_PAL_POSIX_ldflags@ -no-undefined
 
 ###
 

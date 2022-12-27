@@ -104,4 +104,7 @@ AC_REQUIRE([EX_CHECK_PALS])dnl
 		AC_MSG_ERROR([no build types available for $host_type $host_platform])
 	fi
 
+	AM_CONDITIONAL([EXEC_PAL_BUILD_MOD], [test "$exec_build_dynamic" = "yes"])
+	AM_CONDITIONAL([EXEC_PAL_BUILD_DLL], [test "$exec_build_targeted" = "yes"])
+
 ])dnl

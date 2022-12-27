@@ -7,10 +7,10 @@ Monolith_glue = $(top_builddir)/@EXEC_GLUE_OBJECT_MONOLITH@
 
 Monolith_resident = $(top_builddir)/Subsystems/libResident.la
 
-Monolith_POSIX_cppflags = $(Monolith_cppflags) @EXEC_PAL_POSIX_CPPFLAGS@ 
+Monolith_POSIX_cppflags = $(Monolith_cppflags) @EXEC_PAL_POSIX_cppflags@ 
 Monolith_POSIX_sources = $(Monolith_sources)
 Monolith_POSIX_glue = $(Monolith_glue)
-Monolith_POSIX_ldflags = @AM_LDFLAGS@ @EXEC_GLUE_LDFLAGS@ @EXEC_PAL_POSIX_LDFLAGS@ -static-libtool-libs
+Monolith_POSIX_ldflags = @AM_LDFLAGS@ @EXEC_GLUE_LDFLAGS@ @EXEC_PAL_POSIX_ldflags@ -static-libtool-libs
 
 ###
 

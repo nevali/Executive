@@ -2,6 +2,8 @@
 # include "BuildConfiguration.h"
 #endif
 
+#if FEATURE_PAL_DIAGNOSTICS
+
 #include "p_POSIX.h"
 
 #define INTF_TO_CLASS(i) (PAL_POSIX_PlatformDiagnostics *)((i)->instptr)
@@ -218,4 +220,6 @@ PAL_POSIX_PlatformDiagnostics_setEnvironmentLogLevel(void)
 		fprintf(stderr, "POSIX: WARNING: unknown log level '%s'\n", level);
 	}
 }
-#endif
+#endif /*!EXEC_BUILD_RELEASE*/
+
+#endif /*FEATURE_PAL_DIAGNOSTICS*/

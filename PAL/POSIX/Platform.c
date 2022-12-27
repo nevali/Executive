@@ -73,8 +73,10 @@ PAL_POSIX_Platform_init(void)
 	PALLOGF((LOG_DEBUG7, "- PAL::POSIX = %p, <IObject> = %p", &(PAL_POSIX_platform), &(PAL_POSIX_platform.Object)));
 	PAL_POSIX_AddressSpace_init();
 	PALLOGF((LOG_DEBUG7, "- PAL::POSIX::addressSpace<IAddressSpace> = %p", PAL_POSIX_platform.data.addressSpace));
+#if FEATURE_PAL_DIAGNOSTICS
 	PAL_POSIX_PlatformDiagnostics_init();
 	PALLOGF((LOG_DEBUG7, "- PAL::POSIX::diagnostics<IPlatformDiagnostics> = %p", PAL_POSIX_platform.data.diagnostics));
+#endif
 	PAL_POSIX = &PAL_POSIX_platform;
 	PALLOGF((LOG_DEBUG6, "PAL::POSIX::init(): early initialisation complete"));
 }
@@ -213,8 +215,13 @@ PAL_POSIX_Platform_namespaceActivated(IPlatform *self, INamespace *ns)
 	{
 		PAL_panic("PAL::POSIX::Platform::namespaceActivated(): IMutableContainer::create('Devices') failed");
 	}
-	IMutableContainer_add(devices, "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
+	if(PAL_POSIX_platform.data.diagnostics)
+	{
+		IMutableContainer_add(devices, "Diagnostics", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
+	}
+#if 0
 	IMutableContainer_add(devices, "Console", &CLSID_PAL_PlatformDiagnostics, (IObject *) (void *) PAL_POSIX_platform.data.diagnostics);
+#endif
 	IMutableContainer_add(devices, "AddressSpace", &CLSID_PAL_MemoryManager, (IObject *) (void *) PAL_POSIX_platform.data.addressSpace);
 	IMutableContainer_release(devices);
 	PALDebug("PAL::POSIX::Platform::namespaceActivated(): population of Platfom container complete");
@@ -242,7 +249,7 @@ static void
 PAL_POSIX_Platform_phaseTransition(IPlatform *me, PHASE phase)
 {
 	UNUSED__(me);
-
+#if FEATURE_DEBUG_PHASING
 	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::phaseTransition(%04x)", phase));
 	if(phase == PAL_POSIX_phase)
 	{
@@ -287,9 +294,10 @@ PAL_POSIX_Platform_phaseTransition(IPlatform *me, PHASE phase)
 		PALLOGF((LOG_DEBUG3, "   > PHASE STEP          > new system phase is %04x (previous phase was %04x)", phase, PAL_POSIX_phase));
 	}
 #endif
+
+#endif /*FEATURE_DEBUG_PHASING*/
 	PAL_POSIX_phase = phase;
 }
-
 
 /* IContainer */
 static STATUS

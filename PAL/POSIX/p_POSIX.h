@@ -89,13 +89,15 @@ void PAL_POSIX_Platform_init(void);
 void PAL_POSIX_Platform_setAddressSpace(IAddressSpace *mm);
 void PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag);
 void PAL_POSIX_AddressSpace_init(void);
-void PAL_POSIX_PlatformDiagnostics_init(void);
 
+#if FEATURE_PAL_DIAGNOSTICS
+void PAL_POSIX_PlatformDiagnostics_init(void);
 extern void PAL_POSIX_PlatformDiagnostics_log(IPlatformDiagnostics *me, LogLevel level, const char *str);
+#endif
 
 extern PHASE PAL_POSIX_phase;
 
-# if EXEC_BUILD_RELEASE
+# if EXEC_BUILD_RELEASE || !FEATURE_PAL_DIAGNOSTICS
 #  define PALLOGF(x)
 #  define PALLog(level, str)
 #  define PALDebug(str)
@@ -107,7 +109,7 @@ extern PHASE PAL_POSIX_phase;
 #  define PALDebug7(str)
 #  define PALTrace(str)
 #  define PALCondition(str)
-# else
+# else /*EXEC_BUILD_RELEASE || !FEATURE_PAL_DIAGNOSTICS*/
 extern void PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str, ...);
 #  define PALLOGF(X)                    PAL_POSIX_PlatformDiagnostics__logf X
 #  define PALLog(level, str)            PAL_POSIX_PlatformDiagnostics_log(NULL, level, str)
@@ -116,7 +118,7 @@ extern void PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str,
 #  define PALDebug7(str)                PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG7, str)
 #  define PALTrace(str)                 PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_TRACE, str)
 #  define PALCondition(str)             PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_CONDITION, str)
-# endif
+# endif /*!EXEC_BUILD_RELEASE && FEATURE_PAL_DIAGNOSTICS*/
 
 # ifdef __cplusplus
 }
