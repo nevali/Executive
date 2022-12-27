@@ -457,4 +457,6 @@ PAL_POSIX_Platform_exceptionHandler(int signo, siginfo_t *info, void *context)
 	UNUSED__(signo);
 	UNUSED__(info);
 	UNUSED__(context);
+
+	abort();
 }
