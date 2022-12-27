@@ -23,19 +23,23 @@ Executive_Directory_resolve(IContainer *me, const char *name, IDirectoryEntry **
 	ExAssert(NULL != name);
 	ExAssert(NULL != entry);
 	*entry = NULL;
-
-	EXLOGF((LOG_TRACE, "Executive::Directory::<IContainer>resolve('%s')", name));
+	
+	EXTRACEF(("Executive::Directory::<IContainer>resolve('%s')", name));
 	for(iterator = self->data.first; iterator; iterator = iterator->data.next)
 	{
 		if(ExStrEqual(iterator->data.name, name))
 		{
+#if FEATURE_DEBUG_NAMESPACE
 			EXLOGF((LOG_DEBUG7, "Executive::Directory::resolve(): entry located"));
+#endif
 			IDirectoryEntry_retain((&(iterator->DirectoryEntry)));
 			*entry = &(iterator->DirectoryEntry);
 			return E_SUCCESS;
 		}
 	}
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_CONDITION, "%%E-NOENT: object '%s' could not be found", name));
+#endif
 	return E_NOENT;
 }
 

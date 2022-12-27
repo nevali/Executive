@@ -67,12 +67,14 @@ Executive_Directory_metaClass(REFUUID clsid, REFUUID iid, void **out)
 #ifndef NDEBUG
 	ExUuidStr(clsid, cbuf);
 	ExUuidStr(iid, ibuf);
-	EXLOGF((LOG_TRACE, "Executive::Directory::metaClass(clsid:%s, iid:%s)", cbuf, ibuf));
+	EXTRACEF(("Executive::Directory::metaClass(clsid:%s, iid:%s)", cbuf, ibuf));
 #endif
 	if(!Executive_Directory_metaClass_init)
 	{
 		Executive_Directory_metaClass_init = 1;
+#if FEATURE_DEBUG_CLASSES
 		EXLOGF((LOG_DEBUG, "Executive::Directory::metaClass(): initialising now"));
+#endif
 		for(c = 0; Executive_Diretory_metaClass_map[c].classid; c++)
 		{
 			mc = Executive_Diretory_metaClass_map[c].metaClass;
@@ -96,7 +98,7 @@ Executive_Directory_metaClass(REFUUID clsid, REFUUID iid, void **out)
 			return MObject_queryInterface((&(Executive_Diretory_metaClass_map[c].metaClass->Object)), iid, out);
 		}
 	}
-#ifndef NDEBUG
+#if FEATURE_DEBUG_CLASSES
 	EXLOGF((LOG_CONDITION, "%%E-NOENT: Executive::Directory::metaClass(): clsid:%s is not supported by this implementation", cbuf));
 #endif
 	return E_NOENT;
@@ -113,7 +115,9 @@ Executive_Directory_MetaClass_queryInterface(IObject *me, REFUUID iid, void **ou
 	 */
 	if(ExUuidEqual(iid, &IID_IObject) || ExUuidEqual(iid, &IID_MObject))
 	{
+#if FEATURE_DEBUG_CLASSES
 		EXLOGF((LOG_DEBUG7, "Executive::Directory::Container::+queryInterface(): returning MObject"));
+#endif
 		if(out)
 		{
 			*out = &(self->Object);
@@ -131,14 +135,18 @@ Executive_Directory_MetaClass_queryInterface(IObject *me, REFUUID iid, void **ou
 	} */
 	if(ExUuidEqual(iid, &IID_MDirectoryEntryTarget))
 	{
+#if FEATURE_DEBUG_CLASSES
 		EXLOGF((LOG_DEBUG7, "Executive::Directory::Container::+queryInterface(): returning MDirectoryEntryTarget"));
+#endif
 		if(out)
 		{
 			*out = &(self->DirectoryEntryTarget);
 		}
 		return E_SUCCESS;
 	}
+#if FEATURE_DEBUG_CLASSES
 	EXLOGF((LOG_CONDITION, "E-NOTIMPL: metaclass interface iid:" UUID_PRINTF_FORMAT " is not implemented by Executive::Directory", UUID_PRINTF_ARGS(iid)));
+#endif
 	return E_NOTIMPL;
 }
 

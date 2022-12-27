@@ -62,17 +62,24 @@ Platform::logf(LogLevel level, const char *format, ...)
 void
 Platform::trace(const char *str)
 {
+	UNUSED__(str);
+#if FEATURE_TRACE
 	platform.diagnostics.log(LOG_TRACE, str);
+#endif
 }
 
 void
 Platform::tracef(const char *format, ...)
 {
+#if FEATURE_TRACE
 	va_list args;
 
 	va_start(args, format);
 	platform.diagnostics.vlogf(LOG_TRACE, format, args);
 	va_end(args);
+#else
+	UNUSED__(format);
+#endif
 }
 
 /* IObject */

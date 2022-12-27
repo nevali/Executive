@@ -26,8 +26,7 @@ Executive_Directory_MObject_create(MObject *me, IAllocator *allocator, REFUUID i
 
 	ExAssert(NULL != out);
 
-	EXLOGF((LOG_TRACE, "Executive::Directory<MObject>::+create()"));
-
+	EXTRACEF(("Executive::Directory<MObject>::+create()"));
 	*out = NULL;
 	if(!(dir = IAllocator_alloc(allocator, sizeof(Executive_Directory))))
 	{

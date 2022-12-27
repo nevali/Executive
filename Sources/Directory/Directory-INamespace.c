@@ -36,16 +36,20 @@ Executive_Directory_resolveEntry(INamespace *me, const char *path, IContainer *s
 	ExAssert(NULL != path);
 	parent = NULL;
 	basename = NULL;
-	EXLOGF((LOG_TRACE, "Executive::Directory<INamespace>::resolveEntry('%s')", path));
+	EXTRACEF(("Executive::Directory<INamespace>::resolveEntry('%s')", path));
 
 	/* resolve all but the final path component to a container */
 	if(E_SUCCESS != (status = Executive_Directory_resolveContainer(me, path, scope, &parent, &basename)))
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG6, "Executive::Directory<INamespace>::resolveEntry(): resolveContainer() failed - %d", status));
+#endif
 		return status;
 	}
 	/* resolve the remainder within that container */
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG7, "Executive::Directory<INamespace>::resolveEntry(): resolving '%s' within parent %p", basename, parent));
+#endif
 	ExAssert(NULL != parent);
 	status = IContainer_resolve(parent, basename, dentry);
 	IContainer_release(parent);
@@ -59,6 +63,8 @@ Executive_Directory_resolveEntry(INamespace *me, const char *path, IContainer *s
  * a particular scope
  *
  * any links encountered along the way are followed, up to a maximum limit
+ *
+ * XXX this desparately needs to be refactored
  */
 STATUS
 Executive_Directory_resolveContainer(INamespace *me, const char *path, IContainer *scope, IContainer **container, const char **basename)
@@ -76,7 +82,7 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 	ExAssert(NULL != container);
 	ExAssert(NULL != path);
 
-	EXLOGF((LOG_TRACE, "Executive::Directory<INamespace>::resolveContainer('%s')", path));
+	EXTRACEF(("Executive::Directory<INamespace>::resolveContainer('%s')", path));
 
 	*container = NULL;
 	if(basename)
@@ -127,12 +133,14 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 		save = tail[0];
 		tail[0] = 0;
 
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG7, "*** will attempt to resolve path component '%s' to a container", head));
-
+#endif
 		/* attempt to resolve the path component within the current scope */
 		if(E_SUCCESS != (status = IContainer_resolve(scope, head, &dentry))) break;
 		flags = IDirectoryEntry_flags(dentry);
 		/* attempt to resolve any link chains */
+		/* XXX this should not be a magic number here s*/
 		for(; linkCount < 16 && flags & DEF_LINK; linkCount++)
 		{
 			/* attempt to read the link */
@@ -140,9 +148,13 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 			if(status != E_SUCCESS)
 			{
 				/* cannot traverse if it doesn't support ILink */
+#if FEATURE_DEBUG_NAMESPACE
 				EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: Executive::Directory::ResolveContainer(): '%s' does not support ILink", buffer));
+#endif
 				break;
 			}
+	
+			/* resolve the link */
 			{
 				char *buf;
 				size_t buflen;
@@ -150,17 +162,23 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 				buflen = ILink_target(link, NULL, 0);
 				buf = ExAlloc(buflen);
 				ILink_target(link, buf, buflen);
+#if FEATURE_DEBUG_NAMESPACE
 				EXLOGF((LOG_DEBUG7, "attempting to resolve '%s'", buf));
+#endif
 				status = Executive_Directory_resolveEntry(me, buf, scope, &linkEntry);
 				ExFree(buf);
 				ILink_release(link);
 			}
 			if(E_SUCCESS != status)
 			{
+#if FEATURE_DEBUG_NAMESPACE
 				EXLOGF((LOG_DEBUG, "resolveEntry() failed %d", status));
+#endif
 				break;
 			}
+#if FEATURE_DEBUG_NAMESPACE
 			EXLOGF((LOG_DEBUG7, "have resolved link to a new entry"));
+#endif
 			/* replace the entry and fetch the flags again */
 			IDirectoryEntry_release(dentry);
 			dentry = linkEntry;
@@ -171,19 +189,25 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 		 */
 		if(flags & DEF_LINK)
 		{
-			EXLOGF((LOG_CONDITION, "%%E-???: %s: too many levels of links (stopped at %d)", linkCount));
+#if FEATURE_DEBUG_NAMESPACE
+			EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: %s: too many levels of links (stopped at %d)", path, linkCount));
+#endif
 			status = E_NOT_CONTAINER;
 			break;
 		}
 		if(E_SUCCESS != status)
 		{
+#if FEATURE_DEBUG_NAMESPACE
 			EXLOGF((LOG_DEBUG, "link traversal failed"));
+#endif
 			break;
 		}
 		if(!(flags & DEF_CONTAINER))
 		{
 			/* this object must be either a container or a link to a container */
+#if FEATURE_DEBUG_NAMESPACE
 			EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: Executive::Directory::ResolveContainer(): '%s' is not a containerr", buffer));
+#endif
 			status = E_NOT_CONTAINER;
 			break;
 		}	
@@ -193,7 +217,9 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 		dentry = NULL;
 		if(status != E_SUCCESS)
 		{
+#if FEATURE_DEBUG_NAMESPACE
 			EXLOGF((LOG_CONDITION, "%%E-NOT-CONTAINER: Executive::Directory::ResolveContainer(): '%s' does not support IContainer", buffer));
+#endif
 			break;
 		}
 		ExAssert(NULL != childContainer);
@@ -207,19 +233,25 @@ Executive_Directory_resolveContainer(INamespace *me, const char *path, IContaine
 	}
 	if(E_SUCCESS == status)
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG7, "%s: successfully resolved to container", buffer));
+#endif
 		if(basename)
 		{
 			/* skip any leftover slashes */
 			for(; head[0] == '/'; head++);
 			*basename = path + (head - buffer);
+#if FEATURE_DEBUG_NAMESPACE
 			EXLOGF((LOG_DEBUG7, "buffer = '%s', basename = '%s'", buffer, *basename));
+#endif
 		}
 		*container = scope;
 	}
 	else
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG, "%s: failed to resolve to container %d", buffer, status));
+#endif
 		IContainer_release(scope);
 	}
 	if(dentry)
@@ -317,23 +349,31 @@ Executive_Directory_INamespace_create(INamespace *me, const char *path, IContain
 	{
 		return status;
 	}
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG7, "located parent entry for '%s'", path));
 	EXLOGF((LOG_DEBUG7, "basename is '%s'", basename));
+#endif
 	if(E_SUCCESS != (status = IContainer_queryInterface(container, &IID_IMutableContainer, (void **) &mutable)))
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG, "IDirectoryEntry::queryTargetInterface() failed %d", status));
+#endif
 		IContainer_release(container);
 		return status;
 	}
 	IContainer_release(container);
 	if(E_SUCCESS != (status = IMutableContainer_create(mutable, basename, clsid, iid, out)))
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG, "IMutableContainer::create() failed %d", status));
+#endif
 		IMutableContainer_release(mutable);
 		return status;
 	}
 	IMutableContainer_release(mutable);
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG3, "new object created successfully"));
+#endif
 	return status;
 }
 
@@ -351,23 +391,31 @@ Executive_Directory_INamespace_add(INamespace *me, const char *path, IContainer 
 	{
 		return status;
 	}
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG7, "located parent entry for '%s'", path));
 	EXLOGF((LOG_DEBUG7, "basename is '%s'", basename));
+#endif
 	if(E_SUCCESS != (status = IContainer_queryInterface(container, &IID_IMutableContainer, (void **) &mutable)))
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG, "IDirectoryEntry::queryTargetInterface() failed %d", status));
+#endif
 		IContainer_release(container);
 		return status;
 	}
 	IContainer_release(container);
 	if(E_SUCCESS != (status = IMutableContainer_add(mutable, basename, clsid, target)))
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG, "IMutableContainer::add() failed %d", status));
+#endif
 		IMutableContainer_release(mutable);
 		return status;
 	}
 	IMutableContainer_release(mutable);
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG2, "new object created successfully"));
+#endif
 	return status;
 }
 
@@ -384,23 +432,31 @@ Executive_Directory_INamespace_createLink(INamespace *me, const char *path, ICon
 	{
 		return status;
 	}
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG7, "located parent entry for '%s'", path));
 	EXLOGF((LOG_DEBUG7, "basename is '%s'", basename));
+#endif
 	if(E_SUCCESS != (status = IContainer_queryInterface(container, &IID_IMutableContainer, (void **) &mutable)))
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG, "IDirectoryEntry::queryTargetInterface() failed %d", status));
+#endif
 		IContainer_release(container);
 		return status;
 	}
 	IContainer_release(container);
 	if(E_SUCCESS != (status = IMutableContainer_createLink(mutable, basename, target, force)))
 	{
+#if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_DEBUG, "IMutableContainer::createLink() failed %d", status));
+#endif
 		IMutableContainer_release(mutable);
 		return status;
 	}
 	IMutableContainer_release(mutable);
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG2, "new link created successfully"));
+#endif
 	return status;
 }
 
@@ -419,7 +475,9 @@ Executive_Directory_INamespace_setFlags(INamespace *me, const char *path, IConta
 	IDirectoryEntry_release(dentry);
 	if(status != E_SUCCESS)
 	{
+ #if FEATURE_DEBUG_NAMESPACE
 		EXLOGF((LOG_CONDITION, "%%E-%d: IDirectoryEntry::setFlags() failed for '%s'", status, path));
+#endif
 	}
 	return status;
 }

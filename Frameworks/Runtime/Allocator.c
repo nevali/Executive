@@ -158,7 +158,9 @@ RtAllocator_create(IAddressSpace *addressSpace)
 		/* Use the system allocator to allocate a new RtAllocator
 		 * structure
 		 */
+#if FEATURE_DEBUG_MEM
 		RTLOGF((LOG_DEBUG7, "RtAllocator::create(): initialising secondary allocator"));
+#endif
 		alloc = (RtAllocator *)	mspace_calloc(systemAllocator.data.msp, 1, sizeof(RtAllocator));
 		if(!alloc)
 		{
@@ -174,11 +176,15 @@ RtAllocator_create(IAddressSpace *addressSpace)
 		 * is subsequently used to allocate the data structures used by other
 		 * allocators
 		 */
+#if FEATURE_DEBUG_MEM
 		RTLOGF((LOG_DEBUG7, "RtAllocator::create(): initialising system allocator"));
+#endif
 		alloc = &systemAllocator;
 		RtMemSet(alloc, 0, sizeof(RtAllocator));
 	}
+#if FEATURE_DEBUG_MEM
 	RTLOGF((LOG_DEBUG7, "RtAllocator::create(): alloc = %p", alloc));
+#endif
 	IAddressSpace_retain(addressSpace);
 	alloc->vtable.vtable = &RtAllocator_vtable;
 	alloc->data.refCount = 1;
@@ -188,7 +194,9 @@ RtAllocator_create(IAddressSpace *addressSpace)
 	alloc->data.msp = create_mspace_MemoryManager(alloc, 0, 0);
 	RTASSERT(NULL != alloc->data.msp);
 	/* create the region list */
+#if FEATURE_DEBUG_MEM
 	RTLOGF((LOG_DEBUG7, "creating regions list"));
+#endif
 	alloc->data.regionsCount = 0;
 	alloc->data.regionsSize = 2;
 	alloc->data.regions = (IRegion **) mspace_calloc(alloc->data.msp, (alloc->data.regionsSize), sizeof(IRegion *));
@@ -197,7 +205,9 @@ RtAllocator_create(IAddressSpace *addressSpace)
 	RTASSERT(NULL != alloc->data.firstRegion);
 	alloc->data.regions[0] = alloc->data.firstRegion;
 	alloc->data.regionsCount = 1;
+#if FEATURE_DEBUG_MEM
 	RTLOGF((LOG_DEBUG7, "returning IAllocator interface pointer %p", &(alloc->Allocator)));
+#endif
 	return &(alloc->Allocator);
 }
 
@@ -224,7 +234,9 @@ Rt_AllocatorMap(RtAllocator *self, size_t size, RegionFlags flags)
 		return NULL;
 	}
 	pages = size / self->data.pageSize;
+#if FEATURE_DEBUG_MEM
 	RTLOGF((LOG_DEBUG7, "DEBUG: %s: request is for %lu pages", __FUNCTION__, pages));
+#endif
 	if(IAddressSpace_obtainTransientRegion(self->data.addressSpace, pages, flags, &(systemAllocator.RegionHolder), &region) != E_SUCCESS)
 	{
 		RTPANIC("Rt_AllocatorMap(): IAddressSpace::obtainTransientRegion() failed (out of memory?)");
@@ -233,7 +245,9 @@ Rt_AllocatorMap(RtAllocator *self, size_t size, RegionFlags flags)
 	if(!self->data.firstRegion)
 	{
 		self->data.firstRegion = region;
+#if FEATURE_DEBUG_MEM
 		RTLOGF((LOG_DEBUG7, "DEBUG: %s: obtained first region (%llu bytes) from the address space", __FUNCTION__, (unsigned long long) size));
+#endif
 		return IRegion_base(region);
 	}
 	RTLOGF((LOG_WARNING, "WARNING: Rt_AllocatorMap(): second region obtained but that isn't handled yet"));

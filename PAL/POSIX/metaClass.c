@@ -32,8 +32,10 @@ PAL_metaClass(REFUUID clsid, REFUUID iid, void **out)
 			abort();
 		}
 	}
+#if FEATURE_TRACE
 /*	fprintf(stderr, "PAL::metaClass(" UUID_PRINTF_FORMAT ")\n", UUID_PRINTF_ARGS(clsid)); */
 	PALLOGF((LOG_TRACE, "PAL::POSIX::metaClass(): clsid:" UUID_PRINTF_FORMAT " iid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid)));
+#endif
 	if(out)
 	{
 		*out = NULL;
@@ -73,7 +75,9 @@ PAL_metaClass(REFUUID clsid, REFUUID iid, void **out)
 	}
 #endif
 	/* Class unsupported */
+#if FEATURE_DEBUG_CLASSES
 	PALLOGF((LOG_CONDITION, "%%E-NOENT: PAL::POSIX::metaClass(): unsupported clsid:" UUID_PRINTF_FORMAT " requested via PAL$metaClass()",
 		UUID_PRINTF_ARGS(clsid)));
+#endif
 	return E_NOENT;
 }

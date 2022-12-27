@@ -46,14 +46,13 @@ RtDebugFormat(LogLevel level, const char *format, ...)
 void
 RtTraceFormat(const char *format, ...)
 {
-#if EXEC_BUILD_DEBUG
+#if EXEC_BUILD_DEBUG && FEATURE_TRACE
 	va_list args;
 
 	va_start(args, format);
 	RtLogFormatArgs(LOG_TRACE, format, args);
 	va_end(args);
 #else /*EXEC_BUILD_DEBUG*/
-	UNUSED__(level);
 	UNUSED__(format);
 #endif /*!EXEC_BUILD_DEBUG*/
 }

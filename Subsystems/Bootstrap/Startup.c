@@ -15,7 +15,9 @@ void Bootstrap_Startup_mainThread(IThread *self)
 	INamespace_open(ns, "/System/Platform/Devices/Diagnostics", NULL, &IID_IPlatformDiagnostics, (void **) &diag);
 	for(;;)
 	{
+#if FEATURE_TRACE
 		IPlatformDiagnostics_log(diag, LOG_TRACE, "Bootstrap: Startup: tock");
+#endif
 		IThread_yield(self);
 	}
 }

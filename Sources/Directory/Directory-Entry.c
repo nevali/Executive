@@ -148,7 +148,9 @@ Executive_Directory_Entry_setFlags(IDirectoryEntry *me, DirectoryEntryFlags flag
     flags &= ~(DEF_LINK|DEF_VOID|DEF_CONTAINER);
     if(self->data.flags & DEF_IMMUTABLE || self->data.userFlags & DEF_IMMUTABLE)
     {
+#if FEATURE_DEBUG_NAMESPACE
         EXLOGF((LOG_CONDITION, "%%E-PERM: set flags: operation not permitted (directory entry is marked immutable); flags = %d, new flags = %d", self->data.flags, flags));
+#endif
         return E_PERM;
     }
     self->data.userFlags = flags;

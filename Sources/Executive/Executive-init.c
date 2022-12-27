@@ -210,7 +210,9 @@ Executive_init_directory(void)
 		 * do so now */
 		Executive_init_sysContainer();
 	}
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG, "Executive::init_directory(): initial population of the object directory completed"));
+#endif
 }
 
 /*PRIVATE*/

@@ -170,34 +170,38 @@ PAL_POSIX_Console_vlogf(PAL_POSIX_Console *self, LogLevel level, const char *for
 	{
 		PAL_POSIX_Console_start();
 	}
+	if(!*format)
+	{
+		return 0;
+	}
 	switch(level)
 	{
 		case LOG_EMERGENCY:
 			printf("\033[0;41;37;1m\033[97m  EMERGENCY: ");
 			break;
 		case LOG_ALERT:
-			printf(   "\033[0;31;91m      ALERT: ");
+			printf(   "\033[31m      ALERT: ");
 			break;
 		case LOG_CRITICAL:
-			printf(   "\033[0;31;91m   CRITICAL: ");
+			printf(   "\033[31m   CRITICAL:\033[37m ");
 			break;
 		case LOG_ERROR:
-			printf(   "\033[0;31;91m      Error: ");
+			printf(   "\033[31m      Error:\033[37m ");
 			break;
 		case LOG_WARNING:
-			printf(   "\033[0;33;93m    Warning: ");
+			printf(   "\033[33m    Warning:\033[37m ");
 			break;
 		case LOG_NOTICE:
-			printf(   "\033[0;37m     Notice: ");
+			printf(   "\033[37;1m     Notice:\033[37m ");
 			break;
 		case LOG_INFO:
-			printf(         "\033[0;37m             ");
+			printf(         "\033[37m Infomation:\033[30m ");
 			break;
 		default:
-			printf("\033[37m<%d>  ", level);
+			printf("\033[30m<%d>  ", level);
 	}
 	r = vprintf(format, args);
-	printf("\033[K\033[0;100;37;1;97m\n");
+	printf("\033[K\033[0;47;30m\033[100m\n");
 	return r;
 }
 
@@ -210,7 +214,8 @@ PAL_POSIX_Console_start(void)
 #if HAVE_SETUPTERM
 	setupterm();
 #endif
-	printf("\033[100;37;1;97m\033[2J\033[1;1H");
+	/* Default is black on white */
+	printf("\033[0;47;30m\033[100m\033[2J\033[1;1H");
 	fflush(stdout);
 }
 

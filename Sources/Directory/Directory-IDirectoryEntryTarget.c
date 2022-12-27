@@ -24,7 +24,7 @@ Executive_Directory_linked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
 
 	UNUSED__(entry);
 
-/*	EXLOGF((LOG_TRACE, "Executive::Directory::<IDirectoryEntryTarget>linked('%s')", (entry ? IDirectoryEntry_name(entry) : "(NULL)"))); */
+/*	EXTRACEF(("Executive::Directory::<IDirectoryEntryTarget>linked('%s')", (entry ? IDirectoryEntry_name(entry) : "(NULL)"))); */
 	switch(self->data.kind)
 	{
 	case DK_ROOT:
@@ -65,5 +65,5 @@ Executive_Directory_unlinked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
 	UNUSED__(self);
 	UNUSED__(entry);
 
-/*	EXLOGF((LOG_TRACE, "Executive::Directory::<IDirectoryEntryTarget>unlinked(): %s", IDirectoryEntry_name(entry))); */
+/*	EXTRACEF(("Executive::Directory::<IDirectoryEntryTarget>unlinked(): %s", IDirectoryEntry_name(entry))); */
 }

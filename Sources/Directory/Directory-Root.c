@@ -12,7 +12,9 @@ Executive_Directory_Root_populate(IMutableContainer *me)
 	Executive_Directory *self = INTF_TO_CLASS(me);
 	IMutableContainer *mutableContainer;
 
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG, "Executive::Directory: creating the root directory objects"));
+#endif
 /*	ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "System", &CLSID_Executive_System, NULL, NULL)); */
 	ExAssert(E_SUCCESS == IMutableContainer_add((&(self->MutableContainer)), "System", &CLSID_Executive_System, &(executive.Object)));
 	ExAssert(E_SUCCESS == IMutableContainer_create((&(self->MutableContainer)), "Users", &CLSID_Executive_Container, NULL, NULL));

@@ -26,7 +26,7 @@ Executive_Directory_MDirectoryEntryTarget_createInstance(MDirectoryEntryTarget *
 	 */
 	ExAssert(NULL != out);
 
-/*	EXLOGF((LOG_TRACE, "Executive::Directory::[Generic]<MDirectoryEntryTarget>::+createInstance(%d, %s)", self->kind, (entry ? IDirectoryEntry_name(entry) : "NULL" ))); */
+/*	EXTRACEF(("Executive::Directory::[Generic]<MDirectoryEntryTarget>::+createInstance(%d, %s)", self->kind, (entry ? IDirectoryEntry_name(entry) : "NULL" ))); */
 
 	*out = NULL;
 	if(self->kind == DK_ROOT)
@@ -70,7 +70,9 @@ Executive_Directory_MDirectoryEntryTarget_createInstance(MDirectoryEntryTarget *
 	switch(self->kind)
 	{
 		case DK_ROOT:
+#if FEATURE_DEBUG_NAMESPACE
 			EXLOGF((LOG_DEBUG, "created Executive::Directory::Root (Object Directory root)"));
+#endif
 			/* it should not be possible to create a new root directory if one
 			 * already exists
 			 */

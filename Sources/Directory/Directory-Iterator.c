@@ -47,7 +47,7 @@ Executive_Directory_Iterator_create(Executive_Directory_Entry *dirent)
 /* dirent may be NULL to indicate an empty list */
 /* ExAssert(NULL != dirent); */
 
-/*	EXLOGF((LOG_TRACE, "Executive::Directory::Iterator::create()")); */
+/*	EXTRACEF(("Executive::Directory::Iterator::create()")); */
 
 	if(NULL == (p = ExAlloc(sizeof(Executive_Directory_Iterator))))
 	{
@@ -80,7 +80,7 @@ static REFCOUNT
 Executive_Directory_Iterator_release(IIterator *me)
 {
 	EXEC_COMMON_RELEASE(Executive_Directory_Iterator, {
-/*		EXLOGF((LOG_TRACE, "Executive::Directory::Iterator::release(): freeing iterator"));  */
+/*		EXTRACEF(("Executive::Directory::Iterator::release(): freeing iterator"));  */
 	});
 }
 

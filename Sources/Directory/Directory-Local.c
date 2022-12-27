@@ -11,7 +11,9 @@ Executive_Directory_Local_populate(IMutableContainer *me)
 {
 	Executive_Directory *self = INTF_TO_CLASS(me);
 
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG, "Executive::Directory: populating the /Local domain"));
+#endif
 /*	ExPhaseShift(PHASE_STARTUP_LOCAL); */
 
 	ExAssert(E_SUCCESS == IMutableContainer_createLink((&(self->MutableContainer)), "Applications", "/System/Volumes/Data/Applications", true));
@@ -24,7 +26,8 @@ Executive_Directory_Local_populate(IMutableContainer *me)
 	{
 		entry->data.flags |= DEF_SYSTEM|DEF_IMMUTABLE;
 	}
+#if FEATURE_DEBUG_NAMESPACE
 	EXLOGF((LOG_DEBUG, "Executive::Directory: initial population of the /Local domain complete"));
-
+#endif
 	return E_SUCCESS;
 }

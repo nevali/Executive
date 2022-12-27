@@ -96,14 +96,16 @@ PAL_POSIX_Platform_init(void)
 #if FEATURE_CONSOLE
 	PAL_POSIX_Console_init();
 #endif
-	PALLOGF((LOG_DEBUG6, "PAL::POSIX::init(): early initialisation complete"));
+	PALTrace("PAL::POSIX::init(): early initialisation complete");
 }
 
 /* INTERNAL */
 void
 PAL_POSIX_Platform_setAddressSpace(IAddressSpace *addressSpace)
 {
+#if FEATURE_TRACE
 	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setAddressSpace(%p): kernel address space object is available", addressSpace));
+#endif
 	if(!PAL_POSIX_platform.data.addressSpace)
 	{
 		PAL_POSIX_platform.data.addressSpace = addressSpace;
@@ -121,7 +123,9 @@ PAL_POSIX_Platform_setDiagnostics(IPlatformDiagnostics *diag)
 	{
 		PAL_POSIX_platform.data.diagnostics = diag;
 	}
+#if FEATURE_TRACE
 	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setDiagnostics(): PlatformDiagnostics object is available"));
+#endif
 #endif
 }
 
@@ -136,7 +140,9 @@ PAL_POSIX_Platform_setConsole(PAL_POSIX_Console *console)
 	{
 		PAL_POSIX_platform.data.console = console;
 	}
+#if FEATURE_TRACE
 	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::setConsole(): Console object is available"));
+#endif
 #endif
 }
 
@@ -147,7 +153,9 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 {
 	UNUSED__(self);
 
+#if FEATURE_TRACE
 	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::queryInterface(iid:" UUID_PRINTF_FORMAT ")", UUID_PRINTF_ARGS(iid)));
+#endif
 	if(out)
 	{
 		*out = NULL;
@@ -158,7 +166,9 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 		{
 			*out = &(PAL_POSIX_platform.Object);
 		}
+#if FEATURE_DEBUG_CLASSES
 		PALLOGF((LOG_DEBUG7, "returning PAL::POSIX::Platform<IObject>"));
+#endif
 		return E_SUCCESS;
 	}
 	if(0 == memcmp(iid, &IID_IPlatform, sizeof(UUID)))
@@ -167,7 +177,9 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 		{
 			*out = &(PAL_POSIX_platform.Platform);
 		}
+#if FEATURE_DEBUG_CLASSES
 		PALLOGF((LOG_DEBUG7, "returning PAL::POSIX::Platform<IPlatform>"));
+#endif
 		return E_SUCCESS;
 	}
 	if(0 == memcmp(iid, &IID_IContainer, sizeof(UUID)))
@@ -176,7 +188,9 @@ PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out)
 		{
 			*out = &(PAL_POSIX_platform.Container);
 		}
+#if FEATURE_DEBUG_CLASSES
 		PALLOGF((LOG_DEBUG7, "PAL::POSIX::Platform::queryInterface(): returning PAL::POSIX::Platform<IContainer>"));
+#endif
 		return E_SUCCESS;
 	}
 	return E_NOTIMPL;
@@ -222,7 +236,12 @@ PAL_POSIX_Platform_allocatorActivated(IPlatform *self, IAllocator *allocator)
 		IAllocator_release(me->data.allocator);
 	}
 	me->data.allocator = allocator;
+#if FEATURE_DEBUG_MEM
 	PALDebug("PAL::POSIX::Platform::allocatorActivated(): new default allocator activated");
+
+#else
+	PALTrace("PAL::POSIX::Platform::allocatorActivated(): new default allocator activated");
+#endif
 }
 
 static void
@@ -238,12 +257,16 @@ PAL_POSIX_Platform_namespaceActivated(IPlatform *self, INamespace *ns)
 		INamespace_release(me->data.rootNS);
 	}
 	me->data.rootNS = ns;
+#if FEATURE_DEBUG_NAMESPACE
 	PALDebug("PAL::POSIX::Platform::namespaceActivated(): new root namespace activated");
+#endif
 	if(me->data.platformContainer)
 	{
 		IMutableContainer_release(me->data.platformContainer);
 	}
+#if FEATURE_DEBUG_NAMESPACE
 	PALDebug("PAL::POSIX::Platform::namespaceActivated(): creating platform container");
+#endif
 	if(E_SUCCESS != (status = Executive_createObject(&CLSID_Executive_Container, &IID_IMutableContainer, (void **) &(PAL_POSIX_platform.data.platformContainer))))
 	{
 		PAL_panic("PAL::POSIX::Platform::namespaceActivated(): Executive::createObjectByName(Executive::Container, IMutableContainer) failed");
@@ -266,25 +289,34 @@ PAL_POSIX_Platform_namespaceActivated(IPlatform *self, INamespace *ns)
 #endif /*FEATURE_CONSOLE*/
 	IMutableContainer_add(devices, "AddressSpace", &CLSID_PAL_MemoryManager, (IObject *) (void *) PAL_POSIX_platform.data.addressSpace);
 	IMutableContainer_release(devices);
+#if FEATURE_DEBUG_NAMESPACE
 	PALDebug("PAL::POSIX::Platform::namespaceActivated(): population of Platfom container complete");
+#endif
 }
 
 static void
 PAL_POSIX_Platform_nap(IPlatform *self)
 {
+	struct timespec ts;
 	UNUSED__(self);
 	
 	PALTrace("PAL::POSIX::Platform::nap()");
-	sleep(1);
+	ts.tv_sec = 0;
+	ts.tv_nsec = 10000;
+	nanosleep(&ts, NULL);
 }
 
 static void
 PAL_POSIX_Platform_tick(IPlatform *self)
 {
+	struct timespec ts;
+
 	UNUSED__(self);
 	
 	PALTrace("PAL::POSIX::Platform::tick()");
-	sleep(1);
+	ts.tv_sec = 0;
+	ts.tv_nsec = 1000;
+	nanosleep(&ts, NULL);
 }
 
 static void
@@ -292,7 +324,9 @@ PAL_POSIX_Platform_phaseTransition(IPlatform *me, PHASE phase)
 {
 	UNUSED__(me);
 #if FEATURE_DEBUG_PHASING
+#if FEATURE_TRACE
 	PALLOGF((LOG_TRACE, "PAL::POSIX::Platform::phaseTransition(%04x)", phase));
+#endif
 	if(phase == PAL_POSIX_phase)
 	{
 		return;
@@ -397,7 +431,9 @@ PAL_POSIX_Platform_setEnvironmentLogLevel(void)
 		{ "debug5", LOG_DEBUG5 },
 		{ "debug6", LOG_DEBUG6 },
 		{ "debug7", LOG_DEBUG7 },
+	#if FEATURE_TRACE
 		{ "trace", LOG_TRACE },
+	#endif
 		{ NULL, 0 }
 	};
 	if(NULL != (level = getenv("EXEC_PAL_LOGLEVEL")))

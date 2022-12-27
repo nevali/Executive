@@ -58,7 +58,9 @@ static PAL_POSIX_AddressSpace PAL_POSIX_memoryManager = { { &PAL_POSIX_AddressSp
 void
 PAL_POSIX_AddressSpace_init(void)
 {
+#if FEATURE_TRACE
 	PALLOGF((LOG_TRACE, "PAL::POSIX::AddressSpace(%p)::init()", &PAL_POSIX_memoryManager));
+#endif
 #if defined(HAVE_SYSCONF) && defined(_SC_PAGESIZE)
 	PAL_POSIX_memoryManager.data.pagesize = sysconf(_SC_PAGESIZE);
 #elif defined(HAVE_GETPAGESIZE)

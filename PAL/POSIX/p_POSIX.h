@@ -9,16 +9,19 @@
 # define INITGUID_EXTERN               1
 
 /* Diagnostics and panic output */
-#  include <stdio.h>
+# include <stdio.h>
 /* Errno values */
-#  include <errno.h>
+# include <errno.h>
 /* malloc(), free(), etc. */
-#  include <stdlib.h>
+# include <stdlib.h>
 /* memcmp() */
-#  include <string.h>
+# include <string.h>
 /* sleep()  */
-#  include <unistd.h>
-#  include <signal.h>
+# include <unistd.h>
+/* sigaction() */
+# include <signal.h>
+/* nanosleep() */
+# include <time.h>
 
 # include <PAL/PAL.h>
 
@@ -146,7 +149,11 @@ extern void PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str,
 #  define PALDebug(str)                 PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG, str)
 #  define PALDebug2(str)                PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG2, str)
 #  define PALDebug7(str)                PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_DEBUG7, str)
-#  define PALTrace(str)                 PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_TRACE, str)
+#  if FEATURE_TRACE
+#   define PALTrace(str)                PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_TRACE, str)
+#  else
+#   define PALTrace(str)                /* FEATURE_TRACE disabled PALTrace() */
+#  endif
 #  define PALCondition(str)             PAL_POSIX_PlatformDiagnostics_log(NULL, LOG_CONDITION, str)
 # endif /*!EXEC_BUILD_RELEASE && FEATURE_PAL_DIAGNOSTICS*/
 

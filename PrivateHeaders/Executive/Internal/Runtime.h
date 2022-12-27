@@ -72,10 +72,15 @@ EXTERN_C IAllocator *RtAllocator_create(IAddressSpace *addressSpace) RUNTIME_PRI
 #  define ExDebug(str)
 #  define ExTrace(str)
 # else
-#  define EXTRACEF(P)                  RtTraceFormat P
+#  if FEATURE_TRACE
+#   define EXTRACEF(P)                  RtTraceFormat P
+#   define ExTrace(str)                 RtLog(LOG_TRACE, str)
+#  else
+#   define EXTRACEF(P)                 /* FEATURE_TRACE disabled EXTRACEF() */
+#   define ExTrace(str)                /* FEATURE_TRACE disabled ExTrace() */
+#  endif
 #  define EXDBGF(P)                    RtDebugFormat P
 #  define ExDebug(str)				   RtLog(LOG_DEBUG, str)
-#  define ExTrace(str)				   RtLog(LOG_TRACE, str)
 # endif
 
 

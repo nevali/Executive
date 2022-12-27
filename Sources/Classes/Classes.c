@@ -86,22 +86,30 @@ Executive_metaClass(REFUUID clsid, REFUUID iid, void **out)
 		{
 			if(metaClass_entries[n].fn)
 			{
+#if FEATURE_DEBUG_CLASSES
 				EXDBGF((LOG_DEBUG6, "Executive::metaClass(): invoking callback for clsid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid)));
+#endif
 				return metaClass_entries[n].fn(clsid, iid, out);
 			}
 			if(metaClass_entries[n].factory)
 			{
+#if FEATURE_DEBUG_CLASSES
 				EXDBGF((LOG_DEBUG6, "Executive::metaClass(): providing factory for clsid:" UUID_PRINTF_FORMAT, UUID_PRINTF_ARGS(clsid)));
+#endif
 				return MFactory_queryInterface(((IObject *) metaClass_entries[n].factory), iid, out);
 			}
 			status = E_NOTIMPL;
+#if FEATURE_DEBUG_CLASSES
 			EXLOGF((LOG_CONDITION, "%s: Executive::metaClass(): clsid:" UUID_PRINTF_FORMAT " does not provide a callback or factory", ExStatusName(status), UUID_PRINTF_ARGS(clsid)));
-			return E_NOTIMPL;
+#endif
+			return status;
 		}
 	}
 	status = E_NOTIMPL;
+#if FEATURE_DEBUG_CLASSES
 	EXLOGF((LOG_CONDITION, "%s: Executive::metaClass(): clsid:" UUID_PRINTF_FORMAT " is not registered", ExStatusName(status), UUID_PRINTF_ARGS(clsid)));
-	return E_NOENT;
+#endif
+	return status;
 }
 
 /* create an instance using MObject or MFactory */
@@ -116,22 +124,32 @@ Executive_createObject(REFUUID clsid, REFUUID iid, void **out)
 		UUID_PRINTF_ARGS(clsid), UUID_PRINTF_ARGS(iid)));
 	if(E_SUCCESS == (status = Executive_metaClass(clsid, &IID_MObject, (void **) &constructor)))
 	{
+#if FEATURE_DEBUG_CLASSES
 		EXLOGF((LOG_DEBUG7, "Executive::createObject: using MObject metaclass interface"));
+#endif
 		status = MObject_create(constructor, executive.data.allocator, iid, out);
+#if FEATURE_DEBUG_CLASSES
 		EXLOGF((LOG_DEBUG7, "Executive::createObject(): MObject::create() -> %s", ExStatusName(status)));
+#endif
 		MObject_release(constructor);
 		return status;
 	}
 	if(E_SUCCESS == (status = Executive_metaClass(clsid, &IID_MFactory, (void **) &factory)))
 	{
+#if FEATURE_DEBUG_CLASSES
 		EXLOGF((LOG_DEBUG7, "Executive::createObject: using MFactory metaclass interface"));
+#endif
 		status = MFactory_createInstance(factory, NULL, iid, out);
+#if FEATURE_DEBUG_CLASSES
 		EXLOGF((LOG_DEBUG7, "Executive::createObject(): MFactory::createInstance() -> %s:", ExStatusName(status)));
+#endif
 		MFactory_release(factory);
 		return status;
 	}
 	status = E_NOENT;
+#if FEATURE_DEBUG_CLASSES
 	EXLOGF((LOG_CONDITION, "%s: unable to obtain a suitable metaclass interface with which to create an instance of the requested class", ExStatusName(status)));
+#endif
 	return status;
 }
 

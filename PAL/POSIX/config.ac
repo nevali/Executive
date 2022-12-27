@@ -28,5 +28,10 @@ if test $exec_glue = posix ; then
 	AC_CHECK_HEADERS([unistd.h sys/mman.h term.h])
 	AC_CHECK_FUNCS([sysconf getpagesize])
 
-	AC_CHECK_LIB([curses],[setupterm],[AS_VAR_APPEND([EXEC_PAL_LIBS],["${EXEC_PAL_LIBS} -lcurses"])])
+	AC_CHECK_LIB([curses],[setupterm],[
+		if test x$ac_cv_header_term_h = xyes ; then
+			AC_DEFINE_UNQUOTED([WITH_CURSES],[1],[build the POSIX PAL using curses(3)])
+		fi
+		AS_VAR_APPEND([EXEC_PAL_LIBS],["${EXEC_PAL_LIBS} -lcurses"
+	])])
 fi

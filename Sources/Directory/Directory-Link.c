@@ -41,7 +41,7 @@ Executive_Directory_Link_create(const char *target)
 {
     Executive_Directory_Link *p;
 
-    EXLOGF((LOG_TRACE, "Executive::Directory::Link::create()"));
+    EXTRACEF(("Executive::Directory::Link::create()"));
 
     ExAssert(NULL != target);
     if(NULL == (p = ExAlloc(sizeof(Executive_Directory_Link))))

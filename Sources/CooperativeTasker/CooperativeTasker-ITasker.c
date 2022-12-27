@@ -92,15 +92,20 @@ void
 Executive_CooperativeTasker_yield(ITasker *me)
 {
 	volatile Executive_CooperativeTasker *self = INTF_TO_CLASS(me);
-	volatile Executive_CooperativeTasker_Thread *thread, *nextThread;
+	volatile Executive_CooperativeTasker_Thread *nextThread;
+#if FEATURE_DEBUG_CONTEXTS
+	volatile Executive_CooperativeTasker_Thread *thread;
+#endif
 
 	EXTRACEF(("Executive::CooperativeTasker::yield()"));
-	EXLOGF((LOG_DEBUG, "currentThread = %p", self->data.currentThread));
-	EXLOGF((LOG_DEBUG, "runnable threads list:-"));
+#if FEATURE_DEBUG_CONTEXTS
+	EXLOGF((LOG_DEBUG5, "currentThread = %p", self->data.currentThread));
+	EXLOGF((LOG_DEBUG5, "runnable threads list:-"));
 	for(thread = self->data.firstRunnableThread; thread; thread = thread->data.nextRunnable)
 	{
-		EXLOGF((LOG_DEBUG, " runnable thread: %p => %u:%u", thread, thread->data.task->data.id, thread->data.id));
+		EXLOGF((LOG_DEBUG7, " runnable thread: %p => %u:%u", thread, thread->data.task->data.id, thread->data.id));
 	}
+#endif
 	/* if there's a current thread, suspend it */
 	self->data.previousThread = NULL;
 	if(self->data.currentThread)
@@ -112,16 +117,20 @@ Executive_CooperativeTasker_yield(ITasker *me)
 		}
 	}
 	nextThread = Executive_CooperativeTasker_nextRunnableThread((Executive_CooperativeTasker *) self);
+#if FEATURE_DEBUG_CONTEXTS
 	EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::yield(): nextThread = %p", nextThread));
+#endif
 	if(!nextThread)
 	{
-		EXTRACEF(("Executive::CooperativeTasker::yield(): no runnable threads"));
+		EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::yield(): no runnable threads"));
 		IPlatform_nap(executive.data.platform);
 		return;
 	}
 	if(nextThread == self->data.previousThread)
 	{
+#if FEATURE_DEBUG_CONTEXTS
 		EXTRACEF(("Executive::CooperativeTasker::yield(): no other runnable threads; napping before resumption"));
+#endif
 		IPlatform_nap(executive.data.platform);
 	}
 	else
@@ -154,14 +163,20 @@ Executive_CooperativeTasker_nextRunnableThread(Executive_CooperativeTasker *self
 	 {
 		if(NULL != (thread = self->data.previousThread->data.nextRunnable))
 		{
-			EXLOGF((LOG_DEBUG, "previously-running thread had a next-runnable pointer, using that"));
+#if FEATURE_DEBUG_CONTEXTS
+			EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::nextRunnableThread(): previously-running thread had a next-runnable pointer, using that"));
+#endif
 			/* XXX assert that it is in fact runnable */
 			return thread;
 		}
-		EXLOGF((LOG_DEBUG, "there WAS a previous thread, but it was the end of the chain"));
+#if FEATURE_DEBUG_CONTEXTS
+		EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::nextRunnableThread(): there was a previous thread, but it was the end of the chain"));
+#endif
 	}
 	/* Otherwise, start at the beginning of the list */
-	EXLOGF((LOG_DEBUG, "next runnable thread is first runnable thread"));
+#if FEATURE_DEBUG_CONTEXTS
+	EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::nextRunnableThread(): next runnable thread is first runnable thread"));
+#endif
 	return (Executive_CooperativeTasker_Thread *) self->data.firstRunnableThread;
 }
 

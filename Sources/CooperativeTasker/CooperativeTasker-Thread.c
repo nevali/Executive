@@ -235,10 +235,10 @@ Executive_CooperativeTasker_Thread_resume(Executive_CooperativeTasker_Thread *me
 		{
 			IContext_swap(((IContext *) self->data.context), NULL);
 		}
-		EXLOGF((LOG_ALERT, "Executive::CooperativeTasker::Thread<%p>::resume(): now resuming thread...", self));
+		EXTRACEF(("Executive::CooperativeTasker::Thread<%p>::resume(): now resuming thread...", self));
 		return;
 	}
-	EXLOGF((LOG_ALERT, "Executive::CooperativeTasker::Thread::resume(): thread had no context; unscheduling"));
+	EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::Thread::resume(): thread had no context; unscheduling"));
 	Executive_CooperativeTasker_Thread_unschedule((Executive_CooperativeTasker_Thread *) self);
 }
 

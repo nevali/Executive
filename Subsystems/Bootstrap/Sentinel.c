@@ -17,7 +17,9 @@ Bootstrap_Sentinel_mainThread(IThread *self)
 	IPlatformDiagnostics_log(diag, LOG_INFO, "Bootstrap: Sentinel: first CPU started");
 	for(;;)
 	{
+#if FEATURE_TRACE
 		IPlatformDiagnostics_log(diag, LOG_TRACE, "Bootstrap: Sentinel: tick");
+#endif
 		IThread_yield(self);
 	}
 }

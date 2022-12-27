@@ -34,7 +34,6 @@ RtStrLen(const char *str)
 	for(c = 0; str[c]; c++)
 	{
 	}
-/*	RTLOGF((LOG_TRACE, "RtStrLen('%s') = %u", str, c)); */
 	return c;
 }
 
