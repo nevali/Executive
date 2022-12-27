@@ -134,7 +134,7 @@ PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str, ...)
 	}
 #endif
 	va_start(ap, str);
-	if(level >= PAL_POSIX->data.logLevel)
+	if(PAL_POSIX && level >= PAL_POSIX->data.logLevel)
 	{
 		fprintf(stderr, "<%d> ", level);
 		vfprintf(stderr, str, ap);
