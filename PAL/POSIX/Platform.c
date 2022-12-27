@@ -6,10 +6,10 @@
 
 #include "p_POSIX.h"
 
-#define INTF_TO_CLASS(i) (PAL_POSIX_Platform *)((void *)(i)->instptr)
+#define INTF_TO_CLASS(i)               (PAL_POSIX_Platform *)((void *)(i)->instptr)
 
-static void PAL_POSIX_setEnvironmentLogLevel(void);
-
+static void PAL_POSIX_Platform_setEnvironmentLogLevel(void);
+static void PAL_POSIX_Platform_setupSignals(void);
 static STATUS PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out);
 static REFCOUNT PAL_POSIX_Platform_retain(IObject *self);
 static REFCOUNT PAL_POSIX_Platform_release(IObject *self);
@@ -21,6 +21,9 @@ static void PAL_POSIX_Platform_tick(IPlatform *self);
 static void PAL_POSIX_Platform_phaseTransition(IPlatform *self, PHASE phase);
 static STATUS PAL_POSIX_Platform_resolve(IContainer *self, const char *name, IDirectoryEntry **entry);
 static IIterator *PAL_POSIX_Platform_iterator(IContainer *self);
+
+static void PAL_POSIX_Platform_powerSignalHandler(int signo);
+static void PAL_POSIX_Platform_exceptionHandler(int signo, siginfo_t *info, void *context);
 
 /* IObject */
 static struct IObject_vtable_ platform_IObject_vtable = {
@@ -60,6 +63,7 @@ PAL_POSIX_Platform_init(void)
 	{
 		return;
 	}
+	PAL_POSIX_Platform_setupSignals();
 #if EXEC_BUILD_RELEASE
 	PAL_POSIX_platform.data.logLevel = LOG_NOTICE;
 #elif EXEC_BUILD_DEBUG
@@ -67,7 +71,7 @@ PAL_POSIX_Platform_init(void)
 #else
 	PAL_POSIX_platform.data.logLevel = LOG_CONDITION;
 #endif
-	PAL_POSIX_setEnvironmentLogLevel();
+	PAL_POSIX_Platform_setEnvironmentLogLevel();
 	/* do this early so that diagnostics can check the log level */
 	PAL_POSIX = &PAL_POSIX_platform;
 #ifdef EXEC_BUILD_CONFIG
@@ -368,7 +372,7 @@ PAL_POSIX_Platform_iterator(IContainer *self)
 
 /*INTERNAL*/
 static void
-PAL_POSIX_setEnvironmentLogLevel(void)
+PAL_POSIX_Platform_setEnvironmentLogLevel(void)
 {
 	const char *level;
 	size_t c;
@@ -410,4 +414,47 @@ PAL_POSIX_setEnvironmentLogLevel(void)
 		}
 		fprintf(stderr, "POSIX: WARNING: unknown log level '%s'\n", level);
 	}
+}
+
+static void
+PAL_POSIX_Platform_setupSignals(void)
+{
+	struct sigaction sa;
+
+	sa.sa_handler = PAL_POSIX_Platform_powerSignalHandler;
+	sigemptyset(&sa.sa_mask);
+	/* XXX SA_RESETHAND in case it fails */
+	sa.sa_flags = SA_RESETHAND|SA_NODEFER;
+	if(-1 == sigaction(SIGINT, &sa, NULL))
+	{
+		fprintf(stderr, "PAL::POSIX::Platform::setupSignals(): failed to install handler for SIGINT: %s\n", strerror(errno));
+	}
+	sa.sa_sigaction = PAL_POSIX_Platform_exceptionHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_SIGINFO;
+	if(-1 == sigaction(SIGBUS, &sa, NULL) ||
+		 -1 == sigaction(SIGFPE, &sa, NULL) ||
+		 -1 == sigaction(SIGILL, &sa, NULL) ||
+		 -1 == sigaction(SIGSEGV, &sa, NULL) ||
+		 -1 == sigaction(SIGSYS, &sa, NULL) ||
+		 -1 == sigaction(SIGTRAP, &sa, NULL))
+	{
+		fprintf(stderr, "PAL::POSIX::Platform::setupSignals(): failed to install at least one exception handler: %s\n", strerror(errno));
+	}
+}
+
+static void
+PAL_POSIX_Platform_powerSignalHandler(int signo)
+{
+	UNUSED__(signo);
+
+	_exit(126);
+}
+
+static void
+PAL_POSIX_Platform_exceptionHandler(int signo, siginfo_t *info, void *context)
+{
+	UNUSED__(signo);
+	UNUSED__(info);
+	UNUSED__(context);
 }

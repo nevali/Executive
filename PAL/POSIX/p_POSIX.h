@@ -18,6 +18,7 @@
 #  include <string.h>
 /* sleep()  */
 #  include <unistd.h>
+#  include <signal.h>
 
 # include <PAL/PAL.h>
 
