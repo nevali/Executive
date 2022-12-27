@@ -106,4 +106,6 @@ extern int PAL_POSIX_Region_create(PAL_POSIX_AddressSpace *mm, RegionFlags flags
 extern PAL_POSIX_Context *PAL_POSIX_Context_create(PAL_POSIX_AddressSpace *addressSpace);
 extern void PAL_POSIX_Context_setup(PAL_POSIX_Context *self);
 
+void PAL_POSIX_Platform_updateSignals(void);
+
 #endif /*!P_ADDRESSSPACE_H_*/

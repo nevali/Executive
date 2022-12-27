@@ -117,6 +117,9 @@ PAL_POSIX_Context_setup(PAL_POSIX_Context *self)
     sigdelset(&sigs, SIGUSR1);
     while(false == trampoline_sprung)
 	{
+		/* block everything in sigs - i.e., all except SIGUSR1 - and wait for a
+		 * signal (which can only be SIGUSR1) to arrive
+		 */
 		sigsuspend(&sigs);
 	}
 	/* Disentagle the stack from the signal-handling machinery (a multi-stage process) */
@@ -171,6 +174,7 @@ PAL_POSIX_Context_trampoline(int signo)
 #if FEATURE_DEBUG_CONTEXTS
 	fprintf(stderr, "PAL::POSIX::Context::trampoline: resumed after setjmp(), bootstrapping context %p\n", trampoline_context);
 #endif
+	PAL_POSIX_Platform_updateSignals();
 	PAL_POSIX_Context_bootstrap();
 }
 

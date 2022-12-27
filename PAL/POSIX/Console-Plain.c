@@ -66,6 +66,10 @@ PAL_POSIX_Console_init(void)
 	PAL_POSIX_console.Object.instptr = &PAL_POSIX_console;
 	PAL_POSIX_console.WriteChannel.lpVtbl = &PAL_POSIX_Console_IWriteChannel_vtable;
 	PAL_POSIX_console.WriteChannel.instptr = &PAL_POSIX_console;
+	if(isatty(0) && isatty(1))
+	{
+		PAL_POSIX_console.data.tty = true;
+	}
 	PAL_POSIX_Platform_setConsole(&PAL_POSIX_console);
 }
 
@@ -177,31 +181,31 @@ PAL_POSIX_Console_vlogf(PAL_POSIX_Console *self, LogLevel level, const char *for
 	switch(level)
 	{
 		case LOG_EMERGENCY:
-			printf("\033[0;41;37;1m\033[97m  EMERGENCY: ");
+			printf("  EMERGENCY: ");
 			break;
 		case LOG_ALERT:
-			printf(   "\033[31m      ALERT: ");
+			printf("      ALERT: ");
 			break;
 		case LOG_CRITICAL:
-			printf(   "\033[31m   CRITICAL:\033[37m ");
+			printf("   CRITICAL: ");
 			break;
 		case LOG_ERROR:
-			printf(   "\033[31m      Error:\033[37m ");
+			printf("      Error: ");
 			break;
 		case LOG_WARNING:
-			printf(   "\033[33m    Warning:\033[37m ");
+			printf("    Warning: ");
 			break;
 		case LOG_NOTICE:
-			printf(   "\033[37;1m     Notice:\033[37m ");
+			printf("     Notice: ");
 			break;
 		case LOG_INFO:
-			printf(         "\033[37m Infomation:\033[30m ");
+			printf("             ");
 			break;
 		default:
-			printf("\033[30m<%d>  ", level);
+			printf("Debug%d ", level);
 	}
 	r = vprintf(format, args);
-	printf("\033[K\033[0;47;30m\033[100m\n");
+	putchar('\n');
 	return r;
 }
 
@@ -211,13 +215,6 @@ static void
 PAL_POSIX_Console_start(void)
 {
 	PAL_POSIX_console.data.started = true;
-#if HAVE_SETUPTERM
-	setupterm();
-#endif
-	/* Default is black on white */
-	printf("\033[0;47;30m\033[100m\033[2J\033[1;1H");
-	fflush(stdout);
 }
-
 
 #endif /*FEATURE_CONSOLE*/

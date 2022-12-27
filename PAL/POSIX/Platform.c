@@ -8,8 +8,9 @@
 
 #define INTF_TO_CLASS(i)               (PAL_POSIX_Platform *)((void *)(i)->instptr)
 
-static void PAL_POSIX_Platform_setEnvironmentLogLevel(void);
 static void PAL_POSIX_Platform_setupSignals(void);
+
+static void PAL_POSIX_Platform_setEnvironmentLogLevel(void);
 static STATUS PAL_POSIX_Platform_queryInterface(IObject *self, REFUUID iid, void **out);
 static REFCOUNT PAL_POSIX_Platform_retain(IObject *self);
 static REFCOUNT PAL_POSIX_Platform_release(IObject *self);
@@ -452,6 +453,28 @@ PAL_POSIX_Platform_setEnvironmentLogLevel(void)
 	}
 }
 
+/*INTERNAL*/
+void
+PAL_POSIX_Platform_updateSignals(void)
+{
+	sigset_t mask;
+
+	sigfillset(&mask);
+	/* interrupts */
+	sigdelset(&mask, SIGINT);
+	sigdelset(&mask, SIGTERM);
+	/* exceptions */
+	sigdelset(&mask, SIGBUS);
+	sigdelset(&mask, SIGILL);
+	sigdelset(&mask, SIGSEGV);
+	sigdelset(&mask, SIGTRAP);
+	if(sigprocmask(SIG_SETMASK, &mask, NULL) == -1)
+	{
+		fprintf(stderr, "PAL::POSIX::Platform::updateSignals(): sigprocmask() failed: %s\n", strerror(errno));
+	}
+}
+
+/*PRIVATE*/
 static void
 PAL_POSIX_Platform_setupSignals(void)
 {
@@ -465,6 +488,10 @@ PAL_POSIX_Platform_setupSignals(void)
 	{
 		fprintf(stderr, "PAL::POSIX::Platform::setupSignals(): failed to install handler for SIGINT: %s\n", strerror(errno));
 	}
+	if(-1 == sigaction(SIGTERM, &sa, NULL))
+	{
+		fprintf(stderr, "PAL::POSIX::Platform::setupSignals(): failed to install handler for SIGTERM: %s\n", strerror(errno));
+	}
 	sa.sa_sigaction = PAL_POSIX_Platform_exceptionHandler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_SIGINFO;
@@ -477,6 +504,7 @@ PAL_POSIX_Platform_setupSignals(void)
 	{
 		fprintf(stderr, "PAL::POSIX::Platform::setupSignals(): failed to install at least one exception handler: %s\n", strerror(errno));
 	}
+	PAL_POSIX_Platform_updateSignals();
 }
 
 static void

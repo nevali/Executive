@@ -5,6 +5,25 @@ An experimental minimal microkernel.
 [![Apache 2.0 licensed][license]](#license)
 ![Implemented in C][language]
 
+## Top of the pile
+
+* Signals / despatch / process contexts for callbacks
+* Reserved descriptors
+* External tasks flag
+* Tasker should return to caller when no tasks available
+* POSIX: check signal handling setup in thread creation
+* POSIX: check timing of naps and ticks
+* PAL: platform timer
+
+* Build: --enable-native-glue (build native glue on hosted build if one is available)
+
+* Runtime: libc - implement a basic c90 libc (no descriptors, only streams, no fork, etc.)
+
+* POSIX: plain vs curses Console
+
+* Short-cuts feature flag -- whether inter-module access is strictly via accessors, or direct access to data structures
+
+
 ## Introduction
 
 The _Executive_ is an experimental minimal microkernel that aims to be

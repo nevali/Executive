@@ -45,7 +45,7 @@ DIST_SUBDIRS = PrivateHeaders DeveloperTools Frameworks Sources Simulator Glue P
 
 SUBDIRS = DeveloperTools Frameworks Sources Simulator Glue PAL Samples Subsystems .
 
-EXTRA_DIST = README.md LICENSE-2.0 Dockerfile docker-bake.hcl
+EXTRA_DIST = README.md LICENSE-2.0 Dockerfile docker-bake.hcl reconfigure
 
 ## If targeted or monolith build were requested, do so here, after everything
 ## else has been built

@@ -8,41 +8,30 @@ dnl set, and made available to the preprocessor
 
 now=$(date +%s)
 
+# These are all placeholder values intended to be overidden
+AC_ARG_VAR([PRODUCT_NAME],[The name of the product])
 PRODUCT_NAME=${PRODUCT_NAME:-"The Operating System"}
-dnl AC_DEFINE_UNQUOTED([PRODUCT_NAME],["${PRODUCT_NAME}"],[The name of the product this component is part of])
-AC_SUBST([PRODUCT_NAME])
-
+AC_ARG_VAR([PRODUCT_SHORTNAME],[The abbreviated name of the product (defaults to PRODUCT_NAME)])
 PRODUCT_SHORTNAME=${PRODUCT_SHORTNAME:-"${PRODUCT_NAME}"}
-dnl AC_DEFINE_UNQUOTED([PRODUCT_SHORTNAME],["${PRODUCT_SHORTNAME}"],[The abbreviated name of the product this component is part of])
-AC_SUBST([PRODUCT_SHORTNAME])
-
+AC_ARG_VAR([PRODUCT_FULLNAME],[The full name of the product (defaults to PRODUCT_NAME)])
 PRODUCT_FULLNAME=${PRODUCT_FULLNAME:-"${PRODUCT_NAME}"}
-dnl AC_DEFINE_UNQUOTED([PRODUCT_FULLNAME],["${PRODUCT_FULLNAME}"],[The expanded name of the product this component is part of])
-AC_SUBST([PRODUCT_FULLNAME])
-
-PRODUCT_RELEASE=${PRODUCT_RELEASE:-"Release 0/Development Build"}
-dnl AC_DEFINE_UNQUOTED([PRODUCT_RELEASE],["${PRODUCT_RELEASE}"],[The release of the product this component is part of])
-AC_SUBST([PRODUCT_RELEASE])
-
-PRODUCT_SHORTREL=${PRODUCT_SHORTREL:-"R0-DEV"}
-dnl AC_DEFINE_UNQUOTED([PRODUCT_SHORTREL],["${PRODUCT_SHORTREL}"],[The abbreviated form of the release of the product this component is part of])
-AC_SUBST([PRODUCT_SHORTREL])
-
+AC_ARG_VAR([PRODUCT_RELEASE],[The product release string])
+PRODUCT_RELEASE=${PRODUCT_RELEASE:-"R$(($(date +%y) + 1)) DEVELOPMENT VERSION"}
+AC_ARG_VAR([PRODUCT_SHORTREL],[The abbreviated product release string])
+PRODUCT_SHORTREL=${PRODUCT_SHORTREL:-"R$(($(date +%y) + 1))-alpha"}
+AC_ARG_VAR([PRODUCT_NAME_RELEASE],[The combined product name and release string])
 PRODUCT_NAME_RELEASE=${PRODUCT_NAME_RELEASE:-"${PRODUCT_NAME} ${PRODUCT_RELEASE}"}
 AC_SUBST([PRODUCT_NAME_RELEASE])
 
-PRODUCT_BUILD_USER=${PRODUCT_BUILD_USER:-$(id -un)}
-AC_SUBST([PRODUCT_BUILD_USER])
-
-PRODUCT_BUILD_HOST=${PRODUCT_BUILD_HOST:-$(hostname | cut -f1 -d.)}
-AC_SUBST([PRODUCT_BUILD_HOST])
+AC_ARG_VAR([BUILD_USER],[The name of the user who performed the build])
+BUILD_USER=${BUILD_USER:-$(id -un)}
+AC_ARG_VAR([BUILD_HOST],[The name of the node the build was performed on])
+BUILD_HOST=${BUILD_HOST:-$(hostname | cut -f1 -d.)}
 
 PRODUCT_BUILD_DATE=${PRODUCT_BUILD_DATE:-$(TZ=UTC date -jf %s $now "+%Y-%m-%d" || date "+%Y-%m-%d" 2>/dev/null)}
 AC_SUBST([PRODUCT_BUILD_DATE])
-
 PRODUCT_BUILD_YEAR=${PRODUCT_BUILD_YEAR:-$(TZ=UTC date -jf %s $now "+%Y" || date "+%Y"  2>/dev/null)}
 AC_SUBST([PRODUCT_BUILD_YEAR])
-
 PRODUCT_BUILD_MONTH=${PRODUCT_BUILD_MONTH:-$(TZ=UTC date -jf %s $now "+%m" || date "+%m" 2>/dev/null)}
 case "$PRODUCT_BUILD_MONTH" in
 	0*)
@@ -50,7 +39,6 @@ case "$PRODUCT_BUILD_MONTH" in
 		;;
 esac
 AC_SUBST([PRODUCT_BUILD_MONTH])
-
 PRODUCT_BUILD_DAY=${PRODUCT_BUILD_DAY:-$(TZ=UTC date -jf %s $now "+%d" || date "+%d" 2>/dev/null)}
 case "$PRODUCT_BUILD_DAY" in
 	0*)
@@ -58,10 +46,8 @@ case "$PRODUCT_BUILD_DAY" in
 		;;
 esac
 AC_SUBST([PRODUCT_BUILD_DAY])
-
 PRODUCT_BUILD_TIME=${PRODUCT_BUILD_TIME:-$(TZ=UTC date -jf %s $now "+%H:%M:%S" || date "+%H:%M:%S" 2>/dev/null)}
 AC_SUBST([PRODUCT_BUILD_TIME])
-
 PRODUCT_BUILD_ID=${PRODUCT_BUILD_ID:-$(printf "%x\n" $now)}
 AC_SUBST([PRODUCT_BUILD_ID])
 
@@ -92,8 +78,8 @@ AC_CONFIG_COMMANDS([PrivateHeaders/BuildInformation.h],[
 
 #define PRODUCT_BUILD_DATE "${PRODUCT_BUILD_DATE}"
 #define PRODUCT_BUILD_TIME "${PRODUCT_BUILD_TIME}"
-#define PRODUCT_BUILD_HOST "${PRODUCT_BUILD_HOST}"
-#define PRODUCT_BUILD_USER "${PRODUCT_BUILD_USER}"
+#define PRODUCT_BUILD_HOST "${BUILD_HOST}"
+#define PRODUCT_BUILD_USER "${BUILD_USER}"
 #define PRODUCT_BUILD_ID 0x${PRODUCT_BUILD_ID}
 #define PRODUCT_BUILD_ID_STR "${PRODUCT_BUILD_ID}"
 
@@ -104,8 +90,8 @@ EOF
 ],[
 PRODUCT_BUILD_DATE="${PRODUCT_BUILD_DATE}"
 PRODUCT_BUILD_TIME="${PRODUCT_BUILD_TIME}"
-PRODUCT_BUILD_HOST="${PRODUCT_BUILD_HOST}"
-PRODUCT_BUILD_USER="${PRODUCT_BUILD_USER}"
+BUILD_HOST="${BUILD_HOST}"
+BUILD_USER="${BUILD_USER}"
 PRODUCT_BUILD_ID="${PRODUCT_BUILD_ID}"
 PRODUCT_BUILD_YEAR="${PRODUCT_BUILD_YEAR}"
 PRODUCT_BUILD_MONTH="${PRODUCT_BUILD_MONTH}"

@@ -100,6 +100,7 @@ struct PAL_POSIX_Console
 	struct
 	{
 		bool started;
+		bool tty;
 	} data;
 };
 #endif /*FEATURE_CONSOLE*/
@@ -112,6 +113,7 @@ void PAL_POSIX_panic(const char *string);
 void PAL_POSIX_init(void);
 void PAL_POSIX_Platform_init(void);
 void PAL_POSIX_Platform_setAddressSpace(IAddressSpace *mm);
+void PAL_POSIX_Platform_updateSignals(void);
 void PAL_POSIX_AddressSpace_init(void);
 
 # if FEATURE_PAL_DIAGNOSTICS

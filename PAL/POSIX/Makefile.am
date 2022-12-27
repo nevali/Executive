@@ -20,7 +20,8 @@
 PALNAME = POSIX
 PALSRC = p_POSIX.h \
 	BuildInformation.c panic.c \
-	metaClass.c Platform.c Console.c PlatformDiagnostics.c \
+	metaClass.c Platform.c PlatformDiagnostics.c \
+	Console-Plain.c Console-Light.c Console-Curses.c \
 	BootEnvironment.c \
 	p_AddressSpace.h \
 	AddressSpace.c Region.c Context.c
