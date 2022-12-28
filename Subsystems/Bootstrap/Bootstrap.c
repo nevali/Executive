@@ -57,8 +57,8 @@ static Bootstrap bootstrap = {
 	} };
 IObject *bootstrap_IObject = &(bootstrap.Object);
 
-static const char *banner = PRODUCT_FULLNAME " [" HOST_FAMILY "] - " PRODUCT_RELEASE "\n"
-	"  " PACKAGE_NAME " version " PACKAGE_VERSION ", build " PRODUCT_BUILD_ID_STR ", built at " PRODUCT_BUILD_DATE " " PRODUCT_BUILD_TIME " by " PRODUCT_BUILD_USER "@" PRODUCT_BUILD_HOST "\n\n";
+static const char *banner = "\n" PRODUCT_FULLNAME " [" HOST_FAMILY "] - " PRODUCT_RELEASE "\n"
+	"  " PACKAGE_NAME " version " PACKAGE_VERSION "-" EXEC_BUILD_CONFIG ", build " PRODUCT_BUILD_ID_STR ", built at " PRODUCT_BUILD_DATE " " PRODUCT_BUILD_TIME " by " PRODUCT_BUILD_USER "@" PRODUCT_BUILD_HOST "\n\n";
 
 /* This code must be written as though it runs exclusively in user-space,
  * using only the interfaces provided to it; undefined references to the UUIDs
@@ -144,7 +144,6 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 {
 	Bootstrap *self = INTF_TO_CLASS(me);
 	STATUS status;
-	struct TaskCreationParameters taskInfo;
 	IExecutable *exec;
 	const char *args[4];
 	TASKID tid;
@@ -168,6 +167,7 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	{
 		Bootstrap_init_container(self);
 	}
+	ExLog(PROGRESS_LOGLEVEL, "Opening system console device...");
 	/* Open the console if possible */
 	if(E_SUCCESS != INamespace_open(root, "/System/Devices/Console", NULL, &IID_IWriteChannel, (void **) &(self->data.console)))
 	{
@@ -180,8 +180,14 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 	}
 	if(self->data.console)
 	{
+		ExLog(PROGRESS_LOGLEVEL, "Console device opened.");
 		IWriteChannel_writeLn((self->data.console), banner);
 	}
+	else
+	{
+		ExLog(LOG_NOTICE, "No console device is available, startup messages will only be sent via diagnostic channels");
+	}
+
 	/* Open /System/Jobs's ICoordinator interface */
 	/* Create the Bootstrap job */
 	/* Release the job coordinator */
@@ -192,24 +198,8 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 		ExLog(LOG_CRIT, "Bootstrap: unable to open /System/Tasks<ITasker>");
 		return status;
 	}
-	/* Create the Sentinel task */
-	taskInfo.flags = TF_EXECUTIVE;
-	taskInfo.name = "Sentinel";
-	taskInfo.addressSpace = NULL; 
-#if 0
-	taskInfo.job = self->data.job;
-#endif
-	taskInfo.namespace = root;
-	taskInfo.mainThread_entrypoint = Bootstrap_Sentinel_mainThread;
-
-	if(E_SUCCESS != (status = ITasker_createTask((self->data.tasker), &taskInfo, &IID_ITask, (void **) &self->data.sentinel)))
-	{
-		ExLog(LOG_CRIT, "Bootstrap: unable to open to create Sentinel task");
-		return status;
-	}
-	ExLog(LOG_DEBUG, "Bootstrap: Sentinel task spawned successfully");
-
 	/* Now create the Startup task */
+	/* XXX we should be able to use ExSpawn() ? */
 	if(E_SUCCESS != (status = INamespace_open(root, "/System/Subsystems/Bootstrap/Startup", NULL, &IID_IExecutable, (void **) &exec)))
 	{
 		/* PANIC */
@@ -217,16 +207,20 @@ Bootstrap_start(ISubsystem *me, INamespace *root)
 		return status;
 	}
 	args[0] = "Startup";
-	args[1] = NULL;
+	/* Pass any kernel arguments to it */
+	args[1] = "--";
+	args[2] = NULL;
+	/* Provide the console as stdin, stdout, and stderr */
+
 	tid = IExecutable_spawn(exec, args, NULL, NULL);
 	IExecutable_release(exec);
+	UNUSED__(tid);
 	if(tid < 0)
 	{
-		/* PANIC */
 		ExLog(LOG_CRIT, "Bootstrap: unable to spawn /System/Subsystems/Bootstrap/Startup");
 		return (STATUS) tid;
 	}
-	ExLog(LOG_DEBUG, "Bootstrap: Startup task spawned successfully");
+	ExLog(PROGRESS_LOGLEVEL, "Startup task created successfully.");
 	return E_SUCCESS;
 }
 
@@ -278,7 +272,8 @@ Bootstrap_init_container(Bootstrap *self)
 		ExLog(LOG_CRIT, "Bootstrap: unable to create Executive::Container");
 		return;
 	}
-	ExLog(LOG_DEBUG, "Bootstrap: populating subsystem objects");
+	ExLog(PROGRESS_LOGLEVEL, "Initialising Bootstrap subsystem objects...");
 	Bootstrap_ResidentTask_init(&Bootstrap_startupTask, self, Bootstrap_Startup_mainThread);
 	IMutableContainer_add((self->data.container), "Startup", &CLSID_Executive_Executable, (void *) &Bootstrap_startupTask);
+	ExLog(PROGRESS_LOGLEVEL, "Bootstrap subsystem objects initialised.");
 }

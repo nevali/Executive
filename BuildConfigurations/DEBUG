@@ -1,0 +1,16 @@
+enable debug
+enable warnings-as-errors
+disable silent-rules
+enable monolith
+enable boot-progress
+enable pal-diagnostics
+enable self-tests
+
+## These can be selectively enabled, or see also the FULLDEBUG build
+## configuration
+# enable trace
+# enable debug-phasing
+# enable debug-contexts
+# enable debug-namespace
+# enable debug-classes
+# enable debug-memory

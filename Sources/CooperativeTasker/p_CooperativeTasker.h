@@ -8,6 +8,12 @@
 # include <Executive/Internal/Classes.h>
 # include <Executive/Internal/Executive.h>
 
+# if FEATURE_BOOTPROGRESS
+#  define LOGLEVEL                     LOG_INFO
+# else
+#  define LOGLEVEL                     LOG_DEBUG
+# endif
+
 # define EXEC_THREAD_STACK_SIZE        32768
 
 typedef struct Executive_CooperativeTasker Executive_CooperativeTasker;
@@ -108,5 +114,7 @@ bool Executive_CooperativeTasker_Thread_suspend(Executive_CooperativeTasker_Thre
 void Executive_CooperativeTasker_Thread_resume(Executive_CooperativeTasker_Thread *self);
 void Executive_CooperativeTasker_Thread_schedule(Executive_CooperativeTasker_Thread *self);
 void Executive_CooperativeTasker_Thread_unschedule(Executive_CooperativeTasker_Thread *self);
+
+void Executive_CooperativeTasker_Sentinel_mainThread(IThread *self);
 
 #endif /*!P_COOPERATIVETASKER_H_*/

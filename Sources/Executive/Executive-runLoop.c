@@ -29,9 +29,12 @@ Executive_runLoop(Executive *self)
 	UNUSED__(self);
 	
 	ExPhaseShift(PHASE_RUNNING);
-	for(;;)
+	if(executive.data.tasker)
 	{
-		EXTRACEF(("Executive::runLoop()"));
+		EXLOGF((LOG_INFO, "Launching initial tasks..."));
+		IPlatform_tick(executive.data.platform);
 		ITasker_yield(executive.data.tasker);
+		ExPanic("Tasker unexpectedly returned control to the Executive");
 	}
+	return E_NOTIMPL;
 }

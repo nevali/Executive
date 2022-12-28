@@ -23,12 +23,11 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_CooperativeTasker.h"
+#if FEATURE_COOPERATIVE_TASKER
 
-/* XXX placeholder */
-#include <setjmp.h>
+# include "p_CooperativeTasker.h"
 
-#define INTF_TO_CLASS(i)               EXEC_COMMON_INTF_TO(i, Executive_CooperativeTasker)
+# define INTF_TO_CLASS(i)              EXEC_COMMON_INTF_TO(i, Executive_CooperativeTasker)
 
 /* ITasker */
 static void Executive_CooperativeTasker_tick(ITasker *me);
@@ -48,28 +47,6 @@ const struct ITasker_vtable_ Executive_CooperativeTasker_ITasker_vtable = {
 	Executive_CooperativeTasker_interrupt,
 	Executive_CooperativeTasker_resume
 };
-
-#if 0
-static void trampoline(Executive_CooperativeTasker_Task *task)
-{
-	/* XXX use maacros to update flags */
-	/* XXX if thread isn't THF_READY bail */
-	task->data.mainThread->data.flags = THF_RUNNING;
-	sigsetjmp(task->data.mainThread->data.env, 0);
-	if(task->data.mainThread->data.flags & THF_RUNNING)
-	{
-		EXLOGF((LOG_DEBUG, "trampoline(): transferring control to entrypoint of thread %u", task->data.mainThread->data.id));
-		task->data.mainThread->data.entrypoint(&task->data.mainThread->Thread);
-		task->data.mainThread->data.flags = THF_COMPLETED;
-		EXLOGF((LOG_DEBUG, "trampoline(): thread %u has finished", task->data.mainThread->data.id));
-		sigsetjmp(task->data.mainThread->data.env, 0);
-	}
-	else
-	{
-		EXLOGF((LOG_DEBUG, "trampoline(): thread %u is a zombie", task->data.mainThread->data.id));
-	}
-}
-#endif
 
 /* Executive::CooperativeTasker::yield()
  * Voluntarily relinquish CPU time
@@ -97,8 +74,8 @@ Executive_CooperativeTasker_yield(ITasker *me)
 	volatile Executive_CooperativeTasker_Thread *thread;
 #endif
 
-	EXTRACEF(("Executive::CooperativeTasker::yield()"));
 #if FEATURE_DEBUG_CONTEXTS
+	EXTRACEF(("Executive::CooperativeTasker::yield()"));
 	EXLOGF((LOG_DEBUG5, "currentThread = %p", self->data.currentThread));
 	EXLOGF((LOG_DEBUG5, "runnable threads list:-"));
 	for(thread = self->data.firstRunnableThread; thread; thread = thread->data.nextRunnable)
@@ -122,7 +99,9 @@ Executive_CooperativeTasker_yield(ITasker *me)
 #endif
 	if(!nextThread)
 	{
+#if FEATURE_DEBUG_CONTEXTS
 		EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::yield(): no runnable threads"));
+#endif
 		IPlatform_nap(executive.data.platform);
 		return;
 	}
@@ -321,3 +300,4 @@ Executive_CooperativeTasker_resume(ITasker *me, int processor)
 	Executive_CooperativeTasker_tick(me);
 }
 
+#endif /*FEATURE_COOPERATIVE_TASKER*/

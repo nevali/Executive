@@ -55,7 +55,7 @@ static struct IContainer_vtable_ platform_IContainer_vtable = {
 
 static PAL_POSIX_Platform PAL_POSIX_platform;
 PAL_POSIX_Platform *PAL_POSIX = NULL;
-PHASE PAL_POSIX_phase = PHASE_UNKNOWN;
+volatile PHASE PAL_POSIX_phase = PHASE_UNKNOWN;
 
 void
 PAL_POSIX_Platform_init(void)
@@ -75,11 +75,7 @@ PAL_POSIX_Platform_init(void)
 	PAL_POSIX_Platform_setEnvironmentLogLevel();
 	/* do this early so that diagnostics can check the log level */
 	PAL_POSIX = &PAL_POSIX_platform;
-#ifdef EXEC_BUILD_CONFIG
-	PALLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - POSIX Platform Adaptation Layer [" EXEC_BUILD_CONFIG " build " PRODUCT_BUILD_ID_STR "]");
-#else
-	PALLog(LOG_DEBUG, PRODUCT_FULLNAME " " PACKAGE_NAME " - POSIX Platform Adaptation Layer [build " PRODUCT_BUILD_ID_STR "]");
-#endif
+	PALLog(LOG_DEBUG, "POSIX Platform Adaptation Layer version " PACKAGE_VERSION "-" EXEC_BUILD_CONFIG ", build " PRODUCT_BUILD_ID_STR ", built at " PRODUCT_BUILD_DATE " " PRODUCT_BUILD_TIME " by " PRODUCT_BUILD_USER "@" PRODUCT_BUILD_HOST);
 	PALLOGF((LOG_DEBUG6, "PAL::POSIX::Platform::init(): initialising PAL metaclasses"));
 	PAL_POSIX_platform.Object.lpVtbl = &platform_IObject_vtable;
 	PAL_POSIX_platform.Object.instptr = &PAL_POSIX_platform;

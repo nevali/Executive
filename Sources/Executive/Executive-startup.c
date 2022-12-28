@@ -32,9 +32,8 @@ Executive_startup(Executive *self)
 	UNUSED__(self);
 	
 	ExPhaseShift(PHASE_STARTUP_EXECTASK);
-#if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, "Starting the Bootstrap subsystem...");
-#endif
+	ExLog(PROGRESS_LOGLEVEL, "Preparing the Bootstrap subsystem...");
+
 	/* Open the Bootstrap subsystem */
 	if(E_SUCCESS != (status = ExOpen("/System/Subsystems/Bootstrap", &IID_ISubsystem, &subsystem)))
 	{
@@ -44,13 +43,9 @@ Executive_startup(Executive *self)
 	/* Ask it to start, supplying it with the root namespace interface pointer */
 	if(E_SUCCESS != (status = ISubsystem_start(subsystem, executive.data.rootNS)))
 	{
-		ExPanic("Bootstrap subsystem failed to start");
+		ExPanic("The Bootstrap subsystem failed to start");
 	}
-#if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, "Bootstrap subsystem started successfully");
-#else
-	ExLog(LOG_DEBUG, "Bootstrap subsystem started successfully");
-#endif
+	ExLog(PROGRESS_LOGLEVEL, "The Bootstrap subsystem has been started.");
 	/* Release the reference */
 	ISubsystem_release(subsystem);
 	return status;

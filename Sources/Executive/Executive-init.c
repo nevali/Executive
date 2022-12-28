@@ -60,9 +60,7 @@ Executive_init(Executive *self, struct ExecutiveEntryParameters *params, IPlatfo
 	Executive_init_diagnostics();
 	Executive_init_directory();
 	Executive_init_tasker();
-#if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, PACKAGE_NAME " subsystems initialised");
-#endif
+	ExLog(PROGRESS_LOGLEVEL, PACKAGE_NAME " internal subsystems have been initialised.");
 	return E_SUCCESS;
 }
 
@@ -139,14 +137,11 @@ Executive_init_diagnostics(void)
 		return;
 	}
 
-	ExLog(LOG_INFO, PRODUCT_NAME " (" PRODUCT_RELEASE " for " HOST_FAMILY ") is starting");
-	ExLog(LOG_INFO, "Diagnostic channel activated");
-#if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, "");
-	ExLog(LOG_INFO, "System initialisation is in progress...");
-#endif
+	ExLog(LOG_INFO, PACKAGE_NAME " (" PACKAGE_VERSION "-" EXEC_BUILD_CONFIG " for " HOST_FAMILY ") is starting.");
+	ExLog(LOG_INFO, "Diagnostic channel activated.");
+	ExLog(PROGRESS_LOGLEVEL, "System initialisation is in progress...");
 #if FEATURE_SELF_TESTS && !NDEBUG
-	ExLog(LOG_NOTICE, "A test of the diagnostic logging system is commencing.");
+	ExLog(LOG_NOTICE, "A test of the diagnostic logging system is commencing:");
 	ExLog(LOG_INFO, "");
 	ExLog(LOG_EMERGENCY, "This is a test message at the EMERGENCY level");
 	ExLog(LOG_ALERT, "This is a test message at the ALERT level");
@@ -179,9 +174,7 @@ Executive_init_directory(void)
 	/* Request the MDirectoryEntryTarget metaclass interface from Executive::Directory::Root */
 	ExPhaseShift(PHASE_STARTUP_ROOT);	
 	EXTRACEF(("Executive::init_directory(): populating the root directory"));
-#if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, "Populating initial object directory...");
-#endif
+	ExLog(PROGRESS_LOGLEVEL, "Populating initial object directory...");
 	ExAssert(E_SUCCESS == Executive_metaClass(&CLSID_Executive_Root, &IID_MDirectoryEntryTarget, (void **) &meta));
 	/* invoke the constructor on the metaclass interface, MDirectoryEntryTarget::createInstance()
 	 * to create the root instance itself
@@ -210,9 +203,7 @@ Executive_init_directory(void)
 		 * do so now */
 		Executive_init_sysContainer();
 	}
-#if FEATURE_DEBUG_NAMESPACE
-	EXLOGF((LOG_DEBUG, "Executive::init_directory(): initial population of the object directory completed"));
-#endif
+	ExLog(PROGRESS_LOGLEVEL, "The object directory has been populated.")
 }
 
 /*PRIVATE*/
@@ -221,14 +212,17 @@ Executive_init_tasker(void)
 {
 	/* Create an instance of the built-in co-operative tasker */
 	ExPhaseShift(PHASE_STARTUP_TASKER);
-#if FEATURE_BOOTPROGRESS
-	ExLog(LOG_INFO, "Starting the Tasker...");
-#endif
+	ExLog(PROGRESS_LOGLEVEL, "Initialising the Tasker...");
 	/* XXX this should be via a metaclass interface */
-	executive.data.tasker = Executive_CooperativeTasker_create();
+#if FEATURE_COOPERATIVE_TASKER
+	if(!executive.data.tasker)
+	{
+		executive.data.tasker = Executive_CooperativeTasker_create();
+	}
+#endif
 	if(NULL == executive.data.tasker)
 	{
-		EXLOGF((LOG_NOTICE, "no Tasker is available, starting in single-tasking mode"));
+		EXLOGF((LOG_NOTICE, "No Tasker is available; the system will start without multitasking facilities."));
 		return;
 	}
 	ExAssert(NULL != executive.data.tasker);

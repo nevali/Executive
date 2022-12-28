@@ -3,6 +3,8 @@
 # include "BuildConfiguration.h"
 #endif
 
+#if FEATURE_COOPERATIVE_TASKER
+
 #include "p_CooperativeTasker.h"
 
 #undef INTF_TO_CLASS
@@ -149,4 +151,4 @@ Executive_CooperativeTasker_Task_runnable(Executive_CooperativeTasker_Task *task
 	return 1;
 }
 
-#undef INTF_TO_CLASS
+#endif /*FEATURE_COOPERATIVE_TASKER*/

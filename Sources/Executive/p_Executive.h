@@ -64,6 +64,12 @@
 
 # include <Executive/Internal/Executive.h>
 
+# if FEATURE_BOOTPROGRESS
+#  define PROGRESS_LOGLEVEL            LOG_INFO
+# else
+#  define PROGRESS_LOGLEVEL            LOG_DEBUG
+# endif
+
 typedef union Executive_BootEnvironment Executive_BootEnvironment;
 typedef struct Executive_CooperativeTasker Executive_CooperativeTasker;
 typedef union Executive_CooperativeTasker_Task Executive_CooperativeTasker_Task;

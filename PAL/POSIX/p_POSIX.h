@@ -130,7 +130,7 @@ size_t PAL_POSIX_Console_logf(PAL_POSIX_Console *self, LogLevel level, const cha
 size_t PAL_POSIX_Console_vlogf(PAL_POSIX_Console *self, LogLevel level, const char *format, va_list args);
 # endif /*FEATURE_CONSOLE*/
 
-extern PHASE PAL_POSIX_phase;
+extern volatile PHASE PAL_POSIX_phase;
 
 # if EXEC_BUILD_RELEASE || !FEATURE_PAL_DIAGNOSTICS
 #  define PALLOGF(x)

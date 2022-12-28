@@ -3,6 +3,8 @@
 # include "BuildConfiguration.h"
 #endif
 
+#if FEATURE_COOPERATIVE_TASKER
+
 #include "p_CooperativeTasker.h"
 
 /** Executive::CooperativeTasker::Thread **/
@@ -233,7 +235,7 @@ Executive_CooperativeTasker_Thread_resume(Executive_CooperativeTasker_Thread *me
 		}
 		else
 		{
-			IContext_swap(((IContext *) self->data.context), NULL);
+			IContext_swap(self->data.context, NULL);
 		}
 		EXTRACEF(("Executive::CooperativeTasker::Thread<%p>::resume(): now resuming thread...", self));
 		return;
@@ -257,11 +259,8 @@ Executive_CooperativeTasker_Thread__start(Executive_CooperativeTasker_Thread *se
 	self->data.flags &= ~THF_STATUSMASK;
 	self->data.flags |= THF_COMPLETED;
 	Executive_CooperativeTasker_Thread_unschedule(self);
-	for(;;)
-	{
-		IThread_yield((&(self->Thread)));
-		EXLOGF((LOG_DEBUG, "Executive::CooperativeTasker::Thread::__start(%u:%u) - we should not have reached this point", self->data.task->data.id, self->data.id));
-	}
+	IThread_yield((&(self->Thread)));
+	ExPanic("Executive::CooperativeTasker::Thread::__start() resumed after yield");
 }
 
 void
@@ -314,3 +313,5 @@ Executive_CooperativeTasker_Thread_schedule(Executive_CooperativeTasker_Thread *
 	self->data.nextRunnable = tasker->data.firstRunnableThread;
 	tasker->data.firstRunnableThread = self;
 }
+
+#endif /*!FEATURE_COOPERATIVE_TASKER*/

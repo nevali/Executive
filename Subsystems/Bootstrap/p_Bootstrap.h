@@ -17,6 +17,12 @@
 # include <Executive/IMutableContainer.h>
 # include <Executive/IExecutable.h>
 
+# if FEATURE_BOOTPROGRESS
+#  define PROGRESS_LOGLEVEL            LOG_INFO
+# else
+#  define PROGRESS_LOGLEVEL            LOG_DEBUG
+# endif
+
 #define ExUuidEqual(a, b) ((a)->d.d1 == (b)->d.d1 && (a)->d.d2 == (b)->d.d2 && (a)->d.d3 == (b)->d.d3 && (a)->d.d4 == (b)->d.d4)
 
 typedef struct Bootstrap Bootstrap;
@@ -59,7 +65,5 @@ extern Bootstrap_ResidentTask Bootstrap_startupTask;
 void Bootstrap_ResidentTask_init(Bootstrap_ResidentTask *self, Bootstrap *bootstrap, ThreadEntrypoint entry);
 
 void Bootstrap_Startup_mainThread(IThread *self);
-
-void Bootstrap_Sentinel_mainThread(IThread *self);
 
 #endif /*!P_BOOTSTRAP_H_*/

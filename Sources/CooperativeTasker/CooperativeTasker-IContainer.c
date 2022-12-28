@@ -3,9 +3,11 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_CooperativeTasker.h"
+#if FEATURE_COOPERATIVE_TASKER
 
-#define INTF_TO_CLASS(i)               EXEC_COMMON_INTF_TO(i, Executive_CooperativeTasker)
+# include "p_CooperativeTasker.h"
+
+# define INTF_TO_CLASS(i)              EXEC_COMMON_INTF_TO(i, Executive_CooperativeTasker)
 
 /* IContainer */
 static STATUS Executive_CooperativeTasker_resolve(IContainer *me, const char *name, IDirectoryEntry **entry);
@@ -40,3 +42,5 @@ Executive_CooperativeTasker_iterator(IContainer *me)
 
 	return NULL;
 }
+
+#endif /*FEATURE_COOPERATIVE_TASKER*/

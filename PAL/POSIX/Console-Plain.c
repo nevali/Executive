@@ -178,6 +178,7 @@ PAL_POSIX_Console_vlogf(PAL_POSIX_Console *self, LogLevel level, const char *for
 	{
 		return 0;
 	}
+	printf("%04x", PAL_POSIX_phase & 0xffff);
 	switch(level)
 	{
 		case LOG_EMERGENCY:
@@ -201,8 +202,11 @@ PAL_POSIX_Console_vlogf(PAL_POSIX_Console *self, LogLevel level, const char *for
 		case LOG_INFO:
 			printf("             ");
 			break;
+		case LOG_CONDITION:
+			printf(" [Condition] ");
+			break;
 		default:
-			printf("Debug%d ", level);
+			printf("   <Debug%d> ", level / 10);
 	}
 	r = vprintf(format, args);
 	putchar('\n');

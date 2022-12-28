@@ -21,6 +21,6 @@ noinst_LTLIBRARIES = libCooperativeTasker.la
 libCooperativeTasker_la_SOURCES = p_CooperativeTasker.h \
 	CooperativeTasker.c CooperativeTasker-IObject.c CooperativeTasker-ITasker.c \
 	CooperativeTasker-IContainer.c CooperativeTasker-Task.c \
-	CooperativeTasker-Thread.c 
+	CooperativeTasker-Thread.c CooperativeTasker-Sentinel.c
 
 libCooperativeTasker_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
