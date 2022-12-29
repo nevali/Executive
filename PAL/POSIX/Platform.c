@@ -376,6 +376,9 @@ PAL_POSIX_Platform_phaseTransition(IPlatform *me, PHASE phase)
 	LogLevel level = LOG_DEBUG;
 	PHASE prevPhase = PAL_POSIX_phase;
 
+	/* if PALLOGF() is a no-op, they will never be used below */
+	UNUSED__(digits);
+	UNUSED__(level);
 	PAL_POSIX_phase = phase;
 	if((phase & 0xf000) != (prevPhase & 0xf000))
 	{
