@@ -36,7 +36,6 @@ Executive_CooperativeTasker_create(void)
  	/* Create the Sentinel task */
 	ExLog(LOGLEVEL, "Creating the Sentinel task...");
 	RtMemSet(&taskInfo, 0, sizeof(taskInfo));
-	taskInfo.flags = TF_EXECUTIVE /* | TF_SENTINEL | TF_CRITICAL */;
 	/* taskInfo.priority = TP_LOWEST; */
 	taskInfo.name = "Sentinel";
 	taskInfo.addressSpace = NULL; 
@@ -49,6 +48,10 @@ Executive_CooperativeTasker_create(void)
 		ExFree(tasker);
 		return NULL;;
 	}
+	tasker->data.firstTask->data.flags = ~TF_TYPEMASK;
+	tasker->data.firstTask->data.flags |= TF_EXECUTIVE|TF_CRITICAL;
+	tasker->data.firstTask->data.mainThread->data.flags &= ~THF_TYPEMASK;
+	tasker->data.firstTask->data.mainThread->data.flags |= THF_SENTINEL|THF_CRITICAL;
 	return &(tasker->Tasker);
 }
 

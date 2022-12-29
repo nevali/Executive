@@ -43,13 +43,15 @@ typedef enum
 	 	TF_TYPEMASK = 7,
 	 	TF_DEFAULT = 0,
 	 	TF_EXECUTIVE = 1,
+	 	TF_EXTERNAL = 2,
 	 	TF_STATUSMASK = (31<<3),
 	 	TF_NEW = 0,
 	 	TF_READY = (1<<3),
 	 	TF_RUNNING = (2<<3),
 	 	TF_SUSPENDED = (3<<3),
 	 	TF_COMPLETED = (4<<3),
-	 	TF_TERMINATED = (5<<3)
+	 	TF_TERMINATED = (5<<3),
+	 	TF_CRITICAL = (1<<8)
 }  TaskFlags;
 #  undef INTEFACE
 #  define INTERFACE ITask

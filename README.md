@@ -10,9 +10,9 @@ An experimental minimal microkernel.
 * DeveloperTools/uuid
 
 * Signals / despatch / process contexts for callbacks
+* Move server-side stubs into the Runtime
 * Reserved descriptors
 * External tasks flag
-* Tasker should return to caller when no tasks available
 * ~~POSIX: check signal handling setup in thread creation~~
 * POSIX: check timing of naps and ticks
 * PAL: platform timer
@@ -26,6 +26,7 @@ An experimental minimal microkernel.
 
 * Startup (? Boot?) Archive - initramfs for the object directory, more widely useful than hostfs
 
+* Symbol naming
 
 ## Introduction
 

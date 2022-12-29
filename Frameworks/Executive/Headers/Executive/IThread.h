@@ -40,6 +40,8 @@ typedef enum
 	 	THF_TYPEMASK = 7,
 	 	THF_DEFAULT = 0,
 	 	THF_EXECUTIVE = 1,
+	 	THF_EXTERNAL = 2,
+	 	THF_SENTINEL = 3,
 	 	THF_STATUSMASK = (31<<3),
 	 	THF_NEW = 0,
 	 	THF_READY = (1<<3),
@@ -48,7 +50,8 @@ typedef enum
 	 	THF_SUSPENDED = (4<<3),
 	 	THF_WAITING = (5<<3),
 	 	THF_COMPLETED = (6<<3),
-	 	THF_TERMINATED = (7<<3)
+	 	THF_TERMINATED = (7<<3),
+	 	THF_CRITICAL = (1<<8)
 }  ThreadFlags;
 #  undef INTEFACE
 #  define INTERFACE IThread
