@@ -5,9 +5,9 @@ ac_enable monolith
 ac_enable boot-progress
 ac_enable pal-diagnostics
 ac_enable self-tests
-# ac_enable trace
+ac_enable trace
 ac_enable debug-phasing
-# ac_enable debug-contexts
+ac_enable debug-contexts
 ac_enable debug-namespace
 ac_enable debug-classes
 ac_enable debug-memory
