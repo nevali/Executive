@@ -1,3 +1,3 @@
-disable cooperative-tasker
-disable console
-disable pal-diagnostics
+ac_disable cooperative-tasker
+ac_disable console
+ac_disable pal-diagnostics
