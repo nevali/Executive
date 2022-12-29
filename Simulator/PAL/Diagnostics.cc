@@ -23,7 +23,9 @@ Diagnostics::Diagnostics():
 	level_(LOG_CONDITION)
 #endif
 {
+#if FEATURE_PAL_DIAGNOSTICS
 	setEnvironmentLogLevel();
+#endif
 }
 
 /*PRIVATE*/
@@ -95,6 +97,7 @@ Diagnostics::logPrefix(LogLevel level)
 void
 Diagnostics::vlogf(LogLevel level, const char *str, va_list args)
 {
+#if FEATURE_PAL_DIAGNOSTICS
 	const char *prefix;
 
 	if(level >= level_)
@@ -111,6 +114,11 @@ Diagnostics::vlogf(LogLevel level, const char *str, va_list args)
 		vfprintf(stderr, str, args);
 		fputs("\033[0m\n", stderr);
 	}
+#else
+	UNUSED__(level);
+	UNUSED__(str);
+	UNUSED__(args);
+#endif
 }
 
 /*INTERNAL*/
@@ -166,6 +174,7 @@ Diagnostics::queryInterface(REFUUID riid, void **ptr)
 void
 Diagnostics::log(LogLevel level, const char *str)
 {
+#if FEATURE_PAL_DIAGNOSTICS
 	const char *prefix;
 
 	if(level >=level_)
@@ -180,6 +189,10 @@ Diagnostics::log(LogLevel level, const char *str)
 			fprintf(stderr, "<%d> %s\033[0m\n", level, str);
 		}
 	}
+#else
+	UNUSED__(level);
+	UNUSED__(str);
+#endif
 }
 
 /* IWriteChannel */
