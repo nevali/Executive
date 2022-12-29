@@ -115,7 +115,7 @@ PAL_POSIX_PlatformDiagnostics_log(struct IPlatformDiagnostics *self, LogLevel le
 #endif
 	if(level >= PAL_POSIX->data.logLevel)
 	{
-		fprintf(stderr, "%04x %11d %s\n", PAL_POSIX_phase & 0xffff, level, str);
+		fprintf(stderr, "%04x %10d: %s\n", PAL_POSIX_phase & 0xffff, level, str);
 	}
 }
 
@@ -136,7 +136,7 @@ PAL_POSIX_PlatformDiagnostics__logf(LogLevel level, const char *str, ...)
 	va_start(ap, str);
 	if(PAL_POSIX && level >= PAL_POSIX->data.logLevel)
 	{
-		fprintf(stderr, "%04x %11d ", PAL_POSIX_phase & 0xffff, level);
+		fprintf(stderr, "%04x %10d: ", PAL_POSIX_phase & 0xffff, level);
 		vfprintf(stderr, str, ap);
 		fputc('\n', stderr);
 	}

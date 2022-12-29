@@ -35,6 +35,7 @@
 # include <Executive/Classes.h>
 # include <Executive/Internal/Classes.h>
 
+
 typedef struct PAL_POSIX_Platform PAL_POSIX_Platform;
 typedef union PAL_POSIX_BootEnvironment PAL_POSIX_BootEnvironment;
 #if FEATURE_PAL_DIAGNOSTICS

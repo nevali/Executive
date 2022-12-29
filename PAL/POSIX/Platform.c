@@ -368,6 +368,30 @@ PAL_POSIX_Platform_phaseTransition(IPlatform *me, PHASE phase)
 	}
 #endif
 
+#elif FEATURE_BOOTPROGRESS
+	static const char *digits[] = { 
+		"ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN",
+		"EIGHT", "NINE", "ALPHA", "BRAVO", "CHARLIE", "DELTA", "ECHO", "FOXTROT"
+	};
+	LogLevel level = LOG_DEBUG;
+	PHASE prevPhase = PAL_POSIX_phase;
+
+	PAL_POSIX_phase = phase;
+	if((phase & 0xf000) != (prevPhase & 0xf000))
+	{
+		level = LOG_NOTICE;
+	}
+	else if((phase & 0xff00) != (prevPhase & 0xff00))
+	{
+		level = LOG_INFO;
+	}
+	PALLOGF((level, "The system has transitioned to phase %s-%s-%s-%s (%04x); it was previously at %04x.",
+		digits[(phase & 0xf000) >> 12],
+		digits[(phase & 0x0f00) >> 8],
+		digits[(phase & 0x00f0) >> 4],
+		digits[phase & 0x000f],
+		phase & 0xffff, prevPhase & 0xffff
+		 ));
 #endif /*FEATURE_DEBUG_PHASING*/
 	PAL_POSIX_phase = phase;
 }
