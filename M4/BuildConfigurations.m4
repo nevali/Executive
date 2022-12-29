@@ -1,6 +1,8 @@
 AC_DEFUN([EX_CHECK_BUILDCONFIG],[
 
 AC_ARG_VAR([EXEC_BUILD_CONFIG],[the name of a build configuration to use])
+AC_ARG_VAR([BUILDCONF],[the name of a build configuration to use (if EXEC_BUILD_CONFIG is unset)])
+test -z "$EXEC_BUILD_CONFIG" && EXEC_BUILD_CONFIG="$BUILDCONF"
 AC_ARG_WITH([build-config],[AS_HELP_STRING([--with-build-config=NAME],[use build configuration NAME])],[EXEC_BUILD_CONFIG="$withval"])
 test x"$EXEC_BUILD_CONFIG" = x"" && EXEC_BUILD_CONFIG="DEVELOP"
 
