@@ -12,7 +12,7 @@ ac_enable() {
 	m4_changequote(,)dnl
 	_var=$(echo $_var | sed -e "s%[^A-Za-z]%_%g")
 	m4_changequote([,])dnl
-	_val="$2"
+	_val="[$]2"
 	test x"$_val" = x"" && _val="yes"
 	eval $_var="\$_val"
 	AC_MSG_RESULT([ - setting option --enable-[$]1=$_val])
@@ -28,7 +28,7 @@ ac_with() {
 	m4_changequote(,)dnl
 	_var=$(echo $_var | sed -e "s%[^A-Za-z]%_%g")
 	m4_changequote([,])dnl
-	_val="$2"
+	_val="[$]2"
 	test x"$_val" = x"" && _val="yes"
 	AC_MSG_RESULT([ - setting option --with-[$]1=$_val])
 	eval $_var=\$val

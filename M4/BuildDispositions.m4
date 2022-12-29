@@ -97,13 +97,6 @@ AC_REQUIRE([EX_CHECK_PALS])dnl
 	AC_MSG_RESULT([$exec_build_monolith])
 	AM_CONDITIONAL([EXEC_BUILD_MONOLITH],[test x$exec_build_monolith = xyes])
 
-	if test $exec_build_dynamic = no && \
-		test $exec_build_modular = no && \
-		test $exec_build_targeted = no && \
-		test $exec_build_monolith = no ; then
-		AC_MSG_ERROR([no build types available for $host_type $host_platform])
-	fi
-
 	AM_CONDITIONAL([EXEC_PAL_BUILD_MOD], [test "$exec_build_dynamic" = "yes"])
 	AM_CONDITIONAL([EXEC_PAL_BUILD_DLL], [test "$exec_build_targeted" = "yes"])
 
