@@ -2,9 +2,24 @@ AC_DEFUN([EX_CHECK_BUILDCONFIG],[
 
 AC_ARG_VAR([EXEC_BUILD_CONFIG],[the name of a build configuration to use])
 AC_ARG_VAR([BUILDCONF],[the name of a build configuration to use (if EXEC_BUILD_CONFIG is unset)])
-test -z "$EXEC_BUILD_CONFIG" && EXEC_BUILD_CONFIG="$BUILDCONF"
+test x"$EXEC_BUILD_CONFIG" = x"" && EXEC_BUILD_CONFIG="$BUILDCONF"
 AC_ARG_WITH([build-config],[AS_HELP_STRING([--with-build-config=NAME],[use build configuration NAME])],[EXEC_BUILD_CONFIG="$withval"])
-test x"$EXEC_BUILD_CONFIG" = x"" && EXEC_BUILD_CONFIG="DEVELOP"
+
+if test x"$EXEC_BUILD_CONFIG" = x"" ; then
+	# the default build configuration depends upon whether this is a source
+	# distribution or a git clone - GENERIC for the former, DEVELOP for the
+	# latter
+	#
+	# this means that users building from source get a standard build by
+	# default, whilst developers working within a git repository get
+	# a development build by default; obviously both can be overridden,
+	# this is only the default 
+	if test -d "$srcdir/.git" ; then
+		EXEC_BUILD_CONFIG="DEVELOP"
+	else
+		EXEX_BUILD_CONFIG="GENERIC"
+	fi
+fi
 
 AC_MSG_CHECKING([which build configuration to use])
 
