@@ -1,0 +1,15 @@
+## This is a standard release configuration
+
+disable debug
+enable release
+enable warnings-as-errors
+disable silent-rules
+disable boot-progress
+disable pal-diagnostics
+disable self-tests
+disable trace
+disable debug-phasing
+disable debug-contexts
+disable debug-namespace
+disable debug-classes
+disable debug-memory

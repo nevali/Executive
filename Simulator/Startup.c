@@ -53,6 +53,7 @@ int
 main(int argc, char **argv, char **envp)
 {
 	TaskCreationParameters tcp;
+	STATUS status;
 
 	UNUSED__(argc);
 	UNUSED__(argv);
@@ -63,9 +64,9 @@ main(int argc, char **argv, char **envp)
 	tcp.mainThread_entrypoint = Simulator_mainThread;
 	tcp.name = argv[0];
 	tcp.namespace = executive.data.rootNS;
-	if(E_SUCCESS != ITasker_createTask(executive.data.tasker, &tcp, NULL, NULL))
+	if((status = ITasker_createTask(executive.data.tasker, &tcp, NULL, NULL)) < 0)
 	{
-		fprintf(stderr, "Simulator: ERROR: failed to create Simulator task\n");
+		fprintf(stderr, "Simulator: ERROR: failed to create Simulator task - %d\n", status);
 		abort();
 	}
 	Executive_runLoop(&executive);

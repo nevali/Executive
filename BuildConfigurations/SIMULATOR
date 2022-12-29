@@ -1,0 +1,7 @@
+# Just build the simulator, no PALs or actual kernel binaries
+
+ac_disable pals
+ac_disable modular
+ac_disable dynamic
+ac_disable targeted
+ac_disable monolith

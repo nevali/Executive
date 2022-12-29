@@ -31,8 +31,6 @@ AC_CONFIG_MACRO_DIR([M4])
 AC_CONFIG_AUX_DIR([BuildScripts])
 ## Detect the system type
 EXEC_CANONICAL_SYSTEM
-## Detect the toolchain (compiler/linker/etc.) type
-EX_CHECK_TOOLCHAIN
 ## By default, install plaform-specific files to a platform-specific
 ## subdirectory of '${prefix}'
 ##
@@ -41,6 +39,10 @@ EX_EXEC_PREFIX_DEFAULT(['${prefix}/${host_bindir}'])
 ## By default, install to a subdirectory of the build directory (override with
 ## e.g., "./configure --prefix=/opt/local")
 AC_PREFIX_DEFAULT([$(pwd)/BuildProducts])
+## Process the build configuration
+EX_CHECK_BUILDCONFIG
+## Detect the toolchain (compiler/linker/etc.) type
+EX_CHECK_TOOLCHAIN
 ## Determine which bundled developer tools to build and use
 EX_CHECK_DEVTOOLS
 ## Allow "./configure --disable-pals"

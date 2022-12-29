@@ -1,0 +1,20 @@
+# Default configuration, used if none other is specified at configure time via
+# EXEC_BUILD_CONFIG=xxx or --with-build-config=xxx (the latter overidding the
+# former)
+
+ac_enable debug
+ac_enable warnings-as-errors
+ac_disable silent-rules
+ac_enable monolith
+ac_enable boot-progress
+ac_enable pal-diagnostics
+ac_enable self-tests
+
+## These can be selectively enabled, or see also the FULLDEBUG build
+## configuration
+# ac_enable trace
+# ac_enable debug-phasing
+# ac_enable debug-contexts
+# ac_enable debug-namespace
+# ac_enable debug-classes
+# ac_enable debug-memory
