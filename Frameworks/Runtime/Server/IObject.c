@@ -21,7 +21,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Despatch.h"
+#include "p_Server.h"
 
 EXEC_DESPATCH_HANDLER(IObject)
 {

@@ -25,9 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
-
 EXTERN_C STATUS IIterator_Client_next(IIterator *me);
 EXTERN_C IObject *IIterator_Client_current(IIterator *me);
 
@@ -77,12 +74,3 @@ IIterator_Client_current(IIterator *me)
 	}
 	return (IObject *) outptr;
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#if !RUNTIME_BUILD_SIMULATOR
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-# include <Executive/IIterator.h>
-#endif

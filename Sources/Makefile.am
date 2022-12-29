@@ -35,7 +35,7 @@ libEntrypointServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_
 ## itself (but requires a PAL to function)
 
 libExecutiveServices_la_SOURCES = p_Executive.h \
-	BootEnvironment.c UUIDs.c
+	BootEnvironment.c
 libExecutiveServices_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
 libExecutiveServices_la_LIBADD = \
 	Executive/libExecutive.la \

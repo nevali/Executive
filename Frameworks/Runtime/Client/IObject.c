@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 struct IObject_vtable_ Runtime_Client_IObject_vtable = {
 	Runtime_Client_queryInterface,
 	Runtime_Client_release,
@@ -72,12 +70,3 @@ Runtime_Client_release(IObject *me)
 		RtMemFree(me);
 	});
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-#if !RUNTIME_BUILD_SIMULATOR
-# include <Runtime/IObject.h>
-#endif

@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 static void IRegion_Client_init_(IRegion_Client *client, int descriptor);
 
 static REFCOUNT IRegion_Client_retain_noop(IRegion *me);
@@ -212,14 +210,3 @@ IRegion_Client_bytes(IRegion *me)
 	ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IRegion_ID_bytes, &out);
 	return out;
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-#if !RUNTIME_BUILD_SIMULATOR
-#include <Executive/IRegion.h>
-#endif
-
-

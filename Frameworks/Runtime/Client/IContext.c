@@ -32,9 +32,3 @@ IContext_Client_create(int descriptor)
 
 	return NULL;
 }
-
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-#include <Executive/IContext.h>
-

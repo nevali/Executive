@@ -23,11 +23,9 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Client.h"
+#include "p_UUIDs.h"
 
 #define INITGUID                       1
 #include <Executive/initguid.h>
 
-#if !RUNTIME_BUILD_SIMULATOR
-# include <Runtime/IRegionHolder.h>
-#endif
+#include <Executive/IPlatform.h>

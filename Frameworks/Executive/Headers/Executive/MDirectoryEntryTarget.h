@@ -28,6 +28,7 @@ typedef struct MDirectoryEntryTarget MDirectoryEntryTarget;
  *  limitations under the License.
  */
 # include <Executive/IObject.h>
+# include <Executive/IDirectoryEntryTarget.h>
 
 /* MDirectoryEntryTarget version 0.0 */
 

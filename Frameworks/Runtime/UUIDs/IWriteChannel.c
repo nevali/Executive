@@ -18,15 +18,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 #ifdef HAVE_CONFIG_H
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Client.h"
+#include "p_UUIDs.h"
 
 #define INITGUID                       1
 #include <Executive/initguid.h>
 
-#if !RUNTIME_BUILD_SIMULATOR
-# include <Runtime/IAllocator.h>
-#endif
+#include <Executive/IWriteChannel.h>

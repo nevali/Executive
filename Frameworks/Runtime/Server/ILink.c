@@ -21,33 +21,21 @@
 # include "BuildConfiguration.h"
 #endif
 
-#include "p_Despatch.h"
+#include "p_Server.h"
 
-EXEC_DESPATCH_HANDLER(IIterator)
+EXEC_DESPATCH_HANDLER(ILink)
 {
-	EXEC_DESPATCH_BEGIN(IIterator)
+	EXEC_DESPATCH_BEGIN(ILink)
 	{
-		/* STATUS next(void); */
-		EXEC_DESPATCH_HANDLE(IIterator, next)
+		/* STATUS target(void); */
+		EXEC_DESPATCH_HANDLE(ILink, target)
 		{
-			despatch->syscall.status = IIterator_next(target);
-			return;
-		}
-		/* IObject *current(void); */
-		EXEC_DESPATCH_HANDLE(IIterator, current)
-		{
-			IObject *r2;
-			
-			r2 = IIterator_current(target);
-			if(NULL == r2)
-			{
-				despatch->syscall.status = E_NOMEM;
-				return;
-			}
-			despatch->syscall.status = E_SUCCESS;
-			EXEC_DESPATCH_DESCRIPTOR(despatch->syscall.arg[2], context, r2, ((REFUUID) &IID_IObject));
+			char *r2;
+			EXEC_DESPATCH_XFER_OUT_FROM_USER(despatch->syscall.arg[2], r2, despatch->syscall.arg[3]);
+			despatch->syscall.status = ILink_target(target, r2, despatch->syscall.arg[3]);
+			EXEC_DESPATCH_XFER_OUT_TO_USER(despatch->syscall.arg[2], r2, despatch->syscall.arg[3]);
 			return;
 		}
 	}
-	EXEC_DESPATCH_END(IIterator);
+	EXEC_DESPATCH_END(ILink);
 }

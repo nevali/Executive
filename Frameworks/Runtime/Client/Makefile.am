@@ -17,23 +17,11 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-noinst_LTLIBRARIES = libExecRuntimeClient.la libRuntimeClient.la
+noinst_LTLIBRARIES = libRuntimeClient.la
 
-if BUILD_SIMULATOR
-
-noinst_LTLIBRARIES += libSimRuntimeClient.la
-
-endif
-
-libExecRuntimeClient_la_SOURCES = p_Client.h \
-	IObject.c IAllocator.c IRegionHolder.c
-libExecRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
-
-libRuntimeClient_la_SOURCES = $(libExecRuntimeClient_la_SOURCES) Client.c \
-	INamespace.c ITask.c IThread.c IAddressSpace.c IContext.c IRegion.c \
-	IWriteChannel.c IContainer.c IMutableContainer.c IDirectoryEntry.c \
-	ILink.c IIterator.c
+libRuntimeClient_la_SOURCES = p_Client.h \
+	Client.c \
+	IObject.c INamespace.c ITask.c IThread.c IAddressSpace.c IContext.c \
+	IRegion.c IWriteChannel.c IContainer.c IMutableContainer.c \
+	IDirectoryEntry.c ILink.c IIterator.c
 libRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_USER=1
-
-libSimRuntimeClient_la_SOURCES = $(libRuntimeClient_la_SOURCES)
-libSimRuntimeClient_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_SIMULATOR=1

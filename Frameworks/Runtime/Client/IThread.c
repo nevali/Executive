@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 static THREADID IThread_Client_id(IThread *me);
 static ThreadFlags IThread_Client_flags(IThread *me);
 static STATUS IThread_Client_task(IThread *me, REFUUID iid, void **out);
@@ -158,13 +156,3 @@ IThread_Client_sleepSeconds(IThread *me, int seconds)
 {
 	return ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IThread_ID_sleepSeconds, seconds);
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-#if !RUNTIME_BUILD_SIMULATOR
-# include <Runtime/IThread.h>
-#endif
-

@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 static size_t IWriteChannel_Client_send(IWriteChannel *me, const uint8_t *buf, size_t buflen);
 static size_t IWriteChannel_Client_write(IWriteChannel *me, const char *str);
 static size_t IWriteChannel_Client_writeLn(IWriteChannel *me, const char *str);
@@ -88,12 +86,3 @@ IWriteChannel_Client_writeLn(IWriteChannel *me, const char *str)
 	}
 	return 0;
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-#if !RUNTIME_BUILD_SIMULATOR
-# include <Executive/IWriteChannel.h>
-#endif

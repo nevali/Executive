@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 static STATUS IDirectoryEntry_Client_queryTargetInterface(IDirectoryEntry *self, REFUUID iid, void **out);
 static STATUS IDirectoryEntry_Client_name(IDirectoryEntry *self, char *buf, size_t bufsize);
 static void IDirectoryEntry_Client_classid(IDirectoryEntry *self, UUID *classid);
@@ -100,12 +98,3 @@ IDirectoryEntry_Client_setFlags(IDirectoryEntry *me, DirectoryEntryFlags flags)
 {
 	return ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, IDirectoryEntry_ID_setFlags, flags);
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#if !RUNTIME_BUILD_SIMULATOR
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-# include <Executive/IDirectoryEntry.h>
-#endif

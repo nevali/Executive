@@ -163,38 +163,6 @@ Executive_unlinked(IDirectoryEntryTarget *me, IDirectoryEntry *entry)
 	}
 }
 
-/** Executive runtime APIs */
-void
-Executive_panic(const char *str)
-{
-	IPlatform_panic(executive.data.platform, str);
-}
-
-void
-Executive_log(int level, const char *str)
-{
-	if(executive.data.diagnostics)
-	{
-		 IPlatformDiagnostics_log(executive.data.diagnostics, level, str);
-	}
-}
-
-void *
-Executive_alloc(size_t nbytes)
-{
-	return IAllocator_alloc(executive.data.allocator, nbytes);
-}
-void *
-Executive_realloc(void *ptr, size_t nbytes)
-{
-	return IAllocator_realloc(executive.data.allocator, ptr, nbytes);
-}
-
-void
-Executive_free(void *ptr)
-{
-	IAllocator_free(executive.data.allocator, ptr);
-}
 
 void
 Executive_yield(void)

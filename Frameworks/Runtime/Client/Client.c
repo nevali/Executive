@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 Runtime_Client *
 Runtime_Client_create(int descriptor)
 {
@@ -101,5 +99,3 @@ Runtime_Client_createFor(int descriptor, REFUUID iid, void **out)
 	RTLOGF((LOG_ERROR, "Runtime: ERROR: constructor for iid:" UUID_PRINTF_FORMAT " failed"));
 	return E_NOTIMPL;
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/

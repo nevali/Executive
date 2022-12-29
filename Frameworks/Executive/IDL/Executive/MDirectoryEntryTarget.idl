@@ -19,9 +19,9 @@ cpp_quote(" *  limitations under the License.");
 cpp_quote(" */");
 
 import "Executive/IObject.idl";
+import "Executive/IDirectoryEntryTarget.idl";
 
 interface IDirectoryEntry;
-interface IDirectoryEntryTarget;
 
 [
 	object,

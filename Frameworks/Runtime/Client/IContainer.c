@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 EXTERN_C STATUS IContainer_Client_resolve(IContainer *me, const char *name, IDirectoryEntry **entry);
 EXTERN_C IIterator *IContainer_Client_iterator(IContainer *me);
 
@@ -94,13 +92,3 @@ EXTERN_C IIterator *IContainer_Client_iterator(IContainer *me)
 	}
 	return (IIterator *) outptr;
 }
-
-#endif /*!#if !RUNTIME_BUILD_EXEC*/
-
-#if !RUNTIME_BUILD_SIMULATOR
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-# include <Executive/IContainer.h>
-#endif
-

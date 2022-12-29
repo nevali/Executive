@@ -25,9 +25,7 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
-EXTERN_C STATUS ILink_Client_target(ILink *me, char *buf, size_t bufsize);
+static STATUS ILink_Client_target(ILink *me, char *buf, size_t bufsize);
 
 static struct ILink_vtable_ ILink_Client_vtable = {
 	RUNTIME_VTABLE_IOBJECT(Runtime_Client, ILink),
@@ -52,12 +50,3 @@ ILink_Client_target(ILink *me, char *buf, size_t bufsize)
 {
 	return ExSystemCall(INTF_TO_CLASS(me)->data.descriptor, ILink_ID_target, buf, bufsize);
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#if RUNTIME_BUILD_USER
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-# include <Executive/ILink.h>
-#endif

@@ -9,6 +9,9 @@ An experimental minimal microkernel.
 
 * DeveloperTools/uuid
 
+* !! STATUS CONDITIONS RATIONALISATION + UTILITIES
+* Structured diagnostic reporting
+
 * Signals / despatch / process contexts for callbacks
 * Move server-side stubs into the Runtime
 * Reserved descriptors
@@ -21,7 +24,7 @@ An experimental minimal microkernel.
 * Build: --enable-native-glue (build native glue on hosted build if one is available)
 * Toolchain checks
 * Short-cuts feature flag -- whether inter-module access is strictly via accessors, or direct access to data structures
-
+* Descriptor -> interface pointer acceleration for shared address spaces, but with "Enforce system calls" feature flag
 * Runtime: libc - implement a basic c90 libc (no descriptors, only streams, no fork, etc.)
 
 * Startup (? Boot?) Archive - initramfs for the object directory, more widely useful than hostfs

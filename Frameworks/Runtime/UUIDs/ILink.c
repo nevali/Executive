@@ -1,5 +1,7 @@
 /* Executive Microkernel
- * Runtime framework
+ * Runtime Framework
+ *   This framework provides low-level user-space APIs to applications, via
+ *   the Executive's system call mechanism
  */
 
 /* Copyright 2015-2022 Mo McRoberts.
@@ -17,17 +19,13 @@
  *  limitations under the License.
  */
 
-#ifndef RUNTIME_TASK_H_
-# define RUNTIME_TASK_H_               1
+#ifdef HAVE_CONFIG_H
+# include "BuildConfiguration.h"
+#endif
 
-# include <Runtime/IThread.h>
-# include <Executive/ITask.h>
-# include <Executive/IJob.h>
-# include <Executive/INamespace.h>
+#include "p_UUIDs.h"
 
-EXTERN_C void RtYield(void) RUNTIME_LINKAGE__(RtYield);
+#define INITGUID                       1
+#include <Executive/initguid.h>
 
-/* Program main routine */
-EXTERN_C STATUS mainThread(IThread *self);
-
-#endif /*!RUNTIME_TASK_H_*/
+#include <Executive/ILink.h>

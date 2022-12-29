@@ -17,8 +17,7 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-#SUBDIRS = IDL Headers ThirdParty Client .
-SUBDIRS = Headers ThirdParty Client .
+SUBDIRS = Headers ThirdParty Client Server UUIDs .
 
 lib_LTLIBRARIES = libRuntime.la
 
@@ -36,14 +35,23 @@ endif
 ## The ExecRuntime library contains the subset of the Runtime framework useable
 ## within the Executive
 
-libExecRuntime_la_SOURCES = Memory.c Allocator.c Strings.c UUID.c Status.c Log.c Namespace.c
+libExecRuntime_la_SOURCES = Memory.c Allocator.c Strings.c UUID.c Status.c Log.c Namespace.c Task.c
 libExecRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
-libExecRuntime_la_LIBADD = ThirdParty/libExecRuntimeThirdParty.la Client/libExecRuntimeClient.la
+libExecRuntime_la_LIBADD = \
+	ThirdParty/libExecRuntimeThirdParty.la \
+	Server/libExecRuntimeServer.la \
+	UUIDs/libExecRuntimeUUIDs.la
 libExecRuntime_la_LDFLAGS = -export-symbols-regex '^_?EXECUTIVE__'
+
+## The standard runtime
 
 libRuntime_la_SOURCES = $(libExecRuntime_la_SOURCES) Private.c
 libRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_USER=1
-libRuntime_la_LIBADD = ThirdParty/libRuntimeThirdParty.la Client/libRuntimeClient.la ../Executive/libExecutive.la
+libRuntime_la_LIBADD = \
+	ThirdParty/libRuntimeThirdParty.la \
+	Client/libRuntimeClient.la \
+	UUIDs/libRuntimeUUIDs.la \
+	../Executive/libExecutive.la
 libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir) -export-symbols-regex '^_?RUNTIME__'
 
 ## The Simulator variant replaces the Executive system call mechanism with a
@@ -52,5 +60,8 @@ libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir) -export-sy
 
 libSimRuntime_la_SOURCES = $(libRuntime_la_SOURCES)
 libSimRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_SIMULATOR=1
-libSimRuntime_la_LIBADD = ThirdParty/libSimRuntimeThirdParty.la Client/libSimRuntimeClient.la
+libSimRuntime_la_LIBADD = \
+	ThirdParty/libSimRuntimeThirdParty.la \
+	Client/libRuntimeClient.la \
+	UUIDs/libSimRuntimeUUIDs.la
 libSimRuntime_la_LDFLAGS = -export-symbols-regex '^_?SIMULATOR__'

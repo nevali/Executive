@@ -25,9 +25,4 @@
 
 #include "p_Client.h"
 
-#if RUNTIME_BUILD_USER
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-# include <Executive/IMutableContainer.h>
-#endif
+/* XXX */

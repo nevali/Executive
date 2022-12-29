@@ -1,5 +1,8 @@
 /* Executive Microkernel
- *   PrivateHeaders/Executive/Internal/Runtime.h
+ * PrivateHeaders/Executive/Internal/Runtime.h
+ *   Defines the internal runtime APIs available to the executive. These are
+ *   mapped to the subset of RtXXX() APIs that are included in the Executive's
+ *   Mini-Runtime
  */
 
 /* Copyright (c) 2015-2022 Mo McRoberts.
@@ -31,13 +34,14 @@
 # include <Executive/IAllocator.h>
 # include <Executive/IAddressSpace.h>
 
+/* This needs to be a better-defined interface */
 EXTERN_C IAllocator *RtAllocator_create(IAddressSpace *addressSpace) RUNTIME_PRIVATE__(RtAllocator_create);
 
 # define ExPanic(str)                  Executive_panic(str)
 # define ExAlloc(nbytes)               RtMemAlloc(nbytes)
 # define ExReAlloc(ptr, nbytes)        RtMemReAlloc(ptr, nbytes)
 # define ExFree(ptr)                   RtMemFree(ptr)
-# define ExYield()                     Executive_yield()
+# define ExYield()                     RtYield()
 # define ExLog(level, str)             RtLog(level, str)
 
 # define STR__(x)                      STR2__(x)
@@ -92,13 +96,11 @@ EXTERN_C IAllocator *RtAllocator_create(IAddressSpace *addressSpace) RUNTIME_PRI
 # else
 #  define EXLOGF(P)                    RtLogFormat P
 #  define ExAssert__(cond, file, line)  if(!(cond)) { ExAssertPanic__(#cond, file, line); }
-#  define ExAssertPanic__(cond, file, line) ExPanic("ASSERTION FAILED: " cond " at " file ":" line)
+#  define ExAssertPanic__(cond, file, line) RtPanic("ASSERTION FAILED: " cond " at " file ":" line)
 # endif
 #  define ExAssert(cond)               ExAssert__(cond, __FILE__, STR__(__LINE__))
 
+/* This does not belong here */
 EXTERN_C STATUS Executive_metaClass(REFUUID clsid, REFUUID iid, void **out);
-
-EXTERN_C void Executive_panic(const char *str);
-EXTERN_C void Executive_yield(void);
 
 #endif /*EXECUTIVE_INTERNAL_RUNTIME_H_*/

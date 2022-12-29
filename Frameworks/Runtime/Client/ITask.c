@@ -23,10 +23,7 @@
 # include "BuildConfiguration.h"
 #endif
 
-
 #include "p_Client.h"
-
-#if !RUNTIME_BUILD_EXEC
 
 static TASKID ITask_Client_id(ITask *me);
 static TaskFlags ITask_Client_flags(ITask *me);
@@ -157,13 +154,3 @@ ITask_Client_addressSpace(ITask *me, REFUUID iid, void **out)
 	}
 	return status;
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-#if !RUNTIME_BUILD_SIMULATOR
-# include <Executive/ITask.h>
-#endif
-

@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 static STATUS IAddressSpace_Client_regionFromPointer(IAddressSpace *me, void *ptr, IRegion **region);
 static int IAddressSpace_Client_pageSize(IAddressSpace *me);
 static STATUS IAddressSpace_Client_obtainRegion(IAddressSpace *me, size_t count, RegionFlags flags, IRegionHolder *owner, IRegion **region);
@@ -180,12 +178,3 @@ IAddressSpace_Client_createContext(IAddressSpace *me, IThread *thread, void *sta
 
 	return E_NOTIMPL;
 }
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-#if !RUNTIME_BUILD_SIMULATOR
-# include <Executive/IAddressSpace.h>
-#endif
-

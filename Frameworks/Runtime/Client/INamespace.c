@@ -25,8 +25,6 @@
 
 #include "p_Client.h"
 
-#if !RUNTIME_BUILD_EXEC
-
 static STATUS INamespace_Client_resolveEntry(INamespace *me, const char *path, IContainer *scope, IDirectoryEntry **dentry);
 static STATUS INamespace_Client_resolveContainer(INamespace *me, const char *path, IContainer *scope, IContainer **container, const char **basename);
 static STATUS INamespace_Client_open(INamespace *me, const char *path, IContainer *scope, REFUUID iid, void **out);
@@ -176,12 +174,3 @@ INamespace_Client_setFlags(INamespace *me, const char *path, IContainer *scope, 
 	return status;
 
 }
-
-#endif /*!RUNTIME_BUILD_EXEC*/
-
-#define INITGUID                       1
-#include <Executive/initguid.h>
-
-#if !RUNTIME_BUILD_SIMULATOR
-# include <Executive/INamespace.h>
-#endif
