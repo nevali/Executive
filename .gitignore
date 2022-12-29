@@ -19,8 +19,11 @@ Makefile
 Makefile.in
 confdefs.h
 conftest.*
+*.Simulator
 /BuildProducts
+/Executive.Dynamic
 /Executive.Dynamic.*
+/Executive.Modular
 /Executive.Modular.*
 /Executive.Monolith.*
 /Executive.Targeted.*
