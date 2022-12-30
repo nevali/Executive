@@ -277,3 +277,7 @@ Bootstrap_init_container(Bootstrap *self)
 	IMutableContainer_add((self->data.container), "Startup", &CLSID_Executive_Executable, (void *) &Bootstrap_startupTask);
 	ExLog(PROGRESS_LOGLEVEL, "Bootstrap subsystem objects initialised.");
 }
+
+#define INITGUID 1
+#include <Executive/initguid.h>
+#include <Executive/IExecutable.h>

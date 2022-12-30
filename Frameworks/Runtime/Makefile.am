@@ -40,8 +40,8 @@ libExecRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_E
 libExecRuntime_la_LIBADD = \
 	ThirdParty/libExecRuntimeThirdParty.la \
 	Server/libExecRuntimeServer.la \
-	UUIDs/libExecRuntimeUUIDs.la
-libExecRuntime_la_LDFLAGS = -export-symbols-regex '^_?EXECUTIVE__'
+	../Executive/UUIDs/libExecutiveUUIDs.la
+libExecRuntime_la_LDFLAGS = -export-symbols-regex '^_?(EXECUTIVE__|IID_|CLSID_)'
 
 ## The standard runtime
 
@@ -52,7 +52,7 @@ libRuntime_la_LIBADD = \
 	Client/libRuntimeClient.la \
 	UUIDs/libRuntimeUUIDs.la \
 	../Executive/libExecutive.la
-libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir) -export-symbols-regex '^_?RUNTIME__'
+libRuntime_la_LDFLAGS = -no-undefined -avoid-version -rpath $(libdir) -export-symbols-regex '^_?(RUNTIME__|IID_|CLSID_)'
 
 ## The Simulator variant replaces the Executive system call mechanism with a
 ## simulated implementation, primarily to aid in low-level development and
@@ -63,5 +63,5 @@ libSimRuntime_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_SI
 libSimRuntime_la_LIBADD = \
 	ThirdParty/libSimRuntimeThirdParty.la \
 	Client/libRuntimeClient.la \
-	UUIDs/libSimRuntimeUUIDs.la
-libSimRuntime_la_LDFLAGS = -export-symbols-regex '^_?SIMULATOR__'
+	UUIDs/libRuntimeUUIDs.la
+libSimRuntime_la_LDFLAGS = -export-symbols-regex '^_?(SIMULATOR__|IID_|CLSID_)'

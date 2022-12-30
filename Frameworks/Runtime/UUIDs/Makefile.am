@@ -32,28 +32,8 @@
 # Classes and interfaces that don't ever get referenced by UUID aren't
 # included
 
-noinst_LTLIBRARIES = libExecRuntimeUUIDs.la libRuntimeUUIDs.la
+noinst_LTLIBRARIES = libRuntimeUUIDs.la
 
-if BUILD_SIMULATOR
-
-noinst_LTLIBRARIES += libSimRuntimeUUIDs.la
-
-endif
-
-libExecRuntimeUUIDs_la_SOURCES = p_UUIDs.h \
-	Classes.c \
-	IObject.c IAllocator.c IRegionHolder.c IBootEnvironment.c \
-	IDirectoryEntryTarget.c IPlatform.c IPlatformDiagnostics.c \
-	ISubsystem.c ITasker.c IAddressSpace.c IContainer.c \
-	IDirectoryEntry.c IIterator.c ILink.c IMutableContainer.c \
-	INamespace.c ITask.c IThread.c IWriteChannel.c IExecutable.c \
-	\
-	MObject.c MDirectoryEntryTarget.c MFactory.c
-libExecRuntimeUUIDs_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_EXEC=1
-
-libSimRuntimeUUIDs_la_SOURCES = p_UUIDs.h \
+libRuntimeUUIDs_la_SOURCES = p_UUIDs.h \
 	IContext.c IRegion.c
-libSimRuntimeUUIDs_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_SIMULATOR=1
-
-libRuntimeUUIDs_la_SOURCES = $(libExecRuntimeUUIDs_la_SOURCES) $(libSimRuntimeUUIDs_la_SOURCES)
-libRuntimeUUIDs_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS} -DRUNTIME_BUILD_USER=1
+libRuntimeUUIDs_la_CPPFLAGS = @AM_CPPFLAGS@ ${WARNING_CPPFLAGS}

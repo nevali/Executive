@@ -102,6 +102,7 @@ Frameworks/Executive/IDL/Makefile
 Frameworks/Executive/IDL/Executive/Makefile
 Frameworks/Executive/Headers/Makefile
 Frameworks/Executive/Headers/Executive/Makefile
+Frameworks/Executive/UUIDs/Makefile
 Frameworks/PAL/Makefile
 Frameworks/PAL/Headers/Makefile
 Frameworks/PAL/Headers/PAL/Makefile

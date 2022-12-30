@@ -1,0 +1,6 @@
+{
+	"name": "Executive",
+	"service": "devcontainer",
+	"dockerComposeFile": "devcontainer.yaml",
+	"workspaceFolder": "/workspace"
+}

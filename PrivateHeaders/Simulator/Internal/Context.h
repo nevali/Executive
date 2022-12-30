@@ -10,7 +10,7 @@ namespace PAL
 		class AddressSpace;
 		class Context;
 
-		struct IContextPrivate: virtual public IObject
+		struct IContextPrivate: public IObject
 		{
 			virtual Context *self(void) = 0;
 		};

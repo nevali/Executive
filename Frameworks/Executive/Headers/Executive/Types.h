@@ -24,15 +24,18 @@
  */
 
 #include <Executive/Linkage.h>
-#if defined(__STDC_VERSION__) && __STDC_VERSION__
+#if defined(__cplusplus)
+# include <cstddef>
+# include <cstdint>
+# include <cstdarg>
+# include <climits>
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__
 # include <stddef.h>
 # include <stdint.h>
 # include <stdarg.h>
 # include <limits.h>
 # if __STDC_VERSION__ >= 199901L
-#  ifndef __cplusplus
-#   include <stdbool.h>
-#  endif
+#  include <stdbool.h>
 #  include <stdalign.h>
 #  include <stdnoreturn.h>
 # endif /*C99*/

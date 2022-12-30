@@ -20,6 +20,8 @@
 #ifndef P_DESPATCH_H_
 # define P_DESPATCH_H_
 
+# define INITGUID_EXTERN               1
+
 # include <Executive/MObject.h>
 
 # include <Executive/Internal/Runtime.h>

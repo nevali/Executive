@@ -5,7 +5,7 @@
  * as a UUID is generally displayed)
  */
 # define UUID_INIT__(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15) \
-	{ { ((d0) << 24) | ((d1) << 16) | ((d2) << 8) | (d3), \
+	{ { ((uint32_t)(d0) << 24) | ((uint32_t)(d1) << 16) | ((uint32_t)(d2) << 8) | (uint32_t)(d3), \
 	((d4) << 8) | (d5), \
 	((d6) << 8) | (d7), \
 	d8, \

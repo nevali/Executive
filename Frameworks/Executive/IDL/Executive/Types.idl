@@ -21,18 +21,21 @@ cpp_quote("");
 
 cpp_quote("#include <Executive/Linkage.h>");
 
-cpp_quote("#if defined(__STDC_VERSION__) && __STDC_VERSION__")
+cpp_quote("#if defined(__cplusplus)");
+cpp_quote("# include <cstddef>");
+cpp_quote("# include <cstdint>");
+cpp_quote("# include <cstdarg>");
+cpp_quote("# include <climits>");
+cpp_quote("#elif defined(__STDC_VERSION__) && __STDC_VERSION__")
 cpp_quote("# include <stddef.h>");
 cpp_quote("# include <stdint.h>");
 cpp_quote("# include <stdarg.h>");
 cpp_quote("# include <limits.h>");
 cpp_quote("# if __STDC_VERSION__ >= 199901L")
-cpp_quote("#  ifndef __cplusplus");
-cpp_quote("#   include <stdbool.h>");
-cpp_quote("#  endif");
+cpp_quote("#  include <stdbool.h>");
 cpp_quote("#  include <stdalign.h>");
 cpp_quote("#  include <stdnoreturn.h>");
-cpp_quote("# endif /*C99*/")
+cpp_quote("# endif /*C99*/");
 cpp_quote("#endif /*__STDC__*/");
 cpp_quote("#if defined(__arm64__) || defined(__aarch64__)");
 cpp_quote("# include <Executive/arm64/Types.h>");

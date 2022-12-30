@@ -19,7 +19,14 @@ operator new(unsigned long nbytes)
 void
 operator delete(void *ptr)
 {
-	return free(ptr);
+	free(ptr);
+}
+
+void
+operator delete(void *ptr, long unsigned int nbytes)
+{
+	UNUSED__(nbytes);
+	free(ptr);
 }
 
 EXTERN_C STATUS

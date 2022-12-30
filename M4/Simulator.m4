@@ -7,7 +7,7 @@ AM_CONDITIONAL([BUILD_SIMULATOR],[test x$exec_build_simulator = xyes])
 if test x$exec_build_simulator = xyes ; then
 	LT_LANG([CXX])
 	if test $GXX = yes ; then
-		AS_VAR_APPEND([AM_CXXFLAGS], [" -fno-rtti -fno-exceptions"])
+		AS_VAR_APPEND([AM_CXXFLAGS], [" -fno-rtti -fno-exceptions -Wno-inaccessible-base"])
 	fi
 fi
 ])

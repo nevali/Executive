@@ -16,10 +16,10 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-SUBDIRS = IDL Headers .
+SUBDIRS = IDL Headers UUIDs .
 
 lib_LTLIBRARIES = libExecutive.la
 
 libExecutive_la_SOURCES = Executive-stubs.c
-
+libExecutive_la_LIBADD = UUIDs/libExecutiveUUIDs.la
 libExecutive_la_LDFLAGS = -avoid-version -rpath $(libdir)

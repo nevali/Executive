@@ -123,5 +123,21 @@ RUN ./configure --prefix="" --host=i86-pc-msdos --disable-idl CC="bcc -ansi -0 -
 FROM scratch AS dos-x86-bcc-bake
 COPY --from=dos-x86-bcc-build /dest/ /
 
-FROM --platform=$BUILDPLATFORM host-base AS devcontainer
+## Devcontainer
+
+FROM --platform=$BUILDPLATFORM hostbase AS devcontainer
+RUN apt-get install curl gnupg apt-transport-https ca-certificates lsb-release apt-utils dialog
+RUN mkdir /workspace /me
+VOLUME /me
+WORKDIR /me
+RUN sed -i -e "s@:/root:@:/me:@" /etc/passwd
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+RUN echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt-get update
+RUN apt-get upgrade
+RUN apt-get install docker-ce docker-ce-cli containerd.io
+RUN apt-get install git less openssh-client
+
 
