@@ -14,3 +14,4 @@ check_PROGRAMS = GlueTest
 
 GlueTest_SOURCES = entry.c test-stubs.c
 GlueTest_CPPFLAGS = ${AM_CPPFLAGS} -DEXEC_BUILD_DYNAMIC=1
+GlueTest_LDADD = @EXEC_GLUE_DYNAMIC_LIBS@

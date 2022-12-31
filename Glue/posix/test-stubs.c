@@ -1,2 +1,2 @@
-#include "../../../Stubs/PAL-stubs.c"
-#include "../../../Stubs/Executive-stubs.c"
+#include "../../Frameworks/PAL/PAL-stubs.c"
+#include "../../Frameworks/Executive/Executive-stubs.c"
