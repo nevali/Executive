@@ -13,4 +13,13 @@
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 
-dist_noinst_DATA = *.idl
+dist_noinst_DATA = Errors.idl Types.idl UUID.idl \
+	\
+	IAddressSpace.idl IAllocator.idl IBootEnvironment.idl IContainer.idl \
+	IContext.idl IDespatchContext.idl IDirectoryEntry.idl \
+	IDirectoryEntryTarget.idl IEvent.idl IExecutable.idl IIterator.idl \
+	IJob.idl ILink.idl IMutableContainer.idl INamespace.idl IObject.idl \
+	IPlatform.idl IPlatformDiagnostics.idl IRegion.idl IRegionHolder.idl \
+	ISubsystem.idl ITask.idl ITasker.idl IThread.idl IWriteChannel.idl \
+	\
+	MDirectoryEntryTarget.idl MFactory.idl MObject.idl

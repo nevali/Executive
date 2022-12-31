@@ -23,6 +23,8 @@ docker-bake.hcl
 BuildProducts
 Executive.Monolith.*
 Executive.Targeted.*
+Executive.Modular.*
+Executive.Dynamic.*
 **/configure
 **/autom4te.cache
 **/depcomp

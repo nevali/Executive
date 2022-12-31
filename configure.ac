@@ -112,6 +112,7 @@ Frameworks/Runtime/IDL/Runtime/Makefile
 Frameworks/Runtime/Headers/Makefile
 Frameworks/Runtime/Headers/Runtime/Makefile
 Frameworks/Runtime/ThirdParty/Makefile
+Frameworks/Runtime/ThirdParty/c99-snprintf/Makefile
 Frameworks/Runtime/ThirdParty/dlmalloc/Makefile
 Frameworks/Runtime/Client/Makefile
 Frameworks/Runtime/Server/Makefile
